@@ -7,12 +7,16 @@
 </picture>
 
 [![CI](https://github.com/Builder106/CapitolAlpha/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/CapitolAlpha/actions/workflows/ci.yml)
+[![Deploy](https://github.com/Builder106/CapitolAlpha/actions/workflows/deploy.yml/badge.svg)](https://github.com/Builder106/CapitolAlpha/actions/workflows/deploy.yml)
+[![Live site](https://img.shields.io/badge/findings-live-success.svg)](https://capitolalpha.vercel.app)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![Playwright](https://img.shields.io/badge/Playwright-scraping-2EAD33.svg?logo=playwright&logoColor=white)](https://playwright.dev/python/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](#license)
 [![Course](https://img.shields.io/badge/Wesleyan-QAC%20420-CC0000.svg)](https://www.wesleyan.edu/qac/)
 
 > Members of Congress disclosed **16,203 stock trades** between 2020 and 2024. Their *purchases* beat the S&P 500 by an average of **+2.58%** over the following 90 days &mdash; statistically significant at p&nbsp;<&nbsp;0.05. This repo is the end-to-end pipeline behind that finding.
+
+**Findings page:** [capitolalpha.vercel.app](https://capitolalpha.vercel.app) &mdash; the headline stat, the four charts, and the PDFs in one place. The Python pipeline that produced them lives in this repo.
 
 ## What this is
 
