@@ -6,119 +6,223 @@
 <title>CapitolAlpha — A statistically significant edge in 16,203 Congressional trades</title>
 <meta name="description" content="Members of Congress disclosed 16,203 stock trades between 2020 and 2024. Their purchases beat the S&P 500 by +2.58% over 90 days, statistically significant at p < 0.05. A QAC 420 project at Wesleyan.">
 <meta name="author" content="Yinka Vaughan">
+<meta name="theme-color" content="#0a1628" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3ede0" media="(prefers-color-scheme: light)">
 <meta property="og:title" content="CapitolAlpha — +2.58% alpha on Congressional purchases">
 <meta property="og:description" content="A reproducible pipeline analyzing 16,203 disclosed Congressional trades (2020–2024). QAC 420, Wesleyan.">
 <meta property="og:image" content="/social-card.png">
 <meta property="og:type" content="article">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/svg+xml" href="/banner-dark.svg">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="canonical" href="https://capitolalpha.vercel.app/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
 <script defer src="/_vercel/insights/script.js"></script>
 <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 <body>
 
-<header class="hero">
+<header class="masthead">
   <div class="container">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="/banner-dark.svg">
-      <source media="(prefers-color-scheme: light)" srcset="/banner-light.svg">
-      <img class="banner" alt="CapitolAlpha — The edge hiding in 16,203 disclosed Congressional trades. Senate + House Periodic Transaction Reports, 2020–2024. +2.58% Jensen's alpha at 90 days, p < 0.05." src="/banner-dark.svg" width="1200" height="420">
-    </picture>
+    <p class="folio">
+      <span>Wesleyan University</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>QAC 420 &mdash; <em>Data for Good</em></span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Spring 2025</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Vol.&nbsp;I, No.&nbsp;1</span>
+    </p>
+    <h1 class="title">CapitolAlpha</h1>
+    <p class="kicker">A statistical investigation</p>
+    <p class="dek">The edge hiding in <strong>16,203</strong> disclosed Congressional trades. Senate and House Periodic Transaction Reports, 2020&ndash;2024.</p>
   </div>
 </header>
+
+<section class="hero-stat" aria-labelledby="headline-finding">
+  <div class="container">
+    <div class="hero-rule" aria-hidden="true"></div>
+    <p class="hero-eyebrow" id="headline-finding">The headline finding</p>
+    <div class="hero-number" aria-label="plus 2.58 percent">
+      <span class="sign">+</span><span class="digits">2.58</span><span class="unit">%</span>
+    </div>
+    <p class="hero-label">90-day Jensen&rsquo;s alpha vs.&nbsp;S&amp;P&nbsp;500</p>
+    <p class="hero-meta">
+      <span>t&nbsp;=&nbsp;2.51</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>p&nbsp;=&nbsp;0.013</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>n&nbsp;=&nbsp;220</span>
+    </p>
+    <div class="hero-rule" aria-hidden="true"></div>
+  </div>
+</section>
+
+<aside class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="ticker-item">ICE</span>
+    <span class="ticker-item">SPY</span>
+    <span class="ticker-item">CDLX</span>
+    <span class="ticker-item">AAPL</span>
+    <span class="ticker-item">NFLX</span>
+    <span class="ticker-item">MSFT</span>
+    <span class="ticker-item">NVDA</span>
+    <span class="ticker-item">PRU</span>
+    <span class="ticker-item">AIZ</span>
+    <span class="ticker-item">DIS</span>
+    <span class="ticker-item">BA</span>
+    <span class="ticker-item">V</span>
+    <span class="ticker-item">COST</span>
+    <span class="ticker-item">TMO</span>
+    <span class="ticker-item">BYND</span>
+    <span class="ticker-item">ICE</span>
+    <span class="ticker-item">SPY</span>
+    <span class="ticker-item">CDLX</span>
+    <span class="ticker-item">AAPL</span>
+    <span class="ticker-item">NFLX</span>
+    <span class="ticker-item">MSFT</span>
+    <span class="ticker-item">NVDA</span>
+    <span class="ticker-item">PRU</span>
+    <span class="ticker-item">AIZ</span>
+    <span class="ticker-item">DIS</span>
+    <span class="ticker-item">BA</span>
+    <span class="ticker-item">V</span>
+    <span class="ticker-item">COST</span>
+    <span class="ticker-item">TMO</span>
+    <span class="ticker-item">BYND</span>
+  </div>
+</aside>
 
 <main class="container">
 
 <section class="lede">
-  <p>Members of Congress disclosed <strong>16,203 stock trades</strong> between 2020 and 2024. The 220 purchases we could cleanly benchmark against the S&amp;P 500 beat the index by an average of <strong>+2.58%</strong> over the following 90 days — statistically significant at <em>p</em>&nbsp;&lt;&nbsp;0.05.</p>
-  <p class="meta">A semester project for <a href="https://www.wesleyan.edu/qac/">QAC 420 — <em>Data for Good</em></a> at Wesleyan. Code, dataset, and statistical workup on <a href="https://github.com/Builder106/CapitolAlpha">GitHub</a>.</p>
+  <p><span class="dropcap">M</span>embers of Congress disclosed <strong>16,203 stock trades</strong> between 2020 and 2024. The 220 purchases we could cleanly benchmark against the S&amp;P&nbsp;500 beat the index by an average of <strong>+2.58%</strong> over the following 90 days &mdash; statistically significant at <em>p</em>&nbsp;&lt;&nbsp;0.05.</p>
+  <p class="byline">A semester project for <a href="https://www.wesleyan.edu/qac/">QAC 420 &mdash; <em>Data for Good</em></a> at Wesleyan. Code, dataset, and statistical workup on <a href="https://github.com/Builder106/CapitolAlpha">GitHub</a>.</p>
 </section>
 
-<section class="numbers">
-  <div class="stat">
-    <div class="stat-value">+2.58%</div>
-    <div class="stat-label">90-day Jensen's alpha</div>
-    <div class="stat-sub">vs. S&amp;P 500, p&nbsp;=&nbsp;0.013</div>
-  </div>
-  <div class="stat">
-    <div class="stat-value">13.74%</div>
-    <div class="stat-label">90-day buy-and-hold ROI</div>
-    <div class="stat-sub">averaged across 220 purchases</div>
-  </div>
-  <div class="stat">
-    <div class="stat-value">2.51</div>
-    <div class="stat-label">t-statistic</div>
-    <div class="stat-sub">1-sample test vs. zero excess return</div>
-  </div>
-  <div class="stat">
-    <div class="stat-value">16,203</div>
-    <div class="stat-label">total disclosed trades</div>
-    <div class="stat-sub">Senate + House PTRs, 2020–2024</div>
+<section class="kpi">
+  <h2 class="section-h">Key figures</h2>
+  <div class="kpi-row">
+    <div class="kpi-item">
+      <div class="kpi-value"><span class="sign">+</span>2.58<small>%</small></div>
+      <div class="kpi-label">90-day alpha</div>
+      <div class="kpi-sub">vs. S&amp;P&nbsp;500 &mdash; <em>p</em>&nbsp;=&nbsp;0.013</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-value">13.74<small>%</small></div>
+      <div class="kpi-label">90-day ROI</div>
+      <div class="kpi-sub">averaged across 220 purchases</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-value">2.51</div>
+      <div class="kpi-label">t-statistic</div>
+      <div class="kpi-sub">1-sample test vs. zero excess return</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-value">16,203</div>
+      <div class="kpi-label">total trades</div>
+      <div class="kpi-sub">Senate + House PTRs, 2020&ndash;2024</div>
+    </div>
   </div>
 </section>
 
-<section>
-  <h2>What we measured</h2>
-  <p>For each disclosed purchase with a resolvable ticker and sufficient price history, we computed the buy-and-hold return over 30, 90, and 180 days from the <em>transaction</em> date. We subtracted the S&amp;P 500's return over the same window to isolate the excess return, then ran a one-sample <em>t</em>-test against a null of zero alpha.</p>
-  <p>The 90-day window was the pre-registered horizon. 30- and 180-day results are reported but should be treated as exploratory — no multiple-testing correction.</p>
+<section class="essay">
+  <h2 class="section-h">What we measured</h2>
+  <p>For each disclosed purchase with a resolvable ticker and sufficient price history, we computed the buy-and-hold return over 30, 90, and 180 days from the <em>transaction</em> date. We subtracted the S&amp;P&nbsp;500&rsquo;s return over the same window to isolate the excess return, then ran a one-sample <em>t</em>-test against a null of zero alpha.</p>
+  <p>The 90-day window was the pre-registered horizon. 30- and 180-day results are reported but should be treated as exploratory &mdash; no multiple-testing correction.</p>
 </section>
 
-<section>
-  <h2>Distribution of 90-day returns</h2>
+<section class="fig">
+  <div class="fig-head">
+    <span class="fig-num">Fig.&nbsp;1</span>
+    <span class="fig-title">Distribution of 90-day returns</span>
+  </div>
   <figure>
     <img src="/charts/returns_kde.png" alt="Kernel density estimate of 90-day buy-and-hold returns on Congressional purchases, with the S&P 500's average return marked for comparison. The mass of the distribution sits to the right of the benchmark." loading="lazy">
-    <figcaption>The mass of Congressional purchase returns sits to the right of the S&amp;P 500 over the same windows. The +2.58 percentage-point gap is the area between the two means.</figcaption>
   </figure>
+  <p class="fig-caption">The mass of Congressional purchase returns sits to the right of the S&amp;P&nbsp;500 over the same windows. The +2.58 percentage-point gap is the area between the two means.</p>
 </section>
 
-<section>
-  <h2>What they were buying</h2>
+<section class="fig">
+  <div class="fig-head">
+    <span class="fig-num">Fig.&nbsp;2</span>
+    <span class="fig-title">What they were buying</span>
+  </div>
   <figure>
-    <img src="/charts/top_assets.png" alt="Top traded assets across the 2020–2024 window, ranked by trade count. Large-cap tech (Apple, Microsoft, NVIDIA, Alphabet) and broad-market ETFs dominate." loading="lazy">
-    <figcaption>Large-cap tech and broad-market ETFs dominate the leaderboard. Concentration is a confound for the alpha number — sector tilt alone explains some of the outperformance.</figcaption>
+    <img src="/charts/top_assets.png" alt="Top traded assets across the 2020–2024 window, ranked by trade count. Large-cap tech (Apple, Microsoft, NVIDIA) and broad-market ETFs dominate." loading="lazy">
   </figure>
+  <p class="fig-caption">Large-cap tech and broad-market ETFs dominate the leaderboard. Concentration is a confound for the alpha number &mdash; sector tilt alone explains some of the outperformance.</p>
+</section>
+
+<section class="fig">
+  <div class="fig-head">
+    <span class="fig-num">Fig.&nbsp;3</span>
+    <span class="fig-title">Tech purchases through the cycle</span>
+  </div>
   <figure>
     <img src="/charts/tech_purchases.png" alt="Monthly count of Congressional purchases in the top tech tickers across 2020–2024, showing buying concentration during the 2020 COVID drawdown and the 2023 rally." loading="lazy">
-    <figcaption>Tech purchase volume clusters around two regimes — the 2020 drawdown and the 2023 rally. Buyers were on the right side of both.</figcaption>
   </figure>
+  <p class="fig-caption">Tech purchase volume clusters around two regimes &mdash; the 2020 drawdown and the 2023 rally. Buyers were on the right side of both.</p>
 </section>
 
-<section>
-  <h2>February 2020 — the suggestive bit</h2>
+<section class="fig">
+  <div class="fig-head">
+    <span class="fig-num">Fig.&nbsp;4</span>
+    <span class="fig-title">February 2020 &mdash; the suggestive bit</span>
+  </div>
   <figure>
     <img src="/charts/covid_crash_sales.png" alt="Senate sale transactions in the weeks before the February 20, 2020 COVID market crash, with a vertical line marking the crash. A noticeable cluster of sales sits in the two weeks before the line." loading="lazy">
-    <figcaption>The top 5% of sellers concentrated their exits in the two weeks before February 20, 2020. Suggestive of foreknowledge — but the data alone can't distinguish that from sector rotation, age-and-wealth effects, or skilled advisors.</figcaption>
   </figure>
+  <p class="fig-caption">The top 5% of sellers concentrated their exits in the two weeks before February&nbsp;20, 2020. Suggestive of foreknowledge &mdash; but the data alone can&rsquo;t distinguish that from sector rotation, age-and-wealth effects, or skilled advisors.</p>
 </section>
 
-<section>
-  <h2>Caveats</h2>
-  <ul>
-    <li><strong>Disclosure lag is large.</strong> PTRs can be filed up to 30–45 days after a trade, so the 90-day alpha measured from the transaction date is <em>not</em> a 90-day alpha available to a public follower in real time. The signal is retrospective.</li>
+<section class="caveats">
+  <h2 class="section-h section-h--inverse">Notes &amp; caveats</h2>
+  <ol class="footnotes">
+    <li><strong>Disclosure lag is large.</strong> PTRs can be filed up to 30&ndash;45 days after a trade, so the 90-day alpha measured from the transaction date is <em>not</em> a 90-day alpha available to a public follower in real time. The signal is retrospective.</li>
     <li><strong>Selection bias on the benchmarked subset.</strong> Only 220 of 16,203 raw trades had a clean ticker, sufficient price history, and a clean entry/exit window. Heavy-tail trades (private placements, fund-of-fund holdings, options) are excluded.</li>
     <li><strong>No multiple-testing correction.</strong> 30- and 180-day horizons and per-legislator slices were explored; only the 90-day headline was pre-registered.</li>
     <li><strong>Causality is unidentified.</strong> Outperformance is consistent with non-public information, but also with sector concentration, age/wealth effects, or skilled advisors. The data cannot distinguish them.</li>
-  </ul>
-  <p>The <a href="/docs/final-reflection.pdf">Final Reflection</a> expands on all of these.</p>
+  </ol>
+  <p class="caveat-foot">The <a href="/docs/final-reflection.pdf">Final Reflection</a> expands on all of these.</p>
 </section>
 
-<section>
-  <h2>Read more</h2>
+<section class="further">
+  <h2 class="section-h">Further reading</h2>
   <ul class="docs">
-    <li><a href="/docs/abstract.pdf">Abstract</a> — 1-page academic summary.</li>
-    <li><a href="/docs/statistics.pdf">Statistics writeup</a> — the formal statistical workup behind the alpha number.</li>
-    <li><a href="/docs/final-reflection.pdf">Final Reflection</a> — 5-page essay on method, ethics, and future work.</li>
-    <li><a href="https://github.com/Builder106/CapitolAlpha">Source code &amp; dataset</a> on GitHub.</li>
+    <li>
+      <span class="doc-tag">Paper</span>
+      <a href="/docs/abstract.pdf">Abstract</a>
+      <span class="doc-desc">&mdash; 1-page academic summary.</span>
+    </li>
+    <li>
+      <span class="doc-tag">Paper</span>
+      <a href="/docs/statistics.pdf">Statistics writeup</a>
+      <span class="doc-desc">&mdash; the formal statistical workup behind the alpha number.</span>
+    </li>
+    <li>
+      <span class="doc-tag">Paper</span>
+      <a href="/docs/final-reflection.pdf">Final Reflection</a>
+      <span class="doc-desc">&mdash; 5-page essay on method, ethics, and future work.</span>
+    </li>
+    <li>
+      <span class="doc-tag doc-tag--repo">Repo</span>
+      <a href="https://github.com/Builder106/CapitolAlpha">Source code &amp; dataset</a>
+      <span class="doc-desc">on GitHub.</span>
+    </li>
   </ul>
 </section>
 
 </main>
 
-<footer>
+<footer class="colophon">
   <div class="container">
-    <p>Yinka Vaughan · Wesleyan University · QAC 420, Spring 2025. MIT-licensed. Built on disclosure data from <a href="https://efdsearch.senate.gov/">efdsearch.senate.gov</a> and <a href="https://disclosures-clerk.house.gov/">disclosures-clerk.house.gov</a>.</p>
+    <p class="colophon-mark">&sect;</p>
+    <p><strong>CapitolAlpha</strong> &middot; Yinka Vaughan &middot; Wesleyan University, QAC&nbsp;420, Spring 2025. Released under the <a href="https://github.com/Builder106/CapitolAlpha/blob/main/LICENSE">MIT&nbsp;License</a>.</p>
+    <p>Built on disclosure data from <a href="https://efdsearch.senate.gov/">efdsearch.senate.gov</a> and <a href="https://disclosures-clerk.house.gov/">disclosures-clerk.house.gov</a>.</p>
+    <p class="set-in">Set in <em>Libre&nbsp;Caslon&nbsp;Text</em>, <em>IBM&nbsp;Plex&nbsp;Mono</em>, and <em>Inter</em>.</p>
   </div>
 </footer>
 
