@@ -1,38 +1,60 @@
-/* CapitolAlpha — broadsheet aesthetic
-   Light mode: cream paper + ink black + Congressional red (FT/Congressional Record feel)
-   Dark mode:  deep navy + parchment + amber (Bloomberg terminal feel) */
+/* CapitolAlpha — equity-research-note aesthetic
+   Light: cool near-white paper, deep navy ink, finance-green for positive numbers, Bloomberg-blue chrome.
+   Dark:  Bloomberg-terminal navy-black, with the same green/red P&L coloring. */
 
 :root {
-  --paper: #f3ede0;
-  --paper-deep: #ebe3d0;
-  --ink: #1a1410;
-  --ink-soft: #2d2620;
-  --rule: rgba(107, 93, 69, 0.28);
-  --rule-strong: rgba(107, 93, 69, 0.55);
-  --accent: #b22234;
-  --accent-deep: #8a1b2b;
-  --gold: #856515;
-  --mute: #6b5d45;
-  --link: #b22234;
-  --link-hover: #8a1b2b;
-  --selection: rgba(178, 34, 52, 0.22);
+  --paper: #fafbfc;
+  --paper-deep: #f1f5f9;
+  --panel: #ffffff;
+  --ink: #0c1626;
+  --ink-soft: #2d3a4f;
+  --rule: #dde3eb;
+  --rule-strong: #cbd5e1;
+  --mute: #475569;
+  --pos: #15803d;
+  --pos-soft: #16a34a;
+  --pos-tint: rgba(21, 128, 61, 0.08);
+  --neg: #b91c1c;
+  --neg-soft: #dc2626;
+  --neg-tint: rgba(185, 28, 28, 0.08);
+  --brand: #1d4ed8;
+  --brand-soft: #2563eb;
+  --gold: #b45309;
+  --link: var(--brand);
+  --link-hover: #1e3a8a;
+  --selection: rgba(29, 78, 216, 0.18);
+  --inverse-bg: #0c1626;
+  --inverse-paper: #e2e8f0;
+  --inverse-mute: #94a3b8;
+  --inverse-rule: rgba(226, 232, 240, 0.16);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #0a1628;
-    --paper-deep: #112340;
-    --ink: #f3ede0;
-    --ink-soft: #d8cdb0;
-    --rule: rgba(243, 237, 224, 0.18);
-    --rule-strong: rgba(243, 237, 224, 0.38);
-    --accent: #ff6b6b;
-    --accent-deep: #ff8a8a;
-    --gold: #ffb84d;
+    --paper: #0a1019;
+    --paper-deep: #131c2b;
+    --panel: #131c2b;
+    --ink: #e2e8f0;
+    --ink-soft: #cbd5e1;
+    --rule: rgba(226, 232, 240, 0.12);
+    --rule-strong: rgba(226, 232, 240, 0.28);
     --mute: #94a3b8;
-    --link: #ffb84d;
-    --link-hover: #ffd699;
-    --selection: rgba(255, 184, 77, 0.28);
+    --pos: #22c55e;
+    --pos-soft: #4ade80;
+    --pos-tint: rgba(34, 197, 94, 0.12);
+    --neg: #ef4444;
+    --neg-soft: #f87171;
+    --neg-tint: rgba(239, 68, 68, 0.12);
+    --brand: #60a5fa;
+    --brand-soft: #93c5fd;
+    --gold: #fbbf24;
+    --link: var(--brand);
+    --link-hover: #bfdbfe;
+    --selection: rgba(96, 165, 250, 0.24);
+    --inverse-bg: #050a13;
+    --inverse-paper: #e2e8f0;
+    --inverse-mute: #94a3b8;
+    --inverse-rule: rgba(226, 232, 240, 0.12);
   }
 }
 
@@ -44,13 +66,13 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: 'Libre Caslon Text', 'Iowan Old Style', 'Source Serif Pro', Georgia, 'Times New Roman', serif;
-  font-size: 18px;
-  line-height: 1.65;
+  font-family: 'IBM Plex Serif', 'Source Serif Pro', Georgia, 'Times New Roman', serif;
+  font-size: 17px;
+  line-height: 1.6;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: 'kern', 'liga', 'onum';
+  font-feature-settings: 'kern', 'liga';
 }
 
 ::selection {
@@ -59,7 +81,7 @@ body {
 }
 
 .container {
-  max-width: 880px;
+  max-width: 920px;
   margin: 0 auto;
   padding: 0 32px;
 }
@@ -67,7 +89,7 @@ body {
 a {
   color: var(--link);
   text-decoration: none;
-  border-bottom: 1px solid color-mix(in srgb, var(--link) 45%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--link) 35%, transparent);
   transition: color 0.15s ease, border-color 0.15s ease;
 }
 a:hover {
@@ -75,260 +97,379 @@ a:hover {
   border-bottom-color: var(--link-hover);
 }
 
-strong { font-weight: 700; color: var(--ink); }
+strong { font-weight: 600; color: var(--ink); }
 em { font-style: italic; }
 
-/* ─── Masthead ──────────────────────────────────────────── */
+/* ─── Brand strip + report header ───────────────────────── */
 
-.masthead {
-  padding: 64px 0 32px;
-  border-top: 6px double var(--ink);
-  margin-top: 12px;
-  text-align: center;
+.brand-strip {
+  height: 4px;
+  background: linear-gradient(to right, var(--brand) 0%, var(--brand) 33%, var(--pos) 33%, var(--pos) 66%, var(--gold) 66%, var(--gold) 100%);
 }
 
-.folio {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+.report-header {
+  padding: 36px 0 24px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.report-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--mute);
-  margin: 0 0 40px;
+  margin: 0 0 36px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
-.folio .sep {
-  margin: 0 10px;
-  opacity: 0.45;
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.folio em {
+.meta-sep {
+  color: var(--rule-strong);
+}
+.report-tag {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 4px 10px;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+.report-meta em {
+  text-transform: none;
+  letter-spacing: 0;
   font-style: italic;
-  letter-spacing: 0.18em;
 }
 
 .title {
-  font-family: 'Libre Caslon Text', 'Iowan Old Style', Georgia, serif;
-  font-size: clamp(56px, 11vw, 108px);
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: clamp(48px, 8vw, 76px);
   font-weight: 700;
-  font-style: italic;
-  letter-spacing: -0.018em;
-  line-height: 0.92;
+  font-style: normal;
+  letter-spacing: -0.025em;
+  line-height: 1;
   margin: 0 0 12px;
   color: var(--ink);
 }
 
-.kicker {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin: 0 0 28px;
-}
-
-.dek {
-  font-family: 'Libre Caslon Text', Georgia, serif;
-  font-size: clamp(17px, 2.2vw, 21px);
-  line-height: 1.5;
+.subtitle {
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: clamp(16px, 1.9vw, 19px);
+  font-style: italic;
   color: var(--mute);
-  max-width: 560px;
-  margin: 0 auto;
-}
-.dek strong { color: var(--ink); }
-
-/* ─── Hero stat ─────────────────────────────────────────── */
-
-.hero-stat {
-  padding: 48px 0 32px;
-  text-align: center;
+  margin: 0 0 36px;
+  max-width: 640px;
 }
 
-.hero-rule {
-  height: 1px;
-  background: var(--rule-strong);
-  margin: 0 auto;
-  max-width: 420px;
+.report-spec {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0;
+  margin: 0 0 8px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
 }
-
-.hero-eyebrow {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.32em;
+.spec-item {
+  padding: 14px 16px 14px 0;
+  border-right: 1px solid var(--rule);
+}
+.spec-item:nth-child(3n) {
+  border-right: 0;
+}
+.spec-item:last-child {
+  border-right: 0;
+}
+.report-spec dt {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
-  margin: 28px 0 24px;
+  color: var(--mute);
+  margin: 0 0 4px;
+}
+.report-spec dd {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0;
 }
 
-.hero-number {
-  font-family: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: clamp(80px, 16vw, 168px);
+@media (max-width: 880px) {
+  .report-spec { grid-template-columns: repeat(3, 1fr); }
+  .spec-item { padding-left: 16px; }
+  .spec-item:nth-child(3n) { border-right: 0; }
+  .spec-item:nth-child(3n+1) { padding-left: 0; }
+}
+@media (max-width: 540px) {
+  .report-spec { grid-template-columns: repeat(2, 1fr); }
+  .spec-item { padding-left: 16px; }
+  .spec-item:nth-child(odd) { padding-left: 0; }
+  .spec-item:nth-child(2n) { border-right: 0; }
+  .spec-item:nth-child(3n) { border-right: 1px solid var(--rule); }
+  .spec-item:nth-child(2n) { border-right: 0; }
+}
+
+/* ─── Verdict panel ─────────────────────────────────────── */
+
+.verdict {
+  padding: 56px 0 40px;
+}
+.verdict-panel {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 48px;
+  align-items: stretch;
+  padding: 36px;
+  background: var(--panel);
+  border: 1px solid var(--rule-strong);
+  border-left: 4px solid var(--pos);
+  border-radius: 2px;
+  position: relative;
+}
+
+.verdict-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.verdict-eyebrow {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mute);
+  margin: 0 0 14px;
+}
+.verdict-rating {
+  margin: 0 0 18px;
+}
+.rating-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 2px;
+  border: 1px solid var(--pos);
+  background: var(--pos-tint);
+  color: var(--pos);
+}
+.rating-arrow {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.verdict-thesis {
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: clamp(17px, 2vw, 20px);
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0 0 16px;
+}
+.verdict-thesis strong {
+  color: var(--pos);
+  font-weight: 700;
+}
+
+.verdict-caveat {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--mute);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+.verdict-caveat a {
+  color: var(--mute);
+  border-bottom-color: var(--rule-strong);
+}
+.verdict-caveat a:hover {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.verdict-number-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-left: 36px;
+  border-left: 1px solid var(--rule);
+}
+
+.verdict-number {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: clamp(56px, 9vw, 92px);
   font-weight: 700;
   letter-spacing: -0.035em;
   line-height: 1;
-  color: var(--accent);
-  margin: 0 0 24px;
+  color: var(--pos);
+  margin: 0 0 16px;
   font-feature-settings: 'tnum' on, 'zero' on;
-  text-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 20%, transparent);
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
 }
-.hero-number .sign {
-  font-size: 0.62em;
-  vertical-align: 0.18em;
-  margin-right: -0.04em;
-  color: color-mix(in srgb, var(--accent) 75%, var(--paper) 25%);
+.verdict-number .delta {
+  font-size: 0.42em;
+  color: var(--pos);
+  vertical-align: 0.3em;
+  margin-right: 0.04em;
+  line-height: 1;
 }
-.hero-number .unit {
-  font-size: 0.5em;
-  vertical-align: 0.4em;
-  margin-left: 0.06em;
-  color: color-mix(in srgb, var(--accent) 70%, var(--ink) 30%);
+.verdict-number .unit {
+  font-size: 0.45em;
+  color: color-mix(in srgb, var(--pos) 75%, var(--ink) 25%);
+  vertical-align: 0.55em;
+  margin-left: 0.04em;
 }
 
-.hero-label {
-  font-family: 'Libre Caslon Text', Georgia, serif;
-  font-size: clamp(16px, 2vw, 20px);
+.verdict-label {
+  font-family: 'IBM Plex Serif', Georgia, serif;
   font-style: italic;
+  font-size: 15px;
   color: var(--ink-soft);
-  margin: 0 0 14px;
+  margin: 0 0 10px;
+  letter-spacing: 0.005em;
 }
 
-.hero-meta {
+.verdict-stats {
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 13px;
-  letter-spacing: 0.06em;
+  font-size: 12px;
+  letter-spacing: 0.05em;
   color: var(--mute);
-  margin: 0 0 28px;
   font-feature-settings: 'tnum' on;
 }
-.hero-meta .sep {
-  margin: 0 14px;
+.verdict-stats .sep {
+  margin: 0 10px;
   opacity: 0.5;
+}
+
+@media (max-width: 760px) {
+  .verdict-panel {
+    grid-template-columns: 1fr;
+    padding: 28px;
+    gap: 32px;
+  }
+  .verdict-number-block {
+    padding-left: 0;
+    padding-top: 24px;
+    border-left: 0;
+    border-top: 1px solid var(--rule);
+  }
 }
 
 /* ─── Ticker tape ───────────────────────────────────────── */
 
 .ticker {
   background: var(--ink);
-  color: var(--paper);
+  color: var(--inverse-paper);
   overflow: hidden;
+  padding: 14px 0;
+  margin: 8px 0 56px;
+  position: relative;
   border-top: 1px solid var(--ink);
   border-bottom: 1px solid var(--ink);
-  padding: 16px 0;
-  margin: 12px 0 64px;
-  position: relative;
 }
 .ticker::before,
 .ticker::after {
   content: '';
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: 0; bottom: 0;
   width: 60px;
   z-index: 2;
   pointer-events: none;
 }
-.ticker::before {
-  left: 0;
-  background: linear-gradient(to right, var(--ink), transparent);
-}
-.ticker::after {
-  right: 0;
-  background: linear-gradient(to left, var(--ink), transparent);
-}
+.ticker::before { left: 0; background: linear-gradient(to right, var(--ink), transparent); }
+.ticker::after  { right: 0; background: linear-gradient(to left, var(--ink), transparent); }
 
 .ticker-track {
   display: flex;
-  gap: 0;
   white-space: nowrap;
-  animation: tickerScroll 55s linear infinite;
+  animation: tickerScroll 60s linear infinite;
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-weight: 500;
+  letter-spacing: 0.1em;
   width: max-content;
 }
 .ticker-item {
-  display: inline-block;
-  padding: 0 28px;
-  border-right: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
-  color: color-mix(in srgb, var(--paper) 85%, transparent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 24px;
+  border-right: 1px solid rgba(226, 232, 240, 0.14);
+  color: rgba(226, 232, 240, 0.6);
 }
-.ticker-item:nth-child(3n) { color: var(--accent-deep); }
-.ticker-item:nth-child(5n) { color: var(--gold); }
+.ticker-item.up { color: var(--pos-soft); }
+.ticker-item.down { color: var(--neg-soft); }
+.ticker-item .tick {
+  font-size: 9px;
+  opacity: 0.85;
+}
 
 @keyframes tickerScroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-
 @media (prefers-reduced-motion: reduce) {
   .ticker-track { animation: none; }
 }
 
-/* ─── Lede ──────────────────────────────────────────────── */
-
-.lede {
-  padding: 0 0 40px;
-  border-bottom: 1px solid var(--rule-strong);
-  margin-bottom: 56px;
-}
-
-.lede p:first-child {
-  font-family: 'Libre Caslon Text', Georgia, serif;
-  font-size: clamp(19px, 2.3vw, 22px);
-  line-height: 1.55;
-  color: var(--ink);
-  margin: 0 0 22px;
-}
-
-.dropcap {
-  font-family: 'Libre Caslon Text', Georgia, serif;
-  font-size: 4.2em;
-  float: left;
-  line-height: 0.85;
-  font-weight: 700;
-  font-style: italic;
-  margin: 0.08em 0.08em -0.05em -0.02em;
-  color: var(--accent);
-}
-
-.lede .byline {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 13px;
-  color: var(--mute);
-  margin: 0;
-  letter-spacing: 0.01em;
-}
-
-/* ─── Section headings (§-prefixed, small caps) ─────────── */
+/* ─── Section headings (▎ vertical-bar prefix) ──────────── */
 
 section { margin: 0 0 56px; }
 
 .section-h {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 12px;
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--ink);
-  margin: 0 0 28px;
-  padding-bottom: 12px;
+  margin: 0 0 24px;
+  padding: 4px 0 10px 16px;
   border-bottom: 1px solid var(--rule-strong);
+  border-left: 3px solid var(--brand);
   display: flex;
-  align-items: baseline;
+  align-items: center;
 }
-.section-h::before {
-  content: '§';
-  margin-right: 14px;
-  color: var(--accent);
-  font-family: 'Libre Caslon Text', Georgia, serif;
-  font-style: italic;
-  font-size: 20px;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-  line-height: 1;
+
+/* ─── Executive summary ─────────────────────────────────── */
+
+.exec-summary {
+  margin-top: 0;
 }
+.exec-summary p {
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: clamp(17px, 2vw, 19px);
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin: 0 0 18px;
+}
+.exec-summary p strong { color: var(--ink); }
+.exec-summary .byline {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--mute);
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+  font-style: normal;
+}
+.exec-summary .byline strong { color: var(--ink); font-weight: 600; }
 
 /* ─── KPI strip ─────────────────────────────────────────── */
 
@@ -338,6 +479,7 @@ section { margin: 0 0 56px; }
   gap: 0;
   border-top: 2px solid var(--ink);
   border-bottom: 2px solid var(--ink);
+  background: var(--panel);
 }
 
 .kpi-item {
@@ -347,41 +489,67 @@ section { margin: 0 0 56px; }
 }
 .kpi-item:last-child { border-right: 0; }
 
+.kpi-item--pos .kpi-value {
+  color: var(--pos);
+}
+.kpi-item--pos::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--pos);
+}
+.kpi-item--neg .kpi-value {
+  color: var(--neg);
+}
+.kpi-item--neg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--neg);
+}
+
 .kpi-value {
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1;
-  color: var(--accent);
+  color: var(--ink);
   font-feature-settings: 'tnum' on;
+  display: flex;
+  align-items: baseline;
 }
-.kpi-value .sign {
-  font-size: 0.65em;
-  vertical-align: 0.18em;
-  margin-right: -0.02em;
+.kpi-arrow {
+  font-size: 18px;
+  margin-right: 4px;
+  color: inherit;
 }
 .kpi-value small {
   font-size: 0.55em;
   font-weight: 700;
-  vertical-align: 0.18em;
-  color: color-mix(in srgb, var(--accent) 65%, var(--ink) 35%);
   margin-left: 0.04em;
+  color: color-mix(in srgb, currentColor 70%, transparent);
 }
 
 .kpi-label {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink);
   margin: 14px 0 6px;
 }
 
 .kpi-sub {
-  font-family: 'Libre Caslon Text', Georgia, serif;
-  font-size: 13px;
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: 12px;
   font-style: italic;
   color: var(--mute);
   line-height: 1.45;
@@ -389,62 +557,58 @@ section { margin: 0 0 56px; }
 
 /* ─── Essay prose ───────────────────────────────────────── */
 
-.essay p,
-section.essay > p {
-  font-family: 'Libre Caslon Text', Georgia, serif;
-  font-size: 18px;
+.essay p {
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: 17px;
   line-height: 1.7;
   color: var(--ink-soft);
   margin: 0 0 18px;
 }
 .essay p strong { color: var(--ink); }
 
-/* ─── Figures ───────────────────────────────────────────── */
+/* ─── Exhibits ──────────────────────────────────────────── */
 
 .fig {
-  margin: 64px 0;
+  margin: 56px 0;
 }
 
 .fig-head {
   display: flex;
   align-items: baseline;
-  gap: 18px;
-  margin: 0 0 18px;
-  padding-bottom: 12px;
+  gap: 16px;
+  margin: 0 0 16px;
+  padding-bottom: 10px;
   border-bottom: 1px solid var(--rule);
+  flex-wrap: wrap;
 }
 .fig-num {
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--accent);
-  padding: 4px 10px;
-  border: 1px solid var(--accent);
+  color: var(--paper);
+  background: var(--brand);
+  padding: 5px 10px;
   border-radius: 2px;
   white-space: nowrap;
+  line-height: 1;
 }
 .fig-title {
-  font-family: 'Libre Caslon Text', Georgia, serif;
-  font-size: clamp(19px, 2.2vw, 23px);
-  font-style: italic;
-  font-weight: 400;
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: clamp(17px, 2vw, 21px);
+  font-weight: 600;
   color: var(--ink);
   letter-spacing: -0.005em;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 .fig figure {
-  margin: 0 0 18px;
-  padding: 20px;
-  background: var(--paper-deep);
+  margin: 0 0 14px;
+  padding: 16px;
+  background: var(--panel);
   border: 1px solid var(--rule);
   border-radius: 2px;
-  transition: border-color 0.2s ease;
-}
-.fig figure:hover {
-  border-color: var(--rule-strong);
 }
 .fig figure img {
   display: block;
@@ -453,29 +617,44 @@ section.essay > p {
 }
 
 .fig-caption {
-  font-family: 'Libre Caslon Text', Georgia, serif;
-  font-size: 15px;
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: 14px;
   font-style: italic;
   line-height: 1.55;
   color: var(--mute);
-  margin: 0;
-  padding-left: 16px;
-  border-left: 2px solid var(--rule);
-  max-width: 720px;
+  margin: 0 0 6px;
+  max-width: 760px;
 }
 
-/* ─── Caveats — boxed, hanging numerals ─────────────────── */
+.fig-source {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--mute);
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+.fig-source span {
+  color: var(--ink);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-right: 6px;
+}
 
-.caveats {
-  background: var(--ink);
-  color: var(--paper);
+/* ─── Important disclosures ─────────────────────────────── */
+
+.disclosures {
+  background: var(--inverse-bg);
+  color: var(--inverse-paper);
   padding: 40px 36px 30px;
   margin: 72px 0;
   border-radius: 2px;
-  border-top: 4px solid var(--accent);
+  border-top: 4px solid var(--neg);
   position: relative;
 }
-.caveats::before {
+.disclosures::before {
   content: '';
   position: absolute;
   top: -4px;
@@ -486,11 +665,9 @@ section.essay > p {
 }
 
 .section-h--inverse {
-  color: var(--paper);
-  border-bottom-color: rgba(243, 237, 224, 0.3);
-}
-.section-h--inverse::before {
-  color: var(--accent);
+  color: var(--inverse-paper);
+  border-bottom-color: var(--inverse-rule);
+  border-left-color: var(--neg);
 }
 
 .footnotes {
@@ -500,11 +677,11 @@ section.essay > p {
   counter-reset: footnote;
 }
 .footnotes li {
-  font-family: 'Libre Caslon Text', Georgia, serif;
-  font-size: 15.5px;
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: 14.5px;
   line-height: 1.6;
-  color: color-mix(in srgb, var(--paper) 80%, var(--ink) 20%);
-  margin: 0 0 18px;
+  color: color-mix(in srgb, var(--inverse-paper) 80%, transparent);
+  margin: 0 0 16px;
   padding-left: 44px;
   position: relative;
   counter-increment: footnote;
@@ -515,35 +692,35 @@ section.essay > p {
   left: 0;
   top: 2px;
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--neg-soft);
   letter-spacing: 0.06em;
   padding-right: 10px;
-  border-right: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  border-right: 1px solid var(--inverse-rule);
   width: 32px;
   text-align: right;
-  line-height: 1.6;
+  line-height: 1.7;
 }
-.footnotes li strong { color: var(--paper); }
-.footnotes li em { color: color-mix(in srgb, var(--paper) 90%, transparent); }
+.footnotes li strong { color: var(--inverse-paper); }
+.footnotes li em { color: color-mix(in srgb, var(--inverse-paper) 90%, transparent); }
 
-.caveats a {
+.disclosures a {
   color: var(--gold);
-  border-bottom-color: color-mix(in srgb, var(--gold) 50%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--gold) 45%, transparent);
 }
-.caveats a:hover {
-  color: color-mix(in srgb, var(--gold) 75%, var(--paper) 25%);
+.disclosures a:hover {
+  color: color-mix(in srgb, var(--gold) 80%, var(--inverse-paper) 20%);
 }
 
-.caveat-foot {
-  font-family: 'Libre Caslon Text', Georgia, serif;
+.disclosure-foot {
+  font-family: 'IBM Plex Serif', Georgia, serif;
   font-style: italic;
-  font-size: 14px;
-  color: color-mix(in srgb, var(--paper) 70%, transparent);
-  margin: 20px 0 0;
-  padding-top: 18px;
-  border-top: 1px solid rgba(243, 237, 224, 0.18);
+  font-size: 13px;
+  color: color-mix(in srgb, var(--inverse-paper) 65%, transparent);
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--inverse-rule);
 }
 
 /* ─── Further reading ───────────────────────────────────── */
@@ -554,9 +731,9 @@ section.essay > p {
   margin: 0;
 }
 .docs li {
-  font-family: 'Libre Caslon Text', Georgia, serif;
-  font-size: 16px;
-  padding: 16px 0;
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: 15px;
+  padding: 14px 0;
   border-bottom: 1px solid var(--rule);
   display: flex;
   align-items: baseline;
@@ -566,27 +743,27 @@ section.essay > p {
 .docs li:last-child { border-bottom: 0; }
 
 .doc-tag {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--paper);
-  background: var(--accent);
+  background: var(--brand);
   padding: 4px 10px;
   border-radius: 2px;
   flex-shrink: 0;
-  min-width: 58px;
+  min-width: 60px;
   text-align: center;
+  line-height: 1.2;
 }
 .doc-tag--repo {
   background: var(--gold);
-  color: var(--ink);
+  color: var(--inverse-bg);
 }
 
 .docs a {
-  font-style: italic;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .doc-desc {
@@ -598,67 +775,70 @@ section.essay > p {
 /* ─── Colophon ──────────────────────────────────────────── */
 
 .colophon {
-  padding: 56px 0 64px;
-  margin-top: 80px;
-  border-top: 6px double var(--ink);
-  text-align: center;
-}
-.colophon-mark {
-  font-family: 'Libre Caslon Text', Georgia, serif;
-  font-size: 32px;
-  font-style: italic;
-  color: var(--accent);
-  margin: 0 0 20px;
-  line-height: 1;
+  padding: 36px 0 56px;
+  margin-top: 72px;
+  border-top: 1px solid var(--rule-strong);
 }
 .colophon p {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 13px;
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 12px;
   color: var(--mute);
   line-height: 1.6;
   margin: 0 0 8px;
+  letter-spacing: 0.01em;
 }
-.colophon p strong { color: var(--ink); }
-.colophon .set-in {
-  font-family: 'Libre Caslon Text', Georgia, serif;
+.colophon-line {
+  font-size: 13px !important;
+  color: var(--ink) !important;
+}
+.colophon-line strong {
+  font-weight: 600;
+}
+.colophon .disclaimer {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
   font-style: italic;
-  font-size: 12px;
-  margin-top: 16px;
+  font-size: 11px;
+  color: var(--mute);
+  padding: 14px 16px;
+  background: var(--paper-deep);
+  border-left: 3px solid var(--neg);
+  margin: 16px 0;
+  max-width: 720px;
+  line-height: 1.55;
+}
+.colophon .set-in {
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-style: italic;
+  font-size: 11px;
+  margin-top: 8px;
+  color: var(--mute);
 }
 
-/* ─── Mobile ─────────────────────────────────────────────── */
+/* ─── Mobile tuning ─────────────────────────────────────── */
 
 @media (max-width: 760px) {
-  body { font-size: 17px; }
+  body { font-size: 16px; }
   .container { padding: 0 22px; }
 
-  .masthead { padding: 36px 0 24px; }
-  .folio { font-size: 10px; letter-spacing: 0.18em; margin-bottom: 28px; }
-  .folio .sep { margin: 0 6px; }
+  .report-header { padding-top: 24px; }
+  .report-meta { font-size: 10px; }
 
   .kpi-row { grid-template-columns: repeat(2, 1fr); }
   .kpi-item:nth-child(1),
   .kpi-item:nth-child(2) { border-bottom: 1px solid var(--rule); }
   .kpi-item:nth-child(2) { border-right: 0; }
-  .kpi-value { font-size: 28px; }
+  .kpi-value { font-size: 26px; }
 
-  .fig-head { flex-wrap: wrap; gap: 10px; }
+  .fig-head { gap: 12px; }
   .fig figure { padding: 12px; }
-  .fig-caption { padding-left: 12px; font-size: 14px; }
 
-  .caveats { padding: 28px 22px 22px; }
-  .footnotes li { padding-left: 36px; font-size: 14.5px; }
-
-  .dropcap { font-size: 3.6em; }
-
-  .hero-meta { font-size: 12px; }
-  .hero-meta .sep { margin: 0 8px; }
+  .disclosures { padding: 28px 22px 22px; }
+  .footnotes li { padding-left: 36px; font-size: 14px; }
 }
 
 @media (max-width: 420px) {
-  .title { font-size: 52px; }
-  .hero-number { font-size: 64px; }
-  .ticker { padding: 12px 0; }
+  .title { font-size: 44px; }
+  .verdict-number { font-size: 56px; }
   .ticker-track { font-size: 12px; }
 }
 
@@ -666,10 +846,11 @@ section.essay > p {
 
 @media print {
   body { background: white; color: black; font-size: 11pt; }
-  .ticker, .colophon { display: none; }
+  .brand-strip, .ticker, .colophon { display: none; }
   a { color: black; border-bottom: 0; }
   a::after { content: ' (' attr(href) ')'; font-size: 0.8em; color: #555; }
-  .fig figure { background: none; border: 1px solid #ccc; }
-  .caveats { background: #eee; color: black; border-top-color: black; }
-  .caveats .footnotes li { color: black; }
+  .verdict-panel { border-left-width: 2px; }
+  .disclosures { background: #f5f5f5; color: black; }
+  .disclosures .footnotes li { color: black; }
+  .disclosures .footnotes li::before { color: #b91c1c; border-right-color: #ccc; }
 }
