@@ -7,7 +7,6 @@
 </picture>
 
 [![CI](https://github.com/Builder106/CapitolAlpha/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/CapitolAlpha/actions/workflows/ci.yml)
-[![Deploy](https://github.com/Builder106/CapitolAlpha/actions/workflows/deploy.yml/badge.svg)](https://github.com/Builder106/CapitolAlpha/actions/workflows/deploy.yml)
 [![Live site](https://img.shields.io/badge/findings-live-success.svg)](https://capitolalpha.vercel.app)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![Playwright](https://img.shields.io/badge/Playwright-scraping-2EAD33.svg?logo=playwright&logoColor=white)](https://playwright.dev/python/)
