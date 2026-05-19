@@ -4,13 +4,13 @@
   "trailingSlash": false,
   "headers": [
     {
-      "source": "/(.*)\\.(png|svg|jpg|jpeg|webp|gif|ico)",
+      "source": "/((?!_vercel/).*)\\.(png|svg|jpg|jpeg|webp|gif|ico)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
     },
     {
-      "source": "/(.*)\\.(css|js)",
+      "source": "/((?!_vercel/).*)\\.(css|js)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
