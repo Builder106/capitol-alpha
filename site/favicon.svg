@@ -1,18 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <style>
     .bg { fill: #fafbfc; }
-    .bar { fill: #15803d; }
-    .mono { fill: #0c1626; }
-    .arrow { fill: #15803d; }
+    .fg { fill: #15803d; }
     @media (prefers-color-scheme: dark) {
       .bg { fill: #0a1019; }
-      .mono { fill: #e2e8f0; }
-      .bar { fill: #22c55e; }
-      .arrow { fill: #22c55e; }
+      .fg { fill: #22c55e; }
     }
   </style>
   <rect class="bg" width="32" height="32"/>
-  <rect class="bar" x="0" y="0" width="4" height="32"/>
-  <polygon class="arrow" points="9,12 12,7 15,12"/>
-  <text x="22" y="22" font-family="'IBM Plex Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" class="mono">CA</text>
+  <text x="16" y="25" font-family="Georgia, 'Times New Roman', 'Liberation Serif', serif" font-size="28" font-weight="700" text-anchor="middle" class="fg">&#945;</text>
 </svg>
