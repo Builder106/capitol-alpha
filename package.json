@@ -1,0 +1,13 @@
+{
+  "name": "capitolalpha-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "bddgen": "bddgen",
+    "test:e2e": "bddgen && playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "playwright-bdd": "^9.2.0"
+  }
+}

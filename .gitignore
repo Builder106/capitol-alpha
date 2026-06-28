@@ -2,6 +2,10 @@
 __pycache__/
 *.pyc
 .DS_Store
+node_modules/
+.features-gen/
+playwright-report/
+test-results/
 Syllabus_Latest.pdf
 Presentations
 presentation_guide.md
