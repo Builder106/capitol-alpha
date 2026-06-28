@@ -38,5 +38,5 @@ Then('the abstract PDF link is present', async ({ page }) => {
 });
 
 Then('the final reflection PDF link is present', async ({ page }) => {
-  await expect(page.locator('a[href="/docs/final-reflection.pdf"]')).toBeVisible();
+  await expect(page.locator('a[href="/docs/final-reflection.pdf"]').first()).toBeVisible();
 });
