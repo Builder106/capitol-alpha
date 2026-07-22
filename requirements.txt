@@ -4,4 +4,4 @@ pyyaml>=6.0.3
 pytest>=7.0.0
 playwright>=1.40.0
 pdfplumber>=0.11.0
-yfinance>=0.2.0
+yfinance>=1.5.1
