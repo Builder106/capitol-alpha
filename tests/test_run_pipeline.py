@@ -119,3 +119,17 @@ def test_main(mock_run, mock_args):
     mock_args.return_value = MagicMock(fresh=True, senate_only=True, house_only=False, use_official=False)
     main()
     mock_run.assert_called_once_with(fresh=True, senate_only=True, house_only=False, use_official=False)
+
+def test_run_pipeline_as_main(monkeypatch):
+    from pipeline import run_pipeline
+    monkeypatch.setattr("sys.argv", ["run_pipeline.py", "--house-only"])
+    with patch("pipeline.run_pipeline.run") as mock_run:
+        run_pipeline.main()
+        mock_run.assert_called_once_with(fresh=False, senate_only=False, house_only=True, use_official=False)
+
+def test_run_pipeline_module_main(monkeypatch):
+    import pipeline.run_pipeline as rp
+    monkeypatch.setattr("sys.argv", ["run_pipeline.py", "--house-only"])
+    with patch.object(rp, "run") as mock_run:
+        exec("if __name__ == '__main__': main()", {"__name__": "__main__", "main": rp.main})
+        mock_run.assert_called_once_with(fresh=False, senate_only=False, house_only=True, use_official=False)

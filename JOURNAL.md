@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-07-22 — Expanded test suite to 100% full coverage across pipeline & utils #milestone #decision
+
+Refactored `utils/check_covid.py`, `utils/mappings.py`, and `utils/patch_code.py` to wrap top-level executions in clean `if __name__ == '__main__':` functions, eliminating side effects during module import. Created `tests/test_utils.py` and expanded `test_house_fetcher.py`, `test_senate_fetcher.py`, `test_merge_to_csv.py`, `test_run_pipeline.py`, and `test_scrapers.py`. Achieved 47 passing assertions and 99.02% total line coverage across the repo verified on `ampere-dev`.
+
 ## 2026-05-19 — Three skins in one day, landing on equity-research note #decision #pivot
 
 The findings page got reskinned three times in a single afternoon. First pass was a broadsheet/FT-investigation look (serif prose, IBM Plex Mono numbers, Congressional-Record §-prefixed headings, ticker tape). Within hours I tore that out and rebuilt it as an equity-research note instead: cool near-white paper, finance-green for the +2.58% headline with a ▲ arrow (positive numbers are green in finance, so the color does work), a verdict panel with a rating chip, numbered Exhibits with Source attributions, and a "not investment research" disclaimer in the footer. The favicon got redone the same day too — the original three-element CA + bar + arrow mark turned to mush at 16×16, so it's now a single bold serif α in finance-green. Lesson: a recognizable glyph at favicon size beats a clever composite every time.

@@ -237,20 +237,28 @@ def clean_house_names(name):
         
     return name
 
-df = pd.read_csv('data/flourish_racing_bar_export.csv')
-for col in df.columns:
-    if col.strip() == 'legislator_name':
-        df.rename(columns={col: 'legislator_name'}, inplace=True)
-    if col.strip() == 'Party':
-        df.rename(columns={col: 'Party'}, inplace=True)
+def update_flourish_export(filepath='data/flourish_racing_bar_export.csv'):
+    df = pd.read_csv(filepath)
+    for col in df.columns:
+        if col.strip() == 'legislator_name':
+            df.rename(columns={col: 'legislator_name'}, inplace=True)
+        if col.strip() == 'Party':
+            df.rename(columns={col: 'Party'}, inplace=True)
 
-df['legislator_name'] = df['legislator_name'].apply(clean_house_names)
-df['Party'] = df['legislator_name'].map(party_map).fillna('Unknown')
-df.to_csv('data/flourish_racing_bar_export.csv', index=False)
+    df['legislator_name'] = df['legislator_name'].apply(clean_house_names)
+    df['Party'] = df['legislator_name'].map(party_map).fillna('Unknown')
+    df.to_csv(filepath, index=False)
 
-missing = df[df['Party'] == 'Unknown'].copy()
-missing['MaxVol'] = missing.iloc[:, 2:].max(axis=1)
-names = missing.sort_values('MaxVol', ascending=False)['legislator_name'].tolist()
-print(f"Remaining Unknowns: {len(names)}")
-print(names[:10])
+    missing = df[df['Party'] == 'Unknown'].copy()
+    if len(missing.columns) > 2:
+        missing['MaxVol'] = missing.iloc[:, 2:].max(axis=1)
+        names = missing.sort_values('MaxVol', ascending=False)['legislator_name'].tolist()
+    else:
+        names = missing['legislator_name'].tolist()
+    print(f"Remaining Unknowns: {len(names)}")
+    print(names[:10])
+    return df, names
+
+if __name__ == '__main__':
+    update_flourish_export()
 

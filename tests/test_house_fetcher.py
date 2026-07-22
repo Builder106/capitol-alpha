@@ -1,3 +1,4 @@
+import pytest
 import pandas as pd
 from pipeline.house_fetcher import _parse_date, _parse_amount_range, _normalize_house_row
 
@@ -74,3 +75,61 @@ def test_normalize_house_row_fallback_fields():
     assert normalized["amount_min"] == 15001.0
     assert normalized["amount_max"] == 50000.0
     assert normalized["ptr_link"] == "https://example.com/link"
+
+def test_parse_amount_range_invalid_branches():
+    assert _parse_amount_range("abc - def") == (None, None)
+    assert _parse_amount_range("abc+") == (None, None)
+    assert _parse_amount_range("invalid_number") == (None, None)
+
+def test_fetch_house_and_get_house_df(tmp_path, monkeypatch):
+    import json, pipeline.house_fetcher as hf
+    fake_path = tmp_path / "house_all_transactions.json"
+    monkeypatch.setattr(hf, "HOUSE_JSON_PATH", fake_path)
+
+    # Missing file error
+    with pytest.raises(FileNotFoundError):
+        hf.fetch_house()
+    with pytest.raises(FileNotFoundError):
+        hf.get_house_df()
+
+    # Empty raw file
+    fake_path.write_text("[]")
+    assert hf.fetch_house().empty
+
+    # List of transactions
+    sample = [
+        {
+            "representative": "Pelosi Nancy",
+            "transaction_date": "05/01/2022",
+            "disclosure_date": "05/15/2022",
+            "amount": "$1,001 - $15,000",
+            "ticker": "AAPL"
+        },
+        {
+            "representative": "Old Rep",
+            "transaction_date": "05/01/1990",  # Out of range year
+            "disclosure_date": "05/15/1990",
+            "amount": "$1,001 - $15,000"
+        }
+    ]
+    fake_path.write_text(json.dumps(sample))
+    df = hf.fetch_house()
+    assert len(df) == 1
+    assert df.iloc[0]["legislator_name"] == "Pelosi Nancy"
+
+    df_cache = hf.get_house_df()
+    assert len(df_cache) == 1
+
+    # Dict with transactions key
+    fake_path.write_text(json.dumps({"transactions": sample}))
+    df_dict = hf.fetch_house()
+    assert len(df_dict) == 1
+    assert len(hf.get_house_df()) == 1
+
+    # Dict with data key
+    fake_path.write_text(json.dumps({"data": sample}))
+    assert len(hf.get_house_df()) == 1
+
+    # Empty dict transactions
+    fake_path.write_text(json.dumps({"transactions": []}))
+    assert hf.fetch_house().empty

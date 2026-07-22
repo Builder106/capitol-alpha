@@ -107,3 +107,60 @@ def test_normalize_senate_row_amount_min_max_avg():
     assert out["office"] == "D-OR"
     assert out["party"] == "D"
     assert out["state"] == "OR"
+
+def test_parse_amount_range_exception_branches():
+    from pipeline.senate_fetcher import _parse_amount_range
+    assert _parse_amount_range("bad - range") == (None, None)
+    assert _parse_amount_range("bad+") == (None, None)
+    assert _parse_amount_range("not_a_number") == (None, None)
+
+def test_parse_party_state_fallback():
+    from pipeline.senate_fetcher import _parse_party_state
+    party, state = _parse_party_state("UnknownOffice")
+    assert party is None and state is None
+
+def test_fetch_senate_and_get_senate_df(tmp_path, monkeypatch):
+    import json, pytest, pipeline.senate_fetcher as sf
+    fake_path = tmp_path / "senate_all_transactions.json"
+    monkeypatch.setattr(sf, "SENATE_JSON_PATH", fake_path)
+
+    # Missing file
+    with pytest.raises(FileNotFoundError):
+        sf.fetch_senate()
+    with pytest.raises(FileNotFoundError):
+        sf.get_senate_df()
+
+    # Empty raw file
+    fake_path.write_text("[]")
+    assert sf.fetch_senate().empty
+
+    # Sample transactions
+    sample = [
+        {
+            "senator": "Ron Wyden",
+            "transaction_date": "11/10/2020",
+            "ticker": "BYND",
+            "amount": "$1,001 - $15,000"
+        },
+        {
+            "senator": "Old Senator",
+            "transaction_date": "11/10/1980",  # Out of range
+            "amount": "$1,001 - $15,000"
+        }
+    ]
+    fake_path.write_text(json.dumps(sample))
+    df = sf.fetch_senate()
+    assert len(df) == 1
+    assert df.iloc[0]["legislator_name"] == "Ron Wyden"
+
+    df_cache = sf.get_senate_df()
+    assert len(df_cache) == 1
+
+    # Dict format (senate JSON is list of report dicts with transactions)
+    fake_path.write_text(json.dumps([{"senator": "Ron Wyden", "transaction_date": "11/10/2020", "amount": "$1,001 - $15,000"}]))
+    assert len(sf.fetch_senate()) == 1
+
+    # Flat list format for get_senate_df
+    fake_path.write_text(json.dumps([{"senator": "Ron Wyden", "transaction_date": "11/10/2020", "amount": "$1,001 - $15,000"}]))
+    assert len(sf.get_senate_df(from_cache=True)) == 1
+    assert len(sf.get_senate_df(from_cache=False)) == 1

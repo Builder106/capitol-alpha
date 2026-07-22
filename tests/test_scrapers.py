@@ -137,3 +137,250 @@ def test_senate_scraper(mock_pw, mock_accept, mock_scrape_ptr, mock_extract_sear
         df = scraper.scrape(start_year=2023, end_year=2023)
         assert not df.empty
         assert "AAPL" in df["ticker"].values
+
+def test_playwright_missing_error():
+    with patch("pipeline.scrapers.house_official.HAS_PLAYWRIGHT", False):
+        with pytest.raises(RuntimeError):
+            HouseOfficialScraper()
+            
+    with patch("pipeline.scrapers.senate_official.has_playwright", False):
+        with pytest.raises(RuntimeError):
+            SenateOfficialScraper()
+
+def test_house_pdf_parser_edge_cases():
+    assert parse_house_pdf("http://example.com/file.txt") == []
+
+    with patch("pipeline.scrapers.house_pdf_parser.requests.get", side_effect=Exception("HTTP Error")):
+        assert parse_house_pdf("http://example.com/file.pdf") == []
+
+    with patch("pipeline.scrapers.house_pdf_parser.requests.get") as mock_get:
+        mock_get.return_value.content = b"pdf_data"
+        with patch("pipeline.scrapers.house_pdf_parser.pdfplumber.open", side_effect=Exception("PDF Parse Error")):
+            assert parse_house_pdf("http://example.com/file.pdf") == []
+
+    # Table with missing headers / empty rows / no table
+    with patch("pipeline.scrapers.house_pdf_parser.requests.get") as mock_get:
+        mock_get.return_value.content = b"pdf_data"
+        mock_pdf = MagicMock()
+        mock_page1 = MagicMock()
+        mock_page1.extract_table.return_value = None  # Table is None
+        
+        mock_page2 = MagicMock()
+        mock_page2.extract_table.return_value = [
+            ["Unrelated", "Header"],  # Missing asset/amount in headers
+            ["val1", "val2"]
+        ]
+
+        mock_page3 = MagicMock()
+        mock_page3.extract_table.return_value = [
+            ["Asset", "Date"],  # Missing amount in col_map
+            ["val1", "val2"]
+        ]
+
+        mock_page4 = MagicMock()
+        mock_page4.extract_table.return_value = [
+            ["Asset", "Amount", "Date"],
+            [None, None, None]  # empty row
+        ]
+
+        mock_pdf.pages = [mock_page1, mock_page2, mock_page3, mock_page4]
+        with patch("pipeline.scrapers.house_pdf_parser.pdfplumber.open") as mock_open:
+            mock_open.return_value.__enter__.return_value = mock_pdf
+            assert parse_house_pdf("http://example.com/file.pdf") == []
+
+@patch('pipeline.scrapers.house_official.sync_playwright')
+def test_house_official_scraper_dom_branches(mock_pw):
+    mock_playwright = MagicMock()
+    mock_browser = MagicMock()
+    mock_context = MagicMock()
+    mock_page = MagicMock()
+    
+    mock_pw.return_value.start.return_value = mock_playwright
+    mock_playwright.chromium.launch.return_value = mock_browser
+    mock_browser.new_context.return_value = mock_context
+    mock_context.new_page.return_value = mock_page
+
+    # Test search_tab not visible
+    search_tab = MagicMock()
+    search_tab.is_visible.return_value = False
+    mock_page.query_selector.side_effect = lambda sel: search_tab if sel == 'a[href="#Search"]' else MagicMock()
+    
+    scraper = HouseOfficialScraper()
+    scraper._page = mock_page
+    scraper._ensure_search_page()
+    search_tab.click.assert_called_once()
+
+    # Test empty search results
+    empty_cell = MagicMock()
+    empty_cell.inner_text.return_value = "No activities found"
+    mock_page.query_selector.side_effect = lambda sel: empty_cell if sel == "td.dataTables_empty" else None
+    assert scraper._search_year("2023") == []
+
+    # Test missing table
+    mock_page.query_selector.side_effect = lambda sel: None
+    assert scraper._search_year("2023") == []
+
+    # Test href missing / pdf fallback
+    mock_page.evaluate.return_value = [
+        {"name": "No Href", "href": ""},
+        {"name": "With Href", "filing_type": "periodic transaction report", "href": "doc.pdf"}
+    ]
+    mock_page.query_selector.side_effect = lambda sel: MagicMock()
+    with patch("pipeline.scrapers.house_official.parse_house_pdf", return_value=[]):
+        res = scraper._search_year("2023")
+        assert len(res) == 1
+        assert res[0]["legislator_name"] == "With Href"
+
+    # Test scrape empty dataframe
+    with patch.object(scraper, "_search_year", return_value=[]):
+        df = scraper.scrape(start_year=2023, end_year=2023)
+        assert df.empty
+
+@patch('pipeline.scrapers.senate_official.sync_playwright')
+def test_senate_official_scraper_dom_branches(mock_pw):
+    mock_playwright = MagicMock()
+    mock_browser = MagicMock()
+    mock_context = MagicMock()
+    mock_page = MagicMock()
+    
+    mock_pw.return_value.start.return_value = mock_playwright
+    mock_playwright.chromium.launch.return_value = mock_browser
+    mock_browser.new_context.return_value = mock_context
+    mock_context.new_page.return_value = mock_page
+
+    scraper = SenateOfficialScraper()
+    scraper._page = mock_page
+
+    # Test accept agreement form
+    mock_form = MagicMock()
+    mock_page.query_selector.side_effect = lambda sel: mock_form if sel == "#agreement_form" else None
+    scraper._accept_agreement()
+    mock_page.click.assert_called_with("#agree_statement")
+
+    # Test search_ptr_by_date_range no results alert
+    alert_info = MagicMock()
+    alert_info.inner_text.return_value = "No results"
+    mock_page.query_selector.side_effect = lambda sel: alert_info if sel == ".alert-info" else MagicMock()
+    assert scraper._search_ptr_by_date_range("01/01/2023", "12/31/2023") == []
+
+    # Test search_ptr_by_date_range returning results
+    mock_page.query_selector.side_effect = lambda sel: None
+    with patch.object(scraper, "_extract_search_page_results", return_value=[{"report_url": "http://ptr"}]):
+        res = scraper._search_ptr_by_date_range("01/01/2023", "12/31/2023")
+        assert len(res) == 1
+
+    # Test extract_search_page_results pagination & cell filtering (cell without link & non-ptr link & pagination)
+    row1 = MagicMock()
+    cell1 = MagicMock(); cell1.inner_text.return_value = "FirstName"
+    cell2 = MagicMock(); cell2.inner_text.return_value = "LastName"
+    cell3 = MagicMock(); cell3.inner_text.return_value = "Office"
+    cell4 = MagicMock(); cell4.inner_text.return_value = "PTR"
+    link = MagicMock(); link.get_attribute.return_value = "/ptr/123"
+    cell4.query_selector.return_value = link
+    cell5 = MagicMock(); cell5.inner_text.return_value = "01/01/2023"
+    row1.query_selector_all.return_value = [cell1, cell2, cell3, cell4, cell5]
+
+    row_short = MagicMock()
+    row_short.query_selector_all.return_value = [cell1]  # < 5 cells
+
+    row_no_link = MagicMock()
+    c1 = MagicMock(); c1.inner_text.return_value = "A"
+    c2 = MagicMock(); c2.inner_text.return_value = "B"
+    c3 = MagicMock(); c3.inner_text.return_value = "C"
+    c4 = MagicMock(); c4.inner_text.return_value = "D"; c4.query_selector.return_value = None
+    c5 = MagicMock(); c5.inner_text.return_value = "E"
+    row_no_link.query_selector_all.return_value = [c1, c2, c3, c4, c5]
+
+    row_non_ptr = MagicMock()
+    c4_non_ptr = MagicMock(); c4_non_ptr.inner_text.return_value = "Annual"
+    link_non_ptr = MagicMock(); link_non_ptr.get_attribute.return_value = "/annual/123"
+    c4_non_ptr.query_selector.return_value = link_non_ptr
+    row_non_ptr.query_selector_all.return_value = [c1, c2, c3, c4_non_ptr, c5]
+
+    next_btn = MagicMock()
+    page_call_count = [0]
+    def mock_qs_all(sel):
+        if page_call_count[0] == 0:
+            page_call_count[0] += 1
+            return [row1, row_short, row_no_link, row_non_ptr]
+        return []
+
+    mock_page.query_selector_all.side_effect = mock_qs_all
+    def mock_qs(sel):
+        if sel == ".paginate_button.next:not(.disabled)" and page_call_count[0] == 1:
+            page_call_count[0] += 1
+            return next_btn
+        return None
+    mock_page.query_selector.side_effect = mock_qs
+
+    results = scraper._extract_search_page_results()
+    assert len(results) == 1
+    next_btn.click.assert_called_once()
+
+    # Test scrape_ptr_transactions missing card / table
+    mock_page.query_selector.side_effect = lambda sel: None
+    assert scraper._scrape_ptr_transactions("http://link", "Name", "Date") == []
+
+    card = MagicMock()
+    card.query_selector.return_value = None  # No table
+    mock_page.query_selector.side_effect = lambda sel: card if sel == "section.card" else None
+    assert scraper._scrape_ptr_transactions("http://link", "Name", "Date") == []
+
+    # Test scrape_ptr_transactions table parsing
+    card = MagicMock()
+    table = MagicMock()
+    th1 = MagicMock(); th1.inner_text.return_value = "Asset"
+    th2 = MagicMock(); th2.inner_text.return_value = "Type"
+    th3 = MagicMock(); th3.inner_text.return_value = "Transaction Date"
+    table.query_selector_all.side_effect = lambda sel: [th1, th2, th3] if sel == "thead th" else [tr1]
+
+    tr1 = MagicMock()
+    td1 = MagicMock(); td1.inner_text.return_value = "AAPL"
+    td2 = MagicMock(); td2.inner_text.return_value = "Purchase"
+    td3 = MagicMock(); td3.inner_text.return_value = "01/01/2023"
+    tr1.query_selector_all.return_value = [td1, td2, td3]
+
+    card.query_selector.return_value = table
+    mock_page.query_selector.side_effect = lambda sel: card if sel == "section.card" else None
+    
+    rows = scraper._scrape_ptr_transactions("http://link", "Senator Wyden", "01/05/2023")
+    assert len(rows) == 1
+    assert rows[0]["ticker"] == "AAPL"
+
+    # Test scrape empty results
+    with patch.object(scraper, "_search_ptr_by_date_range", return_value=[{"report_url": ""}]):
+        assert scraper.scrape(2023, 2023).empty
+
+    with patch.object(scraper, "_search_ptr_by_date_range", return_value=[{"report_url": "http://link"}]):
+        with patch.object(scraper, "_scrape_ptr_transactions", side_effect=Exception("scrape fail")):
+            assert scraper.scrape(2023, 2023).empty
+
+@patch('pipeline.scrapers.house_official.sync_playwright')
+def test_house_official_pdf_exception_and_columns(mock_pw):
+    mock_playwright = MagicMock()
+    mock_browser = MagicMock()
+    mock_context = MagicMock()
+    mock_page = MagicMock()
+    
+    mock_pw.return_value.start.return_value = mock_playwright
+    mock_playwright.chromium.launch.return_value = mock_browser
+    mock_browser.new_context.return_value = mock_context
+    mock_context.new_page.return_value = mock_page
+
+    scraper = HouseOfficialScraper()
+    scraper._page = mock_page
+
+    # PDF exception branch
+    mock_page.evaluate.return_value = [
+        {"name": "Smith", "office": "NY", "year": "2023", "filing_type": "periodic transaction report", "href": "doc.pdf"}
+    ]
+    mock_page.query_selector.side_effect = lambda sel: MagicMock()
+    with patch("pipeline.scrapers.house_official.parse_house_pdf", side_effect=Exception("PDF error")):
+        res = scraper._search_year("2023")
+        assert len(res) == 1
+        assert res[0]["legislator_name"] == "Smith"
+
+    # Column missing branch in scrape()
+    with patch.object(scraper, "_search_year", return_value=[{"name": "Smith"}]):
+        df = scraper.scrape(2023, 2023)
+        assert "transaction_year" in df.columns
