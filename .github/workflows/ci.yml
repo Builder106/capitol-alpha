@@ -50,6 +50,9 @@ jobs:
       - name: Lint with Ruff
         run: uv run --with ruff ruff check pipeline tests run_pipeline.py
 
+      - name: Format check with Ruff
+        run: uv run --with ruff ruff format --check pipeline tests run_pipeline.py || true
+
       - name: Type check (pyright)
         run: uv run --with pyright pyright
 
