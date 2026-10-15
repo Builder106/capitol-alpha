@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-10-13: Replace the README Mermaid diagram #decision
+
+The README now uses a static diagram with an editable HTML source at `assets/pipeline.html`. PNG keeps the GitHub rendering consistent. The separate Senate and House fetch paths converge on the normalized trade CSV. EDA and financial analysis branch from that dataset; SPY and ticker prices feed the financial branch. Jensen's alpha and Sharpe tests are grouped with financial analysis, and the final documents are grouped as research outputs.
+
 ## 2026-08-29: Gate the active Vercel project by branch #decision
 
 The active Vercel project uses `site` as its root, so `site/vercel.json` now blocks all Git-triggered deployments except `main` and `staging`. `main` remains the Production Branch and `staging` is the only Preview branch.

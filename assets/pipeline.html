@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CapitolAlpha data pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#fbfcfd}.diagram-container{width:100%;overflow-x:auto}svg{display:block;width:100%;min-width:1280px}@media print{.diagram-container{overflow-x:visible}svg{min-width:0}}</style>
+<div class="diagram-container">
+<svg viewBox="0 0 1280 720" role="img" aria-labelledby="pipeline-title pipeline-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="pipeline-title">CapitolAlpha data pipeline</title>
+<desc id="pipeline-desc">Senate and House filings pass through separate fetchers and converge in a normalized 16,203-row CSV. The CSV feeds EDA and financial analysis; ticker prices also feed financial analysis, which produces statistics and presentation deliverables.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#718096"/></marker></defs>
+<rect width="1280" height="720" fill="#fbfcfd"/>
+<text x="40" y="64" fill="#0c1525" font-family="'Instrument Serif', Georgia, serif" font-size="32">CapitolAlpha data pipeline</text>
+<path d="M 40 88 H 1240" stroke="#0c1525" stroke-opacity=".17"/>
+<path d="M 210 203 H 270" fill="none" stroke="#718096" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M 210 423 H 270" fill="none" stroke="#718096" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M 450 203 H 476 Q 484 203 484 211 V 311 Q 484 319 492 319 H 510" fill="none" stroke="#718096" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M 450 423 H 476 Q 484 423 484 415 V 351 Q 484 343 492 343 H 510" fill="none" stroke="#718096" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M 690 331 H 745" fill="none" stroke="#718096" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M 925 312 H 940 Q 948 312 948 304 V 221 Q 948 213 956 213 H 990" fill="none" stroke="#718096" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M 925 350 H 952 Q 960 350 960 358 V 403 Q 960 411 968 411 H 990" fill="none" stroke="#718096" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M 925 550 H 952 Q 960 550 960 542 V 433 Q 960 425 968 425 H 990" fill="none" stroke="#718096" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M 1080 456 V 548" fill="none" stroke="#718096" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="40" y="160" width="170" height="88" rx="6" fill="#ffffff" stroke="#c9d2dc" stroke-width="1"/>
+<text x="56" y="188" fill="#0c1525" font-family="'Geist', Arial, sans-serif" font-size="16" font-weight="600">Senate filings</text>
+<path d="M 56 200 H 194" stroke="#c9d2dc" stroke-width=".8"/>
+<text x="56" y="220" fill="#4d5a6b" font-family="'Geist Mono', monospace" font-size="11">efdsearch.senate.gov</text>
+<rect x="40" y="380" width="170" height="88" rx="6" fill="#ffffff" stroke="#c9d2dc" stroke-width="1"/>
+<text x="56" y="408" fill="#0c1525" font-family="'Geist', Arial, sans-serif" font-size="16" font-weight="600">House filings</text>
+<path d="M 56 420 H 194" stroke="#c9d2dc" stroke-width=".8"/>
+<text x="56" y="440" fill="#4d5a6b" font-family="'Geist Mono', monospace" font-size="11">Clerk disclosures</text>
+<rect x="270" y="160" width="180" height="88" rx="6" fill="#ffffff" stroke="#c9d2dc" stroke-width="1"/>
+<text x="286" y="188" fill="#0c1525" font-family="'Geist', Arial, sans-serif" font-size="16" font-weight="600">Senate fetcher</text>
+<path d="M 286 200 H 434" stroke="#c9d2dc" stroke-width=".8"/>
+<text x="286" y="220" fill="#4d5a6b" font-family="'Geist Mono', monospace" font-size="11">Playwright / HTML</text>
+<rect x="270" y="380" width="180" height="88" rx="6" fill="#ffffff" stroke="#c9d2dc" stroke-width="1"/>
+<text x="286" y="408" fill="#0c1525" font-family="'Geist', Arial, sans-serif" font-size="16" font-weight="600">House fetcher</text>
+<path d="M 286 420 H 434" stroke="#c9d2dc" stroke-width=".8"/>
+<text x="286" y="440" fill="#4d5a6b" font-family="'Geist Mono', monospace" font-size="11">Playwright / PDF</text>
+<rect x="510" y="287" width="180" height="88" rx="6" fill="#ffffff" stroke="#c9d2dc" stroke-width="1"/>
+<text x="526" y="315" fill="#0c1525" font-family="'Geist', Arial, sans-serif" font-size="16" font-weight="600">Normalize + dedupe</text>
+<path d="M 526 327 H 674" stroke="#c9d2dc" stroke-width=".8"/>
+<text x="526" y="347" fill="#4d5a6b" font-family="'Geist Mono', monospace" font-size="11">merge_to_csv.py</text>
+<rect x="745" y="287" width="180" height="88" rx="6" fill="#ffffff" stroke="#0c8aa3" stroke-width="2"/>
+<text x="761" y="315" fill="#0c1525" font-family="'Geist', Arial, sans-serif" font-size="16" font-weight="600">Trade CSV</text>
+<path d="M 761 327 H 909" stroke="#0c8aa3" stroke-width=".8"/>
+<text x="761" y="347" fill="#4d5a6b" font-family="'Geist Mono', monospace" font-size="11">16,203 rows / 18 cols</text>
+<rect x="990" y="168" width="230" height="88" rx="6" fill="#ffffff" stroke="#c9d2dc" stroke-width="1"/>
+<text x="1006" y="196" fill="#0c1525" font-family="'Geist', Arial, sans-serif" font-size="16" font-weight="600">EDA notebook</text>
+<path d="M 1006 208 H 1204" stroke="#c9d2dc" stroke-width=".8"/>
+<text x="1006" y="228" fill="#4d5a6b" font-family="'Geist Mono', monospace" font-size="11">descriptive statistics</text>
+<rect x="745" y="507" width="180" height="88" rx="6" fill="#ffffff" stroke="#c9d2dc" stroke-width="1"/>
+<text x="761" y="535" fill="#0c1525" font-family="'Geist', Arial, sans-serif" font-size="16" font-weight="600">Market prices</text>
+<path d="M 761 547 H 909" stroke="#c9d2dc" stroke-width=".8"/>
+<text x="761" y="567" fill="#4d5a6b" font-family="'Geist Mono', monospace" font-size="11">SPY + ticker prices</text>
+<rect x="990" y="368" width="230" height="88" rx="6" fill="#ffffff" stroke="#c9d2dc" stroke-width="1"/>
+<text x="1006" y="396" fill="#0c1525" font-family="'Geist', Arial, sans-serif" font-size="16" font-weight="600">Financial analysis</text>
+<path d="M 1006 408 H 1204" stroke="#c9d2dc" stroke-width=".8"/>
+<text x="1006" y="428" fill="#4d5a6b" font-family="'Geist Mono', monospace" font-size="11">return comparisons</text>
+<text x="1006" y="447" fill="#4d5a6b" font-family="'Geist Mono', monospace" font-size="11">alpha / Sharpe</text>
+<rect x="990" y="548" width="230" height="88" rx="6" fill="#eef5f7" stroke="#c9d2dc" stroke-width="1"/>
+<text x="1006" y="576" fill="#0c1525" font-family="'Geist', Arial, sans-serif" font-size="16" font-weight="600">Research outputs</text>
+<path d="M 1006 588 H 1204" stroke="#c9d2dc" stroke-width=".8"/>
+<text x="1006" y="608" fill="#4d5a6b" font-family="'Geist Mono', monospace" font-size="11">abstract / reflection</text>
+<text x="1006" y="627" fill="#4d5a6b" font-family="'Geist Mono', monospace" font-size="11">presentation deck</text>
+</svg>
+</div>
+</html>

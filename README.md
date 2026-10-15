@@ -56,19 +56,9 @@ The statistical details (t-statistics, confidence intervals, risk-adjusted Sharp
 
 ## Pipeline
 
-```mermaid
-flowchart LR
-  senate["efdsearch.senate.gov<br/>Senate Filings"] --> sf["senate_fetcher.py<br/>Playwright + HTML parse"]
-  house["disclosures-clerk.house.gov<br/>House Filings"] --> hf["house_fetcher.py<br/>Playwright + pdfplumber"]
-  sf --> merge["merge_to_csv.py<br/>normalize + dedupe"]
-  hf --> merge
-  merge --> csv[("data/legislative_trades.csv<br/>16,203 rows × 18 cols")]
-  csv --> eda["notebooks/EDA.ipynb<br/>descriptive stats"]
-  csv --> fin["notebooks/Financial_Analysis.ipynb"]
-  yf["yfinance<br/>SPY + ticker prices"] --> fin
-  fin --> alpha["Jensen's alpha<br/>Statistical Tests<br/>Sharpe + Distribution"]
-  alpha --> deliverables["abstract.pdf<br/>Final_Reflection.pdf<br/>Presentation deck"]
-```
+![CapitolAlpha data pipeline](assets/pipeline.png)
+
+Senate and House filings are fetched separately, normalized, and deduplicated into a 16,203-row trade dataset. EDA reads that dataset; financial analysis also uses ticker and SPY prices from yfinance before producing statistics and presentation material.
 
 [`run_pipeline.py`](run_pipeline.py) orchestrates data extraction; individual modules live in [`pipeline/`](pipeline/). Automated tests for data extractors and data cleaning are in [`tests/`](tests/).
 
