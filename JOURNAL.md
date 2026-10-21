@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-10-21: Redraw the pipeline figure from the code #decision
+
+The old figure baked its title into the image, left most of the canvas empty, and set prose in monospace. The new one in `assets/diagrams/` shows only what `run_pipeline.py` and the notebooks do: two fetchers merge into the trade CSV, and only the financial notebook adds yfinance prices. The research outputs box is gone because no code produces it.
+
 ## 2026-10-13: Replace the README Mermaid diagram #decision
 
 The README now uses a static diagram with an editable HTML source at `assets/pipeline.html`. PNG keeps the GitHub rendering consistent. The separate Senate and House fetch paths converge on the normalized trade CSV. EDA and financial analysis branch from that dataset; SPY and ticker prices feed the financial branch. Jensen's alpha and Sharpe tests are grouped with financial analysis, and the final documents are grouped as research outputs.

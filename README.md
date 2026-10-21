@@ -56,9 +56,14 @@ The statistical details (t-statistics, confidence intervals, risk-adjusted Sharp
 
 ## Pipeline
 
-![CapitolAlpha data pipeline](assets/pipeline.png)
+Senate and House filings are fetched separately and merged into one 16,203-row trade CSV. Both notebooks read that CSV, and the financial one also pulls market prices.
 
-Senate and House filings are fetched separately, normalized, and deduplicated into a 16,203-row trade dataset. EDA reads that dataset; financial analysis also uses ticker and SPY prices from yfinance before producing statistics and presentation material.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/diagrams/pipeline-dark.png">
+  <img src="assets/diagrams/pipeline.png" alt="senate_fetcher.py and house_fetcher.py each pull Stock Watcher JSON, or scrape the official site when it is missing. merge_to_csv.py cleans and dedupes both into the trade CSV. The EDA notebook reads it, and the financial analysis notebook reads it along with SPY and ticker prices from yfinance." width="880">
+</picture>
+
+[Edit the diagram](assets/diagrams/pipeline.html).
 
 [`run_pipeline.py`](run_pipeline.py) orchestrates data extraction; individual modules live in [`pipeline/`](pipeline/). Automated tests for data extractors and data cleaning are in [`tests/`](tests/).
 

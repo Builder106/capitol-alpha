@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two chambers merge into one trade CSV</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+:root { color-scheme: light dark; --bg: #ffffff; --ink: #1f2328; --muted: #59636e; --edge: #59636e; --box: #8c959f; --group: #d1d9e0; --groupfill: #f6f8fa; --accent: #0969da; }
+@media (prefers-color-scheme: dark) { :root { --bg: #0d1117; --ink: #f0f6fc; --muted: #9198a1; --edge: #9198a1; --box: #656c76; --group: #3d444d; --groupfill: #151b23; --accent: #4493f8; } }
+html, body { margin: 0; background: var(--bg); }
+main { max-width: 880px; margin: 0 auto; }
+svg { display: block; width: 100%; height: auto; }
+text { font-family: "IBM Plex Sans", system-ui, sans-serif; fill: var(--ink); }
+.mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.muted { fill: var(--muted); }
+.accent-text { fill: var(--accent); }
+.bg, .halo { fill: var(--bg); }
+.node { fill: var(--bg); stroke-width: 1.25; }
+.node.box { stroke: var(--box); }
+.node.accent { stroke: var(--accent); stroke-width: 2; }
+.group { fill: var(--groupfill); stroke: var(--group); }
+.boundary { fill: none; stroke: var(--box); stroke-dasharray: 6 6; }
+.edge { fill: none; stroke: var(--edge); stroke-width: 1.5; }
+.edge.accent { stroke: var(--accent); stroke-width: 2; }
+.edge.dashed { stroke-dasharray: 6 5; }
+.lifeline { fill: none; stroke: var(--group); stroke-dasharray: 4 5; }
+.tip { fill: var(--edge); }
+.tip-accent { fill: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 359" role="img" aria-labelledby="diagram-title diagram-desc">
+<title id="diagram-title">Two chambers merge into one trade CSV</title>
+<desc id="diagram-desc">Senate and House disclosures are fetched separately, from Stock Watcher JSON or by scraping the official sites when the JSON is missing. merge_to_csv.py cleans and deduplicates both into legislative_trades.csv. The EDA notebook reads that CSV. The financial analysis notebook reads it too and adds SPY and ticker prices from yfinance.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="tip" d="M0,0 L10,5 L0,10 Z"/></marker>
+<marker id="arrow-accent" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="tip-accent" d="M0,0 L10,5 L0,10 Z"/></marker>
+</defs>
+<rect class="bg" width="880" height="359"/>
+<rect class="node box" x="16" y="16" width="210" height="88" rx="6"/>
+<text x="30" y="43" font-size="16" class="mono" font-weight="600">senate_fetcher.py</text>
+<text x="30" y="64" font-size="14" class="muted">Stock Watcher JSON</text>
+<text x="30" y="85" font-size="14" class="muted">or the Senate site</text>
+<rect class="node box" x="16" y="146" width="210" height="88" rx="6"/>
+<text x="30" y="173" font-size="16" class="mono" font-weight="600">house_fetcher.py</text>
+<text x="30" y="194" font-size="14" class="muted">Stock Watcher JSON</text>
+<text x="30" y="215" font-size="14" class="muted">or the Clerk site</text>
+<rect class="node box" x="276" y="81" width="190" height="67" rx="6"/>
+<text x="290" y="108" font-size="16" class="mono" font-weight="600">merge_to_csv.py</text>
+<text x="290" y="129" font-size="14" class="muted">clean and dedupe</text>
+<path class="node accent" d="M506,85 V142 A85,10 0 0 0 676,142 V85 A85,10 0 0 0 506,85 Z"/><ellipse class="node accent" cx="591" cy="85" rx="85" ry="10"/>
+<text x="520" y="112" font-size="16" font-weight="600">Trade CSV</text>
+<text x="520" y="133" font-size="14" class="muted">16,203 rows</text>
+<rect class="node box" x="716" y="16" width="148" height="67" rx="6"/>
+<text x="730" y="43" font-size="16" font-weight="600">EDA</text>
+<text x="730" y="64" font-size="14" class="muted">notebook</text>
+<rect class="node box" x="716" y="146" width="148" height="67" rx="6"/>
+<text x="730" y="173" font-size="16" font-weight="600">Financial</text>
+<text x="730" y="194" font-size="14" class="muted">analysis</text>
+<rect class="node box" x="716" y="276" width="148" height="67" rx="6"/>
+<text x="730" y="303" font-size="16" font-weight="600">yfinance</text>
+<text x="730" y="324" font-size="14" class="muted">SPY and tickers</text>
+<path class="edge" d="M226,60 L251,60 L251,101.1 L276,101.1" marker-end="url(#arrow)"/>
+<path class="edge" d="M226,190 L251,190 L251,127.9 L276,127.9" marker-end="url(#arrow)"/>
+<path class="edge accent" d="M466,114.5 L506,114.5" marker-end="url(#arrow-accent)"/>
+<path class="edge" d="M676,98.1 L696,98.1 L696,49.5 L716,49.5" marker-end="url(#arrow)"/>
+<path class="edge" d="M676,128.9 L696,128.9 L696,179.5 L716,179.5" marker-end="url(#arrow)"/>
+<path class="edge" d="M790,276 L790,213" marker-end="url(#arrow)"/>
+<rect class="halo" x="794" y="236.5" width="55.04" height="19"/>
+<text x="798" y="249.5" font-size="14" class="label">prices</text>
+</svg>
+</main>
+<script type="application/json" id="diagram-spec">
+{
+  "title": "Two chambers merge into one trade CSV",
+  "desc": "Senate and House disclosures are fetched separately, from Stock Watcher JSON or by scraping the official sites when the JSON is missing. merge_to_csv.py cleans and deduplicates both into legislative_trades.csv. The EDA notebook reads that CSV. The financial analysis notebook reads it too and adds SPY and ticker prices from yfinance.",
+  "width": 880,
+  "nodes": [
+    {
+      "id": "sen",
+      "x": 16,
+      "y": 16,
+      "w": 210,
+      "title": "senate_fetcher.py",
+      "mono_title": true,
+      "lines": [
+        "Stock Watcher JSON",
+        "or the Senate site"
+      ]
+    },
+    {
+      "id": "hou",
+      "x": 16,
+      "y": 146,
+      "w": 210,
+      "title": "house_fetcher.py",
+      "mono_title": true,
+      "lines": [
+        "Stock Watcher JSON",
+        "or the Clerk site"
+      ]
+    },
+    {
+      "id": "mrg",
+      "x": 276,
+      "y": 81,
+      "w": 190,
+      "title": "merge_to_csv.py",
+      "mono_title": true,
+      "lines": [
+        "clean and dedupe"
+      ]
+    },
+    {
+      "id": "csv",
+      "x": 506,
+      "y": 75,
+      "w": 170,
+      "shape": "store",
+      "accent": true,
+      "title": "Trade CSV",
+      "lines": [
+        "16,203 rows"
+      ]
+    },
+    {
+      "id": "eda",
+      "x": 716,
+      "y": 16,
+      "w": 148,
+      "title": "EDA",
+      "lines": [
+        "notebook"
+      ]
+    },
+    {
+      "id": "fin",
+      "x": 716,
+      "y": 146,
+      "w": 148,
+      "title": "Financial",
+      "lines": [
+        "analysis"
+      ]
+    },
+    {
+      "id": "yf",
+      "x": 716,
+      "y": 276,
+      "w": 148,
+      "title": "yfinance",
+      "lines": [
+        "SPY and tickers"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "sen.r",
+      "to": "mrg.l@0.3"
+    },
+    {
+      "from": "hou.r",
+      "to": "mrg.l@0.7"
+    },
+    {
+      "from": "mrg.r",
+      "to": [
+        506,
+        114.5
+      ],
+      "accent": true
+    },
+    {
+      "from": "csv.r@0.3",
+      "to": "eda.l"
+    },
+    {
+      "from": "csv.r@0.7",
+      "to": "fin.l"
+    },
+    {
+      "from": "yf.t",
+      "to": "fin.b",
+      "label": "prices"
+    }
+  ]
+}
+</script>
+</body>
+</html>
