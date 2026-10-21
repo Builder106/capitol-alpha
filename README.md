@@ -3,7 +3,7 @@
   <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg" type="image/svg+xml">
   <source media="(prefers-color-scheme: dark)"  srcset="assets/banner-dark.png">
   <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.png">
-  <img alt="CapitolAlpha: A statistically significant edge in 16,203 disclosed Congressional trades" src="assets/banner-dark.svg">
+  <img alt="CapitolAlpha: Congressional stock purchases beat the S&amp;P 500 by 2.58% over 90 days (13.74% vs 11.16%, p = 0.013)" src="assets/banner-dark.svg">
 </picture>
 
 [![CI](https://github.com/Builder106/capitol-alpha/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/capitol-alpha/actions/workflows/ci.yml)

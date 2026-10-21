@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="1200" height="420" viewBox="0 0 1200 420" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1200" height="420" fill="#fbfcfd"/>
-  <rect x="0" y="0" width="1200" height="4" fill="#0c8aa3"/>
+  <rect width="1200" height="420" fill="#fafbfc"/>
+  <rect x="0" y="0" width="400" height="4" fill="#1d4ed8"/>
+  <rect x="400" y="0" width="400" height="4" fill="#15803d"/>
+  <rect x="800" y="0" width="400" height="4" fill="#b45309"/>
 
-  <text x="64" y="76" font-family="Helvetica, Arial, sans-serif" font-size="13" letter-spacing="2.8" fill="#6b7a96" font-weight="700">WESLEYAN QAC 420 | DATA FOR GOOD</text>
+  <text x="64" y="150" font-family="Georgia, 'Times New Roman', serif" font-size="68" font-weight="700" fill="#0c1626" letter-spacing="-0.01em">CapitolAlpha</text>
 
-  <text x="64" y="170" font-family="Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#0c1525" letter-spacing="-0.012em">CapitolAlpha</text>
-
-  <text x="64" y="222" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#4a5872">The edge hiding in 16,203 disclosed Congressional trades.</text>
-  <text x="64" y="250" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#4a5872">Senate + House Periodic Transaction Reports, 2020&#8211;2024.</text>
-
-  <g transform="translate(64, 348)" font-family="Helvetica, Arial, sans-serif">
-    <text font-size="13" letter-spacing="1.4" font-weight="700" fill="#6b7a96">
-      <tspan fill="#0c8aa3">16,203</tspan><tspan fill="#4a5872" dx="6">TRADES</tspan>
-      <tspan fill="#c4ccdb" dx="14">/</tspan>
-      <tspan fill="#0c8aa3" dx="14">220</tspan><tspan fill="#4a5872" dx="6">BENCHMARKED PURCHASES</tspan>
-      <tspan fill="#c4ccdb" dx="14">/</tspan>
-      <tspan fill="#d94c4c" dx="14">p &lt; 0.05</tspan>
-    </text>
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="64" y="200" font-size="21" fill="#2d3a4f">The edge hiding in 16,203 disclosed</text>
+    <text x="64" y="228" font-size="21" fill="#2d3a4f">Congressional stock trades, 2020&#8211;2024.</text>
+    <text x="64" y="338" font-size="14" fill="#475569">Wesleyan QAC 420 | Data for Good | Senate and House PTRs</text>
   </g>
 
-  <g transform="translate(770, 100)" font-family="Helvetica, Arial, sans-serif">
-    <text font-size="11" letter-spacing="1.8" fill="#6b7a96" font-weight="700" x="0" y="0">90-DAY HORIZON, VS S&amp;P 500</text>
+  <line x1="660" y1="84" x2="660" y2="350" stroke="#dde3eb" stroke-width="1"/>
 
-    <text font-size="72" font-weight="700" fill="#d94c4c" x="0" y="78" letter-spacing="-0.025em">+2.58%</text>
-    <text font-size="13" letter-spacing="1.6" font-weight="700" fill="#0c1525" x="0" y="108">JENSEN&#8217;S ALPHA</text>
-    <text font-size="13" letter-spacing="1.0" fill="#4a5872" x="0" y="130">on disclosed Congressional purchases</text>
+  <g transform="translate(700, 0)" font-family="Helvetica, Arial, sans-serif">
+    <path d="M0 150 L20 118 L40 150 Z" fill="#15803d"/>
+    <text x="52" y="150" font-size="76" font-weight="700" fill="#15803d" letter-spacing="-0.02em">2.58%</text>
+    <text x="0" y="184" font-size="16" font-weight="700" fill="#0c1626">Jensen&#8217;s alpha, 90 days vs the S&amp;P 500</text>
+    <text x="0" y="208" font-size="14" fill="#475569">p = 0.013 | t = 2.51 | 220 benchmarked purchases</text>
 
-    <line x1="0" y1="170" x2="320" y2="170" stroke="#dce2ed" stroke-width="1"/>
+    <text x="0" y="264" font-size="14" fill="#2d3a4f">Purchases</text>
+    <rect x="90" y="248" width="215" height="22" fill="#64748b"/>
+    <rect x="305" y="248" width="50" height="22" fill="#15803d"/>
+    <text x="365" y="265" font-size="16" font-weight="700" fill="#0c1626">13.74%</text>
 
-    <text font-size="11" letter-spacing="1.4" fill="#8a99b4" font-weight="600" x="0" y="194">90-DAY BUY-AND-HOLD ROI</text>
-    <text font-size="20" font-weight="700" fill="#0c1525" x="0" y="222" letter-spacing="-0.01em">13.74%</text>
-    <text font-size="12" fill="#6b7a96" x="78" y="222">average across 220 purchases</text>
+    <text x="0" y="300" font-size="14" fill="#2d3a4f">S&amp;P 500</text>
+    <rect x="90" y="284" width="215" height="22" fill="#cbd5e1"/>
+    <text x="315" y="301" font-size="16" font-weight="700" fill="#475569">11.16%</text>
+
+    <line x1="305" y1="240" x2="305" y2="314" stroke="#0c1626" stroke-width="1" stroke-dasharray="3 3"/>
+    <text x="0" y="338" font-size="12" fill="#475569">Mean 90-day return after each disclosed purchase</text>
   </g>
 </svg>
