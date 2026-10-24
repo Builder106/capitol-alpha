@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v9
         with:
           enable-cache: true
 
@@ -48,7 +48,7 @@ jobs:
         run: uv run --with pip-licenses pip-licenses --fail-on="AGPL;GPL"
 
       - name: Lint with Ruff
-        run: uv run --with ruff ruff check pipeline tests run_pipeline.py
+        run: uv run --with ruff ruff check notebooks pipeline tests utils run_pipeline.py
 
       - name: Format check with Ruff
         run: uv run --with ruff ruff format --check pipeline tests run_pipeline.py || true

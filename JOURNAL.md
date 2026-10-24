@@ -63,3 +63,7 @@ First commit stood up the whole fetch-and-merge pipeline (Senate + House → nor
 ## 2026-03-31 — Reviewer ethics + rigor feedback that shaped the framing #feedback #quote
 
 Course reviewer comments on the Problem Statement and Statement of Purpose set several guardrails the final work had to honor. On scraping: *"scraping has been a controversial practice — how would you address potential questions about the ethics of scraping?"*and a pointed*"I'm curious if these sources have some sort of firewalls that prevent scraping"*— which is why the reflections draw the explicit line that this automates reading legally-public data, not bypassing CAPTCHAs or access controls. On rigor:*"I'd suggest being careful with this kind of suggestive language — till you find a stat. significant result, you can't really say that it's 'abnormal', right?"*On scope:*"Maybe after looking at the general trends, you can pick out the anomalies (highest/lowest returns) and focus on their stories!"*— which became the anomalies-in-the-tails narrative. And repeatedly:*"Define this!"* on Jensen's Alpha, Sharpe ratio, and information-advantage decay, pushing the deliverables to explain the jargon for a non-technical audience.
+
+## 2026-10-23: Check all Python paths for Any annotations #decision
+
+Ruff ANN401 now covers notebooks, pipeline code, tests, utilities, and `run_pipeline.py`. The unit-test job already treats Python warnings as errors.
