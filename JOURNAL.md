@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-10-27: Enforce Ruff formatting in CI #ci #decision
+
+Ruff format failures now stop CI. Ruff also checks the `UP` rules for outdated Python syntax.
+
 ## 2026-10-21: Redraw the pipeline figure from the code #decision
 
 The old figure baked its title into the image, left most of the canvas empty, and set prose in monospace. The new one in `assets/diagrams/` shows only what `run_pipeline.py` and the notebooks do: two fetchers merge into the trade CSV, and only the financial notebook adds yfinance prices. The research outputs box is gone because no code produces it.

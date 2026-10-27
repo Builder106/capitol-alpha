@@ -48,10 +48,10 @@ jobs:
         run: uv run --with pip-licenses pip-licenses --fail-on="AGPL;GPL"
 
       - name: Lint with Ruff
-        run: uv run --with ruff ruff check notebooks pipeline tests utils run_pipeline.py
+        run: uv run --with ruff ruff check --extend-select UP notebooks pipeline tests utils run_pipeline.py
 
       - name: Format check with Ruff
-        run: uv run --with ruff ruff format --check pipeline tests run_pipeline.py || true
+        run: uv run --with ruff ruff format --check pipeline tests run_pipeline.py
 
       - name: Type check (pyright)
         run: uv run --with pyright pyright
