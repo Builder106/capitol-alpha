@@ -13,6 +13,7 @@ def _parse_date(s):
     if not s or not isinstance(s, str):
         return None
     from datetime import datetime
+
     for fmt in ("%m/%d/%Y", "%Y-%m-%d", "%m/%d/%y"):
         try:
             return datetime.strptime(s.strip(), fmt).year
@@ -24,16 +25,16 @@ def _parse_date(s):
 def _parse_amount_range(value):
     if not value or not isinstance(value, str):
         return None, None
-    s = value.strip().replace('$', '').replace(',', '').lower()
-    if s in ('', 'n/a', 'unknown', '--'):
+    s = value.strip().replace("$", "").replace(",", "").lower()
+    if s in ("", "n/a", "unknown", "--"):
         return None, None
-    if ' - ' in s:
+    if " - " in s:
         try:
-            lo, hi = s.split(' - ', 1)
+            lo, hi = s.split(" - ", 1)
             return float(lo), float(hi)
         except ValueError:
             return None, None
-    if s.endswith('+'):
+    if s.endswith("+"):
         try:
             return float(s[:-1]), None
         except ValueError:
@@ -116,7 +117,9 @@ def get_house_df(from_cache=True):
             df["transaction_year"] = df["transaction_date"].apply(_parse_date)
             df["disclosure_year"] = df["disclosure_date"].apply(_parse_date)
             mask = df["transaction_year"].notna()
-            df = df.loc[mask & (df["transaction_year"] >= MIN_YEAR) & (df["transaction_year"] <= MAX_YEAR)]
+            df = df.loc[
+                mask & (df["transaction_year"] >= MIN_YEAR) & (df["transaction_year"] <= MAX_YEAR)
+            ]
             return df
     raise FileNotFoundError(
         f"Local House data file not found at {HOUSE_JSON_PATH}. "

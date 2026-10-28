@@ -16,9 +16,7 @@ from pipeline.senate_fetcher import get_senate_df
 
 
 def test_compute_factor_adjusted_alpha():
-    df = pd.DataFrame({
-        "roi_90d": [0.15, 0.18, 0.12, 0.20, 0.14]
-    })
+    df = pd.DataFrame({"roi_90d": [0.15, 0.18, 0.12, 0.20, 0.14]})
     bench = pd.Series([0.11, 0.11, 0.11, 0.11, 0.11])
     res = compute_factor_adjusted_alpha(df, bench)
 
@@ -79,11 +77,13 @@ def test_analyze_trade_deltas(tmp_path):
 
     # Existing file with columns
     csv_file = tmp_path / "test_trades.csv"
-    df = pd.DataFrame({
-        "member_name": ["Alice", "Bob"],
-        "transaction_date": ["2024-01-01", "2024-01-02"],
-        "type": ["Purchase", "Sale"]
-    })
+    df = pd.DataFrame(
+        {
+            "member_name": ["Alice", "Bob"],
+            "transaction_date": ["2024-01-01", "2024-01-02"],
+            "type": ["Purchase", "Sale"],
+        }
+    )
     df.to_csv(csv_file, index=False)
 
     summary = analyze_trade_deltas(csv_file)
@@ -102,7 +102,12 @@ def test_analyze_trade_deltas(tmp_path):
 
 def test_monitor_main():
     mon_path = str(Path(__file__).parent.parent / "pipeline" / "monitor.py")
-    with patch("pandas.read_csv", return_value=pd.DataFrame({"member_name": ["Alice"], "transaction_date": ["2024-01-01"], "type": ["Purchase"]})):
+    with patch(
+        "pandas.read_csv",
+        return_value=pd.DataFrame(
+            {"member_name": ["Alice"], "transaction_date": ["2024-01-01"], "type": ["Purchase"]}
+        ),
+    ):
         with patch.object(Path, "exists", return_value=True):
             runpy.run_path(mon_path, run_name="__main__")
 
@@ -110,6 +115,7 @@ def test_monitor_main():
 def test_run_pipeline_main_execution(tmp_path):
     from pipeline.run_pipeline import main as run_pipeline_main
     import subprocess
+
     # Test __main__ guard with module execution
     subprocess.run([sys.executable, "-m", "pipeline.run_pipeline", "--help"], check=True)
 
@@ -123,11 +129,16 @@ def test_run_pipeline_main_execution(tmp_path):
                             mock_house_path.exists.return_value = True
                             mock_path.exists.return_value = True
                             mock_h_path.exists.return_value = True
-                            with patch("pipeline.senate_fetcher.get_senate_df", return_value=pd.DataFrame([{"chamber": "Senate"}])):
-                                with patch("pipeline.run_pipeline.get_senate_df", return_value=pd.DataFrame([{"chamber": "Senate"}])):
+                            with patch(
+                                "pipeline.senate_fetcher.get_senate_df",
+                                return_value=pd.DataFrame([{"chamber": "Senate"}]),
+                            ):
+                                with patch(
+                                    "pipeline.run_pipeline.get_senate_df",
+                                    return_value=pd.DataFrame([{"chamber": "Senate"}]),
+                                ):
                                     with patch("pandas.DataFrame.to_csv"):
                                         run_pipeline_main()
-
 
 
 def test_scrapers_import_playwright_fallback():
@@ -147,7 +158,12 @@ def test_scrapers_import_playwright_fallback():
         "__package__": "pipeline.scrapers",
     }
     with patch("builtins.__import__", side_effect=fake_import):
-        exec(compile(senate_code, str(Path("pipeline/scrapers/senate_official.py").resolve()), "exec"), scope_senate)
+        exec(
+            compile(
+                senate_code, str(Path("pipeline/scrapers/senate_official.py").resolve()), "exec"
+            ),
+            scope_senate,
+        )
         assert scope_senate["has_playwright"] is False
         assert scope_senate["sync_playwright"] is None
 
@@ -158,46 +174,56 @@ def test_scrapers_import_playwright_fallback():
         "__package__": "pipeline.scrapers",
     }
     with patch("builtins.__import__", side_effect=fake_import):
-        exec(compile(house_code, str(Path("pipeline/scrapers/house_official.py").resolve()), "exec"), scope_house)
+        exec(
+            compile(house_code, str(Path("pipeline/scrapers/house_official.py").resolve()), "exec"),
+            scope_house,
+        )
         assert scope_house["HAS_PLAYWRIGHT"] is False
 
 
 def test_senate_fetcher_already_flat_raw(tmp_path):
     json_path = tmp_path / "senate.json"
     import json
-    data = [{
-        "first_name": "Jane",
-        "last_name": "Doe",
-        "office": "Senator",
-        "report_type": "PTR",
-        "date_received": "01/01/2023",
-        "transactions": [{
-            "transaction_date": "01/01/2023",
-            "disclosure_date": "01/05/2023",
-            "ticker": "AAPL",
-            "asset_description": "Apple",
-            "type": "Purchase",
-            "amount": "$1,001 - $15,000",
-        }]
-    }]
+
+    data = [
+        {
+            "first_name": "Jane",
+            "last_name": "Doe",
+            "office": "Senator",
+            "report_type": "PTR",
+            "date_received": "01/01/2023",
+            "transactions": [
+                {
+                    "transaction_date": "01/01/2023",
+                    "disclosure_date": "01/05/2023",
+                    "ticker": "AAPL",
+                    "asset_description": "Apple",
+                    "type": "Purchase",
+                    "amount": "$1,001 - $15,000",
+                }
+            ],
+        }
+    ]
     json_path.write_text(json.dumps(data))
 
     # Test when _flatten_senate_raw produces empty list but raw is a list
     with patch("pipeline.senate_fetcher.SENATE_JSON_PATH", json_path):
         with patch("pipeline.senate_fetcher._flatten_senate_raw", return_value=[]):
             # raw is a list of dicts that can be normalized
-            flat_items = [{
-                "first_name": "Jane",
-                "last_name": "Doe",
-                "office": "Senator",
-                "transaction_date": "01/01/2023",
-                "disclosure_date": "01/05/2023",
-                "ticker": "AAPL",
-                "asset_description": "Apple",
-                "type": "Purchase",
-                "amount": "$1,001 - $15,000",
-                "ptr_link": "http://ptr",
-            }]
+            flat_items = [
+                {
+                    "first_name": "Jane",
+                    "last_name": "Doe",
+                    "office": "Senator",
+                    "transaction_date": "01/01/2023",
+                    "disclosure_date": "01/05/2023",
+                    "ticker": "AAPL",
+                    "asset_description": "Apple",
+                    "type": "Purchase",
+                    "amount": "$1,001 - $15,000",
+                    "ptr_link": "http://ptr",
+                }
+            ]
             json_path.write_text(json.dumps(flat_items))
             df = get_senate_df()
             assert not df.empty

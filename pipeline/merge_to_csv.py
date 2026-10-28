@@ -45,7 +45,9 @@ def clean_dataframe(df):
         return v if v else None
 
     df["legislator_name"] = df["legislator_name"].apply(_normalize_string)
-    df["ticker"] = df["ticker"].apply(lambda v: _normalize_string(v).upper() if _normalize_string(v) else None)
+    df["ticker"] = df["ticker"].apply(
+        lambda v: _normalize_string(v).upper() if _normalize_string(v) else None
+    )
     df["ticker"] = df["ticker"].replace({"--": None, "N/A": None, "NA": None})
 
     transaction_map = {
@@ -56,14 +58,20 @@ def clean_dataframe(df):
         "exchange": "Exchange",
     }
     df["transaction_type"] = (
-        df["transaction_type"].fillna("").astype(str).str.strip().str.lower().map(transaction_map).fillna(df["transaction_type"])
+        df["transaction_type"]
+        .fillna("")
+        .astype(str)
+        .str.strip()
+        .str.lower()
+        .map(transaction_map)
+        .fillna(df["transaction_type"])
     )
 
-    df["owner"] = (
-        df["owner"].fillna("").astype(str).str.strip().str.title().replace({"": None})
-    )
+    df["owner"] = df["owner"].fillna("").astype(str).str.strip().str.title().replace({"": None})
 
-    df = df[df["transaction_date"].notna() & (df["ticker"].notna() | df["asset_description"].notna())]
+    df = df[
+        df["transaction_date"].notna() & (df["ticker"].notna() | df["asset_description"].notna())
+    ]
 
     df = df.drop_duplicates().copy()
 

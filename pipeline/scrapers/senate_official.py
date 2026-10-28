@@ -6,6 +6,7 @@ import pandas as pd
 
 try:
     from playwright.sync_api import Browser, BrowserContext, Page, Playwright, sync_playwright
+
     has_playwright = True
 except ImportError:
     sync_playwright = None  # type: ignore[assignment]
@@ -69,7 +70,9 @@ def _normalize_senate_row(
         "disclosure_date": disclosure_date,
         "transaction_date": raw.get("transaction_date") or raw.get("transaction_date_date") or "",
         "ticker": (raw.get("ticker") or raw.get("asset") or "").strip() or None,
-        "asset_description": raw.get("asset_name") or raw.get("asset_description") or raw.get("asset"),
+        "asset_description": raw.get("asset_name")
+        or raw.get("asset_description")
+        or raw.get("asset"),
         "asset_type": raw.get("asset_type"),
         "transaction_type": raw.get("type") or raw.get("transaction_type"),
         "amount_range": raw.get("amount") or raw.get("amount_range"),
@@ -82,7 +85,9 @@ def _normalize_senate_row(
 class SenateOfficialScraper:
     def __init__(self, headless: bool = True) -> None:
         if not has_playwright:
-            raise RuntimeError("Playwright is required. Install with: pip install playwright && playwright install")
+            raise RuntimeError(
+                "Playwright is required. Install with: pip install playwright && playwright install"
+            )
         self._headless = headless
         self._playwright: Playwright | None = None
         self._browser: Browser | None = None
@@ -92,7 +97,9 @@ class SenateOfficialScraper:
 
     def __enter__(self) -> "SenateOfficialScraper":
         self._playwright = sync_playwright().start()  # type: ignore[misc]
-        self._browser = self._playwright.chromium.launch(headless=self._headless, args=["--disable-dev-shm-usage"])
+        self._browser = self._playwright.chromium.launch(
+            headless=self._headless, args=["--disable-dev-shm-usage"]
+        )
         self._context = self._browser.new_context(
             viewport={"width": 1280, "height": 800},
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0",
@@ -132,14 +139,20 @@ class SenateOfficialScraper:
         self._page.evaluate(
             "() => { document.querySelectorAll('input[name=\"report_type\"]').forEach(el => el.checked = false); }"
         )
-        ptr_cb = self._page.query_selector(f'input[name="report_type"][value="{PTR_REPORT_TYPE_VALUE}"]')
+        ptr_cb = self._page.query_selector(
+            f'input[name="report_type"][value="{PTR_REPORT_TYPE_VALUE}"]'
+        )
         if ptr_cb:
             ptr_cb.check()
         self._page.click("button[type='submit']")
         self._page.wait_for_selector("#filedReports_processing", state="visible", timeout=5000)
         self._page.wait_for_selector("#filedReports_processing", state="hidden", timeout=30000)
-        self._page.wait_for_selector("#filedReports tbody tr, .alert-info", state="visible", timeout=10000)
-        if self._page.query_selector(".alert-info") and "No results" in (self._page.query_selector(".alert-info").inner_text() or ""):
+        self._page.wait_for_selector(
+            "#filedReports tbody tr, .alert-info", state="visible", timeout=10000
+        )
+        if self._page.query_selector(".alert-info") and "No results" in (
+            self._page.query_selector(".alert-info").inner_text() or ""
+        ):
             return []
         return self._extract_search_page_results()
 
@@ -159,14 +172,16 @@ class SenateOfficialScraper:
                     continue
                 if href.startswith("/"):
                     href = f"{SENATE_BASE}{href}"
-                results.append({
-                    "first_name": cells[0].inner_text().strip(),
-                    "last_name": cells[1].inner_text().strip(),
-                    "office": cells[2].inner_text().strip(),
-                    "report_type": cells[3].inner_text().strip(),
-                    "date": cells[4].inner_text().strip(),
-                    "report_url": href,
-                })
+                results.append(
+                    {
+                        "first_name": cells[0].inner_text().strip(),
+                        "last_name": cells[1].inner_text().strip(),
+                        "office": cells[2].inner_text().strip(),
+                        "report_type": cells[3].inner_text().strip(),
+                        "date": cells[4].inner_text().strip(),
+                        "report_url": href,
+                    }
+                )
             next_btn = self._page.query_selector(".paginate_button.next:not(.disabled)")
             if not next_btn:
                 break
@@ -174,7 +189,9 @@ class SenateOfficialScraper:
             self._page.wait_for_selector("#filedReports_processing", state="hidden", timeout=15000)
         return results
 
-    def _scrape_ptr_transactions(self, report_url: str, legislator_name: str, disclosure_date: str) -> list[SenateTransaction]:
+    def _scrape_ptr_transactions(
+        self, report_url: str, legislator_name: str, disclosure_date: str
+    ) -> list[SenateTransaction]:
         self._page.goto(report_url)
         self._page.wait_for_load_state("networkidle")
         section = self._page.query_selector("section.card")
@@ -183,7 +200,10 @@ class SenateOfficialScraper:
         table = section.query_selector("table")
         if not table:
             return []
-        headers = [th.inner_text().strip().lower().replace(" ", "_") for th in table.query_selector_all("thead th")]
+        headers = [
+            th.inner_text().strip().lower().replace(" ", "_")
+            for th in table.query_selector_all("thead th")
+        ]
         rows_data: list[dict[str, str]] = []
         for tr in table.query_selector_all("tbody tr"):
             cells = tr.query_selector_all("td")

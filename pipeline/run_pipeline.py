@@ -34,9 +34,11 @@ def run(
         senate_missing = not SENATE_JSON_PATH.exists()
         house_missing = not HOUSE_JSON_PATH.exists()
 
-        if (not senate_only and not house_only and (senate_missing or house_missing)) or (
-            senate_only and senate_missing
-        ) or (house_only and house_missing):
+        if (
+            (not senate_only and not house_only and (senate_missing or house_missing))
+            or (senate_only and senate_missing)
+            or (house_only and house_missing)
+        ):
             print("Local raw JSON missing; switching to official scraper to gather data.")
             return run(
                 fresh=fresh,
@@ -47,6 +49,7 @@ def run(
 
     if use_official:
         from .scrapers import SenateOfficialScraper, HouseOfficialScraper
+
         senate_df = None
         house_df = None
         if not house_only:
@@ -56,6 +59,7 @@ def run(
             out_s = DATA_DIR / "senate_trades.csv"
             if senate_df is not None and not senate_df.empty:
                 from .merge_to_csv import clean_dataframe
+
                 senate_df = clean_dataframe(senate_df)
                 senate_df.to_csv(out_s, index=False)
                 print(f"Senate: {len(senate_df)} trades -> {out_s}")
@@ -66,13 +70,18 @@ def run(
             out_h = DATA_DIR / "house_trades.csv"
             if house_df is not None and not house_df.empty:
                 from .merge_to_csv import clean_dataframe
+
                 house_df = clean_dataframe(house_df)
                 house_df.to_csv(out_h, index=False)
                 print(f"House: {len(house_df)} disclosure records -> {out_h}")
         if not senate_only and not house_only:
             merged = merge_to_csv(
-                senate_df=senate_df if senate_df is not None and not senate_df.empty else pd.DataFrame(),
-                house_df=house_df if house_df is not None and not house_df.empty else pd.DataFrame(),
+                senate_df=senate_df
+                if senate_df is not None and not senate_df.empty
+                else pd.DataFrame(),
+                house_df=house_df
+                if house_df is not None and not house_df.empty
+                else pd.DataFrame(),
             )
             merged.to_csv(OUTPUT_CSV, index=False)
             print(f"Merged: {len(merged)} rows -> {OUTPUT_CSV}")
@@ -99,13 +108,24 @@ def run(
 
 
 def main():
-    p = argparse.ArgumentParser(description="Capitol Alpha: fetch legislative trades and merge to CSV")
+    p = argparse.ArgumentParser(
+        description="Capitol Alpha: fetch legislative trades and merge to CSV"
+    )
     p.add_argument("--fresh", action="store_true", help="Re-download data instead of using cache")
     p.add_argument("--senate-only", action="store_true", help="Fetch only Senate data")
     p.add_argument("--house-only", action="store_true", help="Fetch only House data")
-    p.add_argument("--use-official", action="store_true", help="Scrape clerk.house.gov and efd.senate.gov (requires Playwright)")
+    p.add_argument(
+        "--use-official",
+        action="store_true",
+        help="Scrape clerk.house.gov and efd.senate.gov (requires Playwright)",
+    )
     args = p.parse_args()
-    run(fresh=args.fresh, senate_only=args.senate_only, house_only=args.house_only, use_official=args.use_official)
+    run(
+        fresh=args.fresh,
+        senate_only=args.senate_only,
+        house_only=args.house_only,
+        use_official=args.use_official,
+    )
 
 
 if __name__ == "__main__":

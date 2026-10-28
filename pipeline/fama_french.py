@@ -23,9 +23,7 @@ class FactorAdjustedAlphaResult(TypedDict):
 
 
 def compute_factor_adjusted_alpha(
-    trades_df: pd.DataFrame,
-    benchmark_returns: pd.Series,
-    rf_rate: float = 0.04
+    trades_df: pd.DataFrame, benchmark_returns: pd.Series, rf_rate: float = 0.04
 ) -> FactorAdjustedAlphaResult:
     """
     Computes single-factor CAPM alpha and multi-factor statistics for trade returns.
@@ -77,6 +75,7 @@ def compute_factor_adjusted_alpha(
 
     # Approximate 2-tailed p-value using normal survival function (erfc)
     import math
+
     p_val = float(math.erfc(abs(t_stat) / math.sqrt(2))) if t_stat != 0 else 1.0
 
     # Multi-factor proxies (SMB: small cap tilt, HML: value tilt)

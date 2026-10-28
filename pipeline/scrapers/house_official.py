@@ -4,6 +4,7 @@ import pandas as pd
 
 try:
     from playwright.sync_api import sync_playwright
+
     HAS_PLAYWRIGHT = True
 except ImportError:
     HAS_PLAYWRIGHT = False
@@ -60,7 +61,9 @@ def _normalize_house_disclosure_row(
 class HouseOfficialScraper:
     def __init__(self, headless: bool = True):
         if not HAS_PLAYWRIGHT:
-            raise RuntimeError("Playwright is required. Install with: pip install playwright && playwright install")
+            raise RuntimeError(
+                "Playwright is required. Install with: pip install playwright && playwright install"
+            )
         self._headless = headless
         self._playwright = None
         self._browser = None
@@ -69,7 +72,9 @@ class HouseOfficialScraper:
 
     def __enter__(self):
         self._playwright = sync_playwright().start()
-        self._browser = self._playwright.chromium.launch(headless=self._headless, args=["--disable-dev-shm-usage"])
+        self._browser = self._playwright.chromium.launch(
+            headless=self._headless, args=["--disable-dev-shm-usage"]
+        )
         self._context = self._browser.new_context(
             viewport={"width": 1280, "height": 800},
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0",
@@ -93,7 +98,9 @@ class HouseOfficialScraper:
         search_tab = self._page.query_selector('a[href="#Search"]')
         if search_tab and not search_tab.is_visible():
             search_tab.click()
-        self._page.wait_for_selector(".search-filter, #searchForm, #LastName", state="visible", timeout=15000)
+        self._page.wait_for_selector(
+            ".search-filter, #searchForm, #LastName", state="visible", timeout=15000
+        )
 
     def _search_year(self, year: str, last_name: str = "") -> list[dict]:
         self._page.select_option("#FilingYear", year)
@@ -101,14 +108,18 @@ class HouseOfficialScraper:
         submit = self._page.query_selector("button[type='submit']")
         if submit:
             submit.click()
-        self._page.wait_for_selector("#search-result h2, table.library-table.dataTable, td.dataTables_empty", state="visible", timeout=20000)
+        self._page.wait_for_selector(
+            "#search-result h2, table.library-table.dataTable, td.dataTables_empty",
+            state="visible",
+            timeout=20000,
+        )
         empty = self._page.query_selector("td.dataTables_empty")
         if empty and "No activities found" in (empty.inner_text() or ""):
             return []
         table = self._page.query_selector("table.library-table.dataTable")
         if not table:
             return []
-            
+
         # Unpaginate completely by commanding DataTables to list everything at once
         self._page.evaluate("""() => {
             let dt = $(".library-table.dataTable").DataTable();
@@ -117,9 +128,10 @@ class HouseOfficialScraper:
             }
         }""")
         self._page.wait_for_timeout(3000)
-        
+
         # Extract row metadata efficiently via Javascript
-        row_data = self._page.evaluate("""(year) => {
+        row_data = self._page.evaluate(
+            """(year) => {
             let output = [];
             document.querySelectorAll("table.library-table.dataTable tbody tr").forEach(tr => {
                 let nameCell = tr.querySelector('td[data-label="Name"]');
@@ -141,8 +153,10 @@ class HouseOfficialScraper:
                 });
             });
             return output;
-        }""", year)
-        
+        }""",
+            year,
+        )
+
         results = []
         for i, r in enumerate(row_data):
             name = r.get("name", "")
@@ -150,19 +164,19 @@ class HouseOfficialScraper:
             yr = r.get("year", year)
             filing_type = r.get("filing_type", "").lower()
             href = r.get("href", "")
-            
+
             if not href:
                 continue
-                
+
             if href.startswith("/"):
                 pdf_url = f"{HOUSE_BASE}{href}"
             else:
                 pdf_url = f"{HOUSE_BASE}/{href}"
-                
+
             if "ptr" in filing_type or "transaction" in filing_type or "periodic" in filing_type:
-                print(f"  [{year}] Downloading and parsing PTR PDF {i+1}/{len(row_data)}: {name}")
+                print(f"  [{year}] Downloading and parsing PTR PDF {i + 1}/{len(row_data)}: {name}")
                 base_row = _normalize_house_disclosure_row(name, office, yr, filing_type, pdf_url)
-                
+
                 # Fetch deeper PDF contents
                 try:
                     pdf_trades = parse_house_pdf(pdf_url)
@@ -176,7 +190,7 @@ class HouseOfficialScraper:
                         results.append(base_row)
                 except Exception as e:
                     results.append(base_row)
-                    
+
         return results
 
     def scrape(
