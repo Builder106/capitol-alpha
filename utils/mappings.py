@@ -241,9 +241,9 @@ def update_flourish_export(filepath='data/flourish_racing_bar_export.csv'):
     df = pd.read_csv(filepath)
     for col in df.columns:
         if col.strip() == 'legislator_name':
-            df.rename(columns={col: 'legislator_name'}, inplace=True)
+            df = df.rename(columns={col: 'legislator_name'})
         if col.strip() == 'Party':
-            df.rename(columns={col: 'Party'}, inplace=True)
+            df = df.rename(columns={col: 'Party'})
 
     df['legislator_name'] = df['legislator_name'].apply(clean_house_names)
     df['Party'] = df['legislator_name'].map(party_map).fillna('Unknown')
