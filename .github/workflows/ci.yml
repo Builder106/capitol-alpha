@@ -3,8 +3,16 @@ name: CI
 on:
   push:
     branches: [main, staging]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.markdownlint*'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.markdownlint*'
   workflow_dispatch:
 
 permissions:
@@ -66,7 +74,6 @@ jobs:
 
   playwright:
     name: E2E tests (Playwright BDD)
-    needs: test
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -89,8 +96,22 @@ jobs:
           done
           npm audit --audit-level=high
 
-      - name: Install Playwright browsers
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install Playwright Chromium + system deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system deps only (cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
 
       - name: Generate Gherkin specs
         run: npx bddgen
@@ -110,7 +131,7 @@ jobs:
 
   deploy:
     name: Trigger Vercel deploy
-    needs: [secrets, playwright]
+    needs: [secrets, test, playwright]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
     runs-on: ubuntu-24.04
     steps:
