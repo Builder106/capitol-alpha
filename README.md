@@ -15,6 +15,10 @@
 
 > **Analyzing whether Congressional stock trades beat the market.** An open research pipeline tracking 16,000 politician stock disclosures against the S&P 500.
 
+<p align="center">
+  <img src="assets/screenshot.png" alt="The CapitolAlpha research note: the title, a summary strip of sector, coverage, window, sample, horizon and benchmark, and a headline finding that disclosed Congressional purchases beat the S&P 500 by an average of 2.58% over 90 days." width="880">
+</p>
+
 ## 💡 What is CapitolAlpha?
 
 Do members of Congress make better stock market trades than ordinary investors? CapitolAlpha is an open data pipeline that automatically collects and analyzes over 16,000 stock trades reported by federal politicians. It compares their financial returns against the general stock market (S&P 500) to determine whether politicians have an abnormal trading advantage.
