@@ -1,8 +1,8 @@
 import json
-import requests
+
 import pandas as pd
 
-from .config import DATA_DIR, HOUSE_S3_URL, MIN_YEAR, MAX_YEAR
+from .config import DATA_DIR, MIN_YEAR, MAX_YEAR
 from .senate_fetcher import _parse_party_state
 
 HOUSE_JSON_PATH = DATA_DIR / "house_all_transactions.json"

@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-11-06: Remove dead Stock Watcher S3 endpoints from configuration #cleanup #decision
+
+Issue #29 reported that the third-party Stock Watcher S3 buckets return 403 and its GitHub repository is stale. Live ingestion has already migrated to the official House Clerk and Senate eFD scrapers via `--use-official` (and automatic fallback when local JSON is missing). Cleaned up the unused `HOUSE_S3_URL`, `SENATE_S3_URL`, and `SENATE_RAW_URL` constants along with unused `requests` imports from `pipeline/config.py`, `pipeline/house_fetcher.py`, and `pipeline/senate_fetcher.py`.
+
 ## 2026-11-06: Make the social preview image absolute #fix
 
 The page set `og:image` to `/social-card.png`. Link preview crawlers don't resolve a relative path, so shared links showed no card. The tag now points at the production origin, and `og:url`, the image size and `twitter:image` are set to match. The 1200x630 image is unchanged, and the Playwright suite passes.

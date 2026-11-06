@@ -1,10 +1,9 @@
 import json
 from datetime import datetime
 
-import requests
 import pandas as pd
 
-from .config import SENATE_RAW_URL, SENATE_S3_URL, DATA_DIR, MIN_YEAR, MAX_YEAR
+from .config import DATA_DIR, MIN_YEAR, MAX_YEAR
 
 SENATE_JSON_PATH = DATA_DIR / "senate_all_transactions.json"
 
