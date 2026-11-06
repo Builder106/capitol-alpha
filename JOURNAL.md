@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-11-06: Make the social preview image absolute #fix
+
+The page set `og:image` to `/social-card.png`. Link preview crawlers don't resolve a relative path, so shared links showed no card. The tag now points at the production origin, and `og:url`, the image size and `twitter:image` are set to match. The 1200x630 image is unchanged, and the Playwright suite passes.
+
 ## 2026-10-27: Enforce Ruff formatting in CI #ci #decision
 
 Ruff format failures now stop CI. Ruff also checks the `UP` rules for outdated Python syntax.
