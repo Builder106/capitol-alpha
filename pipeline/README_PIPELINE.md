@@ -106,6 +106,43 @@ The pipeline automatically resolves ticker symbols and links transactions to can
 - **Corporate Entity Mapping**: Maps resolved tickers and descriptive company names to canonical corporate entities (e.g. `AAPL` -> `Apple Inc.`, `MSFT` -> `Microsoft Corporation`).
 - **Non-Equity Exclusion**: Filters out municipal bonds, treasury bills, corporate debt with coupons/maturities, and cryptocurrencies from equity ticker resolution.
 
+## Committee/sector analysis
+
+Run the backend analysis after creating the normalized trade CSV and preparing
+historical membership, ticker-sector, and committee-jurisdiction reference CSVs:
+
+```bash
+uv run python -m pipeline.committee_signals \
+  --trades data/legislative_trades.csv \
+  --assignments /path/to/assignments.csv \
+  --ticker-sectors /path/to/ticker_sectors.csv \
+  --committee-sectors /path/to/committee_sectors.csv \
+  --as-of 2024-04-30 --lookback-days 90 --min-trades 3 \
+  --output /path/to/committee_signals.csv
+```
+
+Reference headers (all three files are required):
+
+```text
+assignments.csv:       chamber,legislator_name,committee,start_date,end_date
+ticker_sectors.csv:    ticker,sector
+committee_sectors.csv: chamber,committee,sector
+```
+
+Membership dates use `YYYY-MM-DD`; blank `end_date` means ongoing. Supply complete
+historical membership for the trade cohort, with names reconciled to the canonical
+CSV. Sector labels must share one taxonomy across both sector files. The command
+uses local inputs, produces a separate CSV, and preserves an existing output on
+validation or serialization failure. The output directory must already exist;
+the output must differ from every input path.
+
+Each output row contains the chamber, committee, jurisdiction sector, disclosure
+window, eligible trade count, four membership/sector contingency counts, phi
+correlation, member-sector purchases and sales, net purchase ratio, threshold,
+and `buy`, `sell`, `neutral`, or `insufficient_data` activity signal. No amount
+weighting or price downloads are involved. See [the methodology](../docs/METHODOLOGY.md#4-committee-trade-correlation-analysis)
+for eligibility rules, equations, reference requirements, and limitations.
+
 ## Tests
 
 ```bash

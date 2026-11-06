@@ -9,7 +9,7 @@ Congressional financial disclosures and market analysis roadmap.
 
 ## v1.2 — Portfolio Backtesting & Signal Modeling
 
-- [ ] **Committee Trade Correlation Analysis**: Sector-specific trading signal generation based on committee assignments.
+- [x] **Committee Trade Correlation Analysis**: Sector-specific trading signal generation based on committee assignments.
 - [ ] **Interactive Visual Explorer**: Accessible chart visualizer for member trading histories.
 
 ## Out of Scope
