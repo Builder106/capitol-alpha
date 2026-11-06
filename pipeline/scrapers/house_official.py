@@ -1,4 +1,5 @@
 from datetime import datetime
+from urllib.parse import urljoin
 
 import pandas as pd
 
@@ -10,6 +11,7 @@ except ImportError:
     HAS_PLAYWRIGHT = False
 
 from ..config import MIN_YEAR, MAX_YEAR
+from ..ingestion import IngestionError, retry
 from .house_pdf_parser import parse_house_pdf
 
 HOUSE_BASE = "https://disclosures-clerk.house.gov"
@@ -118,7 +120,7 @@ class HouseOfficialScraper:
             return []
         table = self._page.query_selector("table.library-table.dataTable")
         if not table:
-            return []
+            raise IngestionError(f"House search table missing for {year}")
 
         # Unpaginate completely by commanding DataTables to list everything at once
         self._page.evaluate("""() => {
@@ -158,6 +160,7 @@ class HouseOfficialScraper:
         )
 
         results = []
+        seen: set[str] = set()
         for i, r in enumerate(row_data):
             name = r.get("name", "")
             office = r.get("office", "")
@@ -165,31 +168,26 @@ class HouseOfficialScraper:
             filing_type = r.get("filing_type", "").lower()
             href = r.get("href", "")
 
-            if not href:
-                continue
-
-            if href.startswith("/"):
-                pdf_url = f"{HOUSE_BASE}{href}"
-            else:
-                pdf_url = f"{HOUSE_BASE}/{href}"
-
             if "ptr" in filing_type or "transaction" in filing_type or "periodic" in filing_type:
+                if not href:
+                    raise IngestionError(f"Missing House PTR URL for {name} ({year})")
+                pdf_url = urljoin(HOUSE_BASE + "/", href)
+                if pdf_url in seen:
+                    continue
+                seen.add(pdf_url)
                 print(f"  [{year}] Downloading and parsing PTR PDF {i + 1}/{len(row_data)}: {name}")
                 base_row = _normalize_house_disclosure_row(name, office, yr, filing_type, pdf_url)
 
-                # Fetch deeper PDF contents
-                try:
-                    pdf_trades = parse_house_pdf(pdf_url)
-                    if pdf_trades:
-                        for trade in pdf_trades:
-                            rich_row = base_row.copy()
-                            rich_row.update(trade)
-                            rich_row["comment"] = f"Parsed from PDF. Type: {filing_type}"
-                            results.append(rich_row)
-                    else:
-                        results.append(base_row)
-                except Exception as e:
-                    results.append(base_row)
+                pdf_trades = parse_house_pdf(pdf_url)
+                if not pdf_trades:
+                    raise IngestionError(f"No transactions in House PTR {pdf_url}")
+                for trade in pdf_trades:
+                    rich_row = base_row.copy()
+                    rich_row.update(trade)
+                    rich_row["transaction_year"] = _parse_date(trade.get("transaction_date", ""))
+                    rich_row["disclosure_year"] = _parse_date(trade.get("disclosure_date", ""))
+                    rich_row["comment"] = f"Parsed from PDF. Type: {filing_type}"
+                    results.append(rich_row)
 
         return results
 
@@ -201,17 +199,15 @@ class HouseOfficialScraper:
     ) -> pd.DataFrame:
         start_year = start_year or MIN_YEAR
         end_year = end_year or MAX_YEAR
-        self._ensure_search_page()
+        if start_year > end_year:
+            raise ValueError("start_year must be <= end_year")
+        retry(self._ensure_search_page, "Open House search")
         all_rows = []
         for year in range(start_year, end_year + 1):
             print(f"\\n--- Starting query for House disclosures in {year} ---")
-            try:
-                rows = self._search_year(str(year), last_name)
-                print(f"Total parsed House transactions from {year}: {len(rows)}")
-                all_rows.extend(rows)
-            except Exception as e:
-                print(f"Failed to parse {year}: {e}")
-                continue
+            rows = retry(lambda: self._search_year(str(year), last_name), f"House PTR year {year}")
+            print(f"Total parsed House transactions from {year}: {len(rows)}")
+            all_rows.extend(rows)
         if not all_rows:
             return pd.DataFrame()
         df = pd.DataFrame(all_rows)

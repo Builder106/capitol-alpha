@@ -13,6 +13,13 @@ from pipeline.scrapers.senate_official import (
     _normalize_senate_row,
 )
 from pipeline.scrapers.house_pdf_parser import parse_house_pdf
+from pipeline.ingestion import IngestionError
+
+
+@pytest.fixture(autouse=True)
+def no_retry_sleep():
+    with patch("pipeline.ingestion.sleep"):
+        yield
 
 
 def test_house_parse_date():
@@ -69,23 +76,24 @@ def test_parse_house_pdf(mock_req, mock_plumber):
     mock_page = MagicMock()
 
     # Return table that mimics a parsed house pdf
-    mock_page.extract_table.return_value = [
-        ["Asset", "Owner", "Date", "Notification Date", "Amount", "Type"],  # Should be skipped
-        ["Apple Inc (AAPL)", "Self", "01/01/2023", "01/05/2023", "$1,001 - $15,000", "P"],
-        ["Some Invalid Row"],
-        ["Microsoft", "Spouse", "invalid date", "invalid date", "$1 - $5", "S (partial)"],
+    mock_page.extract_tables.return_value = [
+        [
+            ["Asset", "Owner", "Date", "Notification Date", "Amount", "Type"],  # Should be skipped
+            ["Apple Inc (AAPL)", "Self", "01/01/2023", "01/05/2023", "$1,001 - $15,000", "P"],
+            ["Microsoft", "Spouse", "01/02/2023", "", "$1 - $5", "S (partial)"],
+        ]
     ]
     mock_pdf.pages = [mock_page]
     mock_plumber.open.return_value.__enter__.return_value = mock_pdf
 
     res = parse_house_pdf("http://fake.pdf")
-    assert len(res) == 3
+    assert len(res) == 2
     assert res[0]["ticker"] == "AAPL"
     assert res[0]["transaction_date"] == "01/01/2023"
     assert res[0]["amount_range"] == "$1,001 - $15,000"
 
-    assert res[2]["ticker"] is None
-    assert res[2]["transaction_date"] == "invalid date"
+    assert res[1]["ticker"] is None
+    assert res[1]["transaction_date"] == "01/02/2023"
 
 
 @patch("pipeline.scrapers.house_official.sync_playwright")
@@ -128,8 +136,8 @@ def test_house_scraper(mock_parse_pdf, mock_pw):
     # Error handling test
     mock_page.evaluate.side_effect = Exception("evaluate failed")
     with HouseOfficialScraper() as scraper:
-        df2 = scraper.scrape(start_year=2023, end_year=2023)
-        assert df2.empty
+        with pytest.raises(IngestionError, match="House PTR year"):
+            scraper.scrape(start_year=2023, end_year=2023)
 
 
 @patch("pipeline.scrapers.senate_official.SenateOfficialScraper._search_ptr_by_date_range")
@@ -179,7 +187,7 @@ def test_senate_scraper(
             "transaction_type": "Purchase",
             "transaction_date": "01/01/2023",
             "disclosure_date": "01/05/2023",
-            "amount": "$1,001 - $15,000",
+            "amount_range": "$1,001 - $15,000",
             "owner": "Self",
             "comment": "",
         }
@@ -208,7 +216,8 @@ def test_house_pdf_parser_edge_cases():
     with patch(
         "pipeline.scrapers.house_pdf_parser.requests.get", side_effect=Exception("HTTP Error")
     ):
-        assert parse_house_pdf("http://example.com/file.pdf") == []
+        with pytest.raises(IngestionError):
+            parse_house_pdf("http://example.com/file.pdf")
 
     with patch("pipeline.scrapers.house_pdf_parser.requests.get") as mock_get:
         mock_get.return_value.content = b"pdf_data"
@@ -216,37 +225,45 @@ def test_house_pdf_parser_edge_cases():
             "pipeline.scrapers.house_pdf_parser.pdfplumber.open",
             side_effect=Exception("PDF Parse Error"),
         ):
-            assert parse_house_pdf("http://example.com/file.pdf") == []
+            with pytest.raises(IngestionError):
+                parse_house_pdf("http://example.com/file.pdf")
 
     # Table with missing headers / empty rows / no table
     with patch("pipeline.scrapers.house_pdf_parser.requests.get") as mock_get:
         mock_get.return_value.content = b"pdf_data"
         mock_pdf = MagicMock()
         mock_page1 = MagicMock()
-        mock_page1.extract_table.return_value = None  # Table is None
+        mock_page1.extract_tables.return_value = [[]]  # Table is None
 
         mock_page2 = MagicMock()
-        mock_page2.extract_table.return_value = [
-            ["Unrelated", "Header"],  # Missing asset/amount in headers
-            ["val1", "val2"],
+        mock_page2.extract_tables.return_value = [
+            [
+                ["Unrelated", "Header"],  # Missing asset/amount in headers
+                ["val1", "val2"],
+            ]
         ]
 
         mock_page3 = MagicMock()
-        mock_page3.extract_table.return_value = [
-            ["Asset", "Date"],  # Missing amount in col_map
-            ["val1", "val2"],
+        mock_page3.extract_tables.return_value = [
+            [
+                ["Asset", "Date"],  # Missing amount in col_map
+                ["val1", "val2"],
+            ]
         ]
 
         mock_page4 = MagicMock()
-        mock_page4.extract_table.return_value = [
-            ["Asset", "Amount", "Date"],
-            [None, None, None],  # empty row
+        mock_page4.extract_tables.return_value = [
+            [
+                ["Asset", "Amount", "Date"],
+                [None, None, None],  # empty row
+            ]
         ]
 
         mock_pdf.pages = [mock_page1, mock_page2, mock_page3, mock_page4]
         with patch("pipeline.scrapers.house_pdf_parser.pdfplumber.open") as mock_open:
             mock_open.return_value.__enter__.return_value = mock_pdf
-            assert parse_house_pdf("http://example.com/file.pdf") == []
+            with pytest.raises(IngestionError, match="No transaction tables"):
+                parse_house_pdf("http://example.com/file.pdf")
 
 
 @patch("pipeline.scrapers.house_official.sync_playwright")
@@ -283,7 +300,8 @@ def test_house_official_scraper_dom_branches(mock_pw):
 
     # Test missing table
     mock_page.query_selector.side_effect = lambda sel: None
-    assert scraper._search_year("2023") == []
+    with pytest.raises(IngestionError, match="search table missing"):
+        scraper._search_year("2023")
 
     # Test href missing / pdf fallback
     mock_page.evaluate.return_value = [
@@ -292,9 +310,8 @@ def test_house_official_scraper_dom_branches(mock_pw):
     ]
     mock_page.query_selector.side_effect = lambda sel: MagicMock()
     with patch("pipeline.scrapers.house_official.parse_house_pdf", return_value=[]):
-        res = scraper._search_year("2023")
-        assert len(res) == 1
-        assert res[0]["legislator_name"] == "With Href"
+        with pytest.raises(IngestionError, match="No transactions"):
+            scraper._search_year("2023")
 
     # Test scrape empty dataframe
     with patch.object(scraper, "_search_year", return_value=[]):
@@ -408,18 +425,20 @@ def test_senate_official_scraper_dom_branches(mock_pw):
 
     # Test scrape_ptr_transactions missing card / table
     mock_page.query_selector.side_effect = lambda sel: None
-    assert scraper._scrape_ptr_transactions("http://link", "Name", "Date") == []
+    with pytest.raises(ValueError, match="Missing Senate PTR"):
+        scraper._scrape_ptr_transactions("http://link", "Name", "Date")
 
     card = MagicMock()
     card.query_selector.return_value = None  # No table
     mock_page.query_selector.side_effect = lambda sel: card if sel == "section.card" else None
-    assert scraper._scrape_ptr_transactions("http://link", "Name", "Date") == []
+    with pytest.raises(ValueError, match="Missing Senate PTR"):
+        scraper._scrape_ptr_transactions("http://link", "Name", "Date")
 
     # Test scrape_ptr_transactions table parsing
     card = MagicMock()
     table = MagicMock()
     th1 = MagicMock()
-    th1.inner_text.return_value = "Asset"
+    th1.inner_text.return_value = "Ticker"
     th2 = MagicMock()
     th2.inner_text.return_value = "Type"
     th3 = MagicMock()
@@ -446,7 +465,8 @@ def test_senate_official_scraper_dom_branches(mock_pw):
 
     # Test scrape empty results
     with patch.object(scraper, "_search_ptr_by_date_range", return_value=[{"report_url": ""}]):
-        assert scraper.scrape(2023, 2023).empty
+        with pytest.raises(IngestionError, match="Missing Senate PTR URL"):
+            scraper.scrape(2023, 2023)
 
     with patch.object(
         scraper, "_search_ptr_by_date_range", return_value=[{"report_url": "http://link"}]
@@ -454,7 +474,8 @@ def test_senate_official_scraper_dom_branches(mock_pw):
         with patch.object(
             scraper, "_scrape_ptr_transactions", side_effect=Exception("scrape fail")
         ):
-            assert scraper.scrape(2023, 2023).empty
+            with pytest.raises(IngestionError, match="Read Senate PTR"):
+                scraper.scrape(2023, 2023)
 
 
 @patch("pipeline.scrapers.house_official.sync_playwright")
@@ -486,9 +507,8 @@ def test_house_official_pdf_exception_and_columns(mock_pw):
     with patch(
         "pipeline.scrapers.house_official.parse_house_pdf", side_effect=Exception("PDF error")
     ):
-        res = scraper._search_year("2023")
-        assert len(res) == 1
-        assert res[0]["legislator_name"] == "Smith"
+        with pytest.raises(Exception, match="PDF error"):
+            scraper._search_year("2023")
 
     # Column missing branch in scrape()
     with patch.object(scraper, "_search_year", return_value=[{"name": "Smith"}]):

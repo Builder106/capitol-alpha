@@ -1,11 +1,12 @@
 import re
-import requests
-import tempfile
-import pdfplumber
-import logging
+from datetime import datetime
+from io import BytesIO
 from typing import TypedDict
 
-logger = logging.getLogger(__name__)
+import pdfplumber
+import requests
+
+from ..ingestion import IngestionError, retry
 
 
 class HousePdfTransaction(TypedDict):
@@ -27,23 +28,19 @@ def parse_house_pdf(pdf_url: str) -> list[HousePdfTransaction]:
     if not pdf_url.lower().endswith(".pdf"):
         return []
 
-    try:
+    def download() -> bytes:
         response = requests.get(pdf_url, timeout=30)
         response.raise_for_status()
-    except Exception as e:
-        logger.error(f"Failed to download PDF {pdf_url}: {e}")
-        return []
+        return response.content
+
+    content = retry(download, f"Download House PTR {pdf_url}")
 
     transactions: list[HousePdfTransaction] = []
 
-    with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
-        tmp.write(response.content)
-        tmp.flush()
-
-        try:
-            with pdfplumber.open(tmp.name) as pdf:
-                for page in pdf.pages:
-                    table = page.extract_table()
+    try:
+        with pdfplumber.open(BytesIO(content)) as pdf:
+            for page in pdf.pages:
+                for table in page.extract_tables():
                     if not table:
                         continue
 
@@ -52,7 +49,7 @@ def parse_house_pdf(pdf_url: str) -> list[HousePdfTransaction]:
 
                     # Try to identify if this is a transaction table
                     headers = [
-                        str(cell).lower().replace("\n", " ").strip() for cell in table[0] if cell
+                        str(cell or "").lower().replace("\n", " ").strip() for cell in table[0]
                     ]
 
                     # Minimal check for PTR columns
@@ -93,6 +90,8 @@ def parse_house_pdf(pdf_url: str) -> list[HousePdfTransaction]:
                             return ""
 
                         asset_description = get_col("asset")
+                        if not asset_description or not get_col("amount"):
+                            raise ValueError("Incomplete transaction row")
                         # Sometimes ticker is in parenthesis in the asset name: 'Apple Inc. (AAPL)'
                         ticker = None
                         ticker_match = re.search(r"\(([A-Z]+)\)", asset_description)
@@ -101,8 +100,7 @@ def parse_house_pdf(pdf_url: str) -> list[HousePdfTransaction]:
 
                         transaction_date = get_col("date")
                         notification_date = get_col("notification_date")
-
-                        # Sometimes dates are merged or formatting breaks, try to parse what we can
+                        datetime.strptime(transaction_date, "%m/%d/%Y")
 
                         transactions.append(
                             {
@@ -118,7 +116,10 @@ def parse_house_pdf(pdf_url: str) -> list[HousePdfTransaction]:
                                 "ptr_link": pdf_url,
                             }
                         )
-        except Exception as e:
-            logger.error(f"Failed to parse PDF {pdf_url}: {e}")
+    except Exception as exc:
+        raise IngestionError(f"Failed to parse House PTR {pdf_url}") from exc
+
+    if not transactions:
+        raise IngestionError(f"No transaction tables in House PTR {pdf_url}; OCR may be required")
 
     return transactions

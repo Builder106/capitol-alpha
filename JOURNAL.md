@@ -71,3 +71,34 @@ Course reviewer comments on the Problem Statement and Statement of Purpose set s
 ## 2026-10-23: Check all Python paths for Any annotations #decision
 
 Ruff ANN401 now covers notebooks, pipeline code, tests, utilities, and `run_pipeline.py`. The unit-test job already treats Python warnings as errors.
+
+## 2026-11-06 — Fail closed when official PTR ingestion is incomplete #decision
+
+The House & Senate PTR milestone builds on the existing official scrapers rather
+than replacing public sources or extending asset entity linking. The roadmap has
+no accompanying `docs/specs/` directory, so acceptance is transaction-level data
+from both existing source adapters, bounded retries, explicit errors instead of
+silent omissions, preservation of existing outputs on source/serialization
+failure, and offline regression coverage.
+
+Source operations now retry three times with one- and two-second backoff. Failed
+reports stop the run; House listing-only fallbacks and Senate report skipping are
+removed. Empty official chamber results also stop publication because an empty
+search can indicate source drift. Scanned House PDFs require operator attention
+for OCR rather than being counted as successfully ingested transactions.
+
+House parsing preserves blank header positions and visits every table and page.
+Filing-year searches retain prior-year transactions disclosed late. Report URLs
+are deduplicated, Senate pagination detects stalls, explicit tickers remain
+separate from asset descriptions, and amount bands retain their bounds and derived
+midpoints. Output keeps the existing canonical CSV columns.
+
+Both chambers finish before publication. CSVs are staged and flushed on the
+destination filesystem, then replaced atomically per file. This protects existing
+data from source errors and failed serialization, but does not provide a
+transaction across all three files during a process crash. Reruns read reports
+again; durable per-report checkpoints and OCR are outside this focused change.
+
+Synthetic local HTML and a multi-page PDF exercise parsing, normalization, rerun
+idempotence, missing tickers, late disclosures, and failure preservation. No live
+ingestion or research-data refresh is part of this milestone.

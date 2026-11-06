@@ -1,22 +1,25 @@
+from __future__ import annotations
+
 from datetime import datetime
 from types import TracebackType
-from typing import TypedDict
+from typing import TYPE_CHECKING, TypedDict
+from urllib.parse import urljoin
 
 import pandas as pd
 
+if TYPE_CHECKING:  # pragma: no cover
+    from playwright.sync_api import Browser, BrowserContext, Page, Playwright
+
 try:
-    from playwright.sync_api import Browser, BrowserContext, Page, Playwright, sync_playwright
+    from playwright.sync_api import sync_playwright
 
     has_playwright = True
 except ImportError:
     sync_playwright = None  # type: ignore[assignment]
     has_playwright = False
-    Playwright = object  # type: ignore[assignment, misc]
-    Browser = object  # type: ignore[assignment, misc]
-    BrowserContext = object  # type: ignore[assignment, misc]
-    Page = object  # type: ignore[assignment, misc]
 
 from ..config import MIN_YEAR, MAX_YEAR
+from ..ingestion import IngestionError, retry
 
 SENATE_BASE = "https://efdsearch.senate.gov"
 SENATE_SEARCH = f"{SENATE_BASE}/search/"
@@ -69,7 +72,7 @@ def _normalize_senate_row(
         "legislator_name": legislator_name,
         "disclosure_date": disclosure_date,
         "transaction_date": raw.get("transaction_date") or raw.get("transaction_date_date") or "",
-        "ticker": (raw.get("ticker") or raw.get("asset") or "").strip() or None,
+        "ticker": (raw.get("ticker") or "").strip() or None,
         "asset_description": raw.get("asset_name")
         or raw.get("asset_description")
         or raw.get("asset"),
@@ -95,7 +98,7 @@ class SenateOfficialScraper:
         self._page: Page | None = None
         self._agreement_accepted = False
 
-    def __enter__(self) -> "SenateOfficialScraper":
+    def __enter__(self) -> SenateOfficialScraper:
         self._playwright = sync_playwright().start()  # type: ignore[misc]
         self._browser = self._playwright.chromium.launch(
             headless=self._headless, args=["--disable-dev-shm-usage"]
@@ -158,7 +161,9 @@ class SenateOfficialScraper:
 
     def _extract_search_page_results(self) -> list[SenateSearchResult]:
         results: list[SenateSearchResult] = []
+        seen_pages: set[tuple[str, ...]] = set()
         while True:
+            page_urls: list[str] = []
             rows = self._page.query_selector_all("#filedReports tbody tr")
             for row in rows:
                 cells = row.query_selector_all("td")
@@ -170,8 +175,8 @@ class SenateOfficialScraper:
                 href = link.get_attribute("href")
                 if not href or "ptr" not in href.lower():
                     continue
-                if href.startswith("/"):
-                    href = f"{SENATE_BASE}{href}"
+                href = urljoin(SENATE_SEARCH, href)
+                page_urls.append(href)
                 results.append(
                     {
                         "first_name": cells[0].inner_text().strip(),
@@ -182,10 +187,20 @@ class SenateOfficialScraper:
                         "report_url": href,
                     }
                 )
+            signature = tuple(page_urls)
+            if signature in seen_pages:
+                raise IngestionError("Senate search pagination did not advance")
+            seen_pages.add(signature)
             next_btn = self._page.query_selector(".paginate_button.next:not(.disabled)")
             if not next_btn:
                 break
+            previous = self._page.eval_on_selector("#filedReports tbody", "el => el.innerHTML")
             next_btn.click()
+            self._page.wait_for_function(
+                "previous => document.querySelector('#filedReports tbody').innerHTML !== previous",
+                arg=previous,
+                timeout=15000,
+            )
             self._page.wait_for_selector("#filedReports_processing", state="hidden", timeout=15000)
         return results
 
@@ -196,13 +211,12 @@ class SenateOfficialScraper:
         self._page.wait_for_load_state("networkidle")
         section = self._page.query_selector("section.card")
         if not section:
-            return []
+            raise ValueError(f"Missing Senate PTR section: {report_url}")
         table = section.query_selector("table")
         if not table:
-            return []
+            raise ValueError(f"Missing Senate PTR table: {report_url}")
         headers = [
-            th.inner_text().strip().lower().replace(" ", "_")
-            for th in table.query_selector_all("thead th")
+            "_".join(th.inner_text().lower().split()) for th in table.query_selector_all("thead th")
         ]
         rows_data: list[dict[str, str]] = []
         for tr in table.query_selector_all("tbody tr"):
@@ -221,26 +235,43 @@ class SenateOfficialScraper:
     def scrape(self, start_year: int | None = None, end_year: int | None = None) -> pd.DataFrame:
         start_year = start_year or MIN_YEAR
         end_year = end_year or MAX_YEAR
+        if start_year > end_year:
+            raise ValueError("start_year must be <= end_year")
         if not self._agreement_accepted:
-            self._accept_agreement()
+            retry(self._accept_agreement, "Accept Senate disclosure agreement")
         start_date = f"01/01/{start_year}"
         end_date = f"12/31/{end_year}"
-        ptr_list = self._search_ptr_by_date_range(start_date, end_date)
+        ptr_list = retry(
+            lambda: self._search_ptr_by_date_range(start_date, end_date), "Search Senate PTRs"
+        )
         all_rows: list[SenateTransaction] = []
+        seen: set[str] = set()
         for item in ptr_list:
             name = f"{item.get('first_name', '')} {item.get('last_name', '')}".strip()
             date = item.get("date") or ""
             url = item.get("report_url", "")
             if not url:
+                raise IngestionError(f"Missing Senate PTR URL for {name}")
+            if url in seen:
                 continue
-            try:
+            seen.add(url)
+
+            def read_report() -> list[SenateTransaction]:
                 trades = self._scrape_ptr_transactions(url, name, date)
                 for t in trades:
                     y = _parse_date(t.get("transaction_date") or "")
-                    if y is not None and start_year <= y <= end_year:
-                        all_rows.append(t)
-            except Exception:
-                continue
+                    if y is None:
+                        raise ValueError(f"Invalid transaction date in Senate PTR {url}")
+                    if not (t.get("ticker") or t.get("asset_description")):
+                        raise ValueError(f"Missing asset in Senate PTR {url}")
+                    if not t.get("transaction_type") or not t.get("amount_range"):
+                        raise ValueError(f"Incomplete transaction in Senate PTR {url}")
+                if not trades:
+                    raise ValueError(f"No transactions in Senate PTR {url}")
+                return trades
+
+            trades = retry(read_report, f"Read Senate PTR {url}")
+            all_rows.extend(trades)
         if not all_rows:
             return pd.DataFrame()
         df = pd.DataFrame(all_rows)

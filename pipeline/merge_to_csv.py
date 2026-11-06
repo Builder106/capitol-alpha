@@ -1,8 +1,11 @@
+from pathlib import Path
+
 import pandas as pd
 
 from .config import OUTPUT_CSV
-from .senate_fetcher import get_senate_df
+from .senate_fetcher import _parse_amount_range, get_senate_df
 from .house_fetcher import get_house_df
+from .ingestion import publish_csvs
 
 COLUMN_ORDER = [
     "chamber",
@@ -51,6 +54,11 @@ def clean_dataframe(df):
     df["ticker"] = df["ticker"].replace({"--": None, "N/A": None, "NA": None})
 
     transaction_map = {
+        "p": "Purchase",
+        "s": "Sale",
+        "s (partial)": "Sale",
+        "s (full)": "Sale",
+        "e": "Exchange",
         "sale (full)": "Sale",
         "sale (partial)": "Sale",
         "sale": "Sale",
@@ -75,6 +83,24 @@ def clean_dataframe(df):
 
     df = df.drop_duplicates().copy()
 
+    if "amount_range" in df.columns:
+        ranges = df["amount_range"].apply(
+            lambda value: _parse_amount_range(value) if isinstance(value, str) else (None, None)
+        )
+        for column, index in (("amount_min", 0), ("amount_max", 1)):
+            parsed = ranges.apply(lambda bounds: bounds[index])
+            df[column] = (
+                pd.to_numeric(df[column], errors="coerce").fillna(parsed)
+                if column in df.columns
+                else parsed
+            )
+        midpoint = (df["amount_min"] + df["amount_max"]) / 2
+        df["amount_avg"] = (
+            pd.to_numeric(df["amount_avg"], errors="coerce").fillna(midpoint)
+            if "amount_avg" in df.columns
+            else midpoint
+        )
+
     for col in ["amount_min", "amount_max", "amount_avg"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -87,6 +113,7 @@ def merge_to_csv(
     house_df=None,
     output_path=None,
     use_cache=True,
+    write_output=True,
 ):
     """Merge Senate/House dataframes into canonical output CSV.
 
@@ -104,10 +131,9 @@ def merge_to_csv(
         merged = pd.DataFrame(columns=COLUMN_ORDER)
     else:
         merged = pd.concat(dfs, ignore_index=True)
-    existing = [c for c in COLUMN_ORDER if c in merged.columns]
-    merged = merged[existing]
-
     merged = clean_dataframe(merged)
+    merged = merged.reindex(columns=COLUMN_ORDER).drop_duplicates().reset_index(drop=True)
 
-    merged.to_csv(output_path, index=False, date_format="%Y-%m-%d")
+    if write_output:
+        publish_csvs({Path(output_path): merged})
     return merged

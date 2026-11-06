@@ -6,6 +6,7 @@ from .config import DATA_DIR, OUTPUT_CSV, MIN_YEAR, MAX_YEAR
 from .senate_fetcher import SENATE_JSON_PATH, fetch_senate, get_senate_df
 from .house_fetcher import HOUSE_JSON_PATH, fetch_house, get_house_df
 from .merge_to_csv import merge_to_csv
+from .ingestion import IngestionError, publish_csvs
 
 
 def run(
@@ -28,6 +29,8 @@ def run(
     use_official: scrape official sites with Playwright.
     """
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    if senate_only and house_only:
+        raise ValueError("--senate-only and --house-only are mutually exclusive")
     use_cache = not fresh
 
     if not use_official:
@@ -49,31 +52,35 @@ def run(
 
     if use_official:
         from .scrapers import SenateOfficialScraper, HouseOfficialScraper
+        from .merge_to_csv import clean_dataframe
 
         senate_df = None
         house_df = None
+        outputs = {}
         if not house_only:
             print("Scraping efdsearch.senate.gov ...")
             with SenateOfficialScraper(headless=True) as scraper:
                 senate_df = scraper.scrape()
             out_s = DATA_DIR / "senate_trades.csv"
             if senate_df is not None and not senate_df.empty:
-                from .merge_to_csv import clean_dataframe
-
                 senate_df = clean_dataframe(senate_df)
-                senate_df.to_csv(out_s, index=False)
+                outputs[out_s] = senate_df
                 print(f"Senate: {len(senate_df)} trades -> {out_s}")
+            else:
+                raise IngestionError("Senate returned no transactions; existing outputs retained")
         if not senate_only:
             print("Scraping disclosures-clerk.house.gov ...")
             with HouseOfficialScraper(headless=True) as scraper:
                 house_df = scraper.scrape()
             out_h = DATA_DIR / "house_trades.csv"
             if house_df is not None and not house_df.empty:
-                from .merge_to_csv import clean_dataframe
-
                 house_df = clean_dataframe(house_df)
-                house_df.to_csv(out_h, index=False)
+                outputs[out_h] = house_df
                 print(f"House: {len(house_df)} disclosure records -> {out_h}")
+            else:
+                raise IngestionError("House returned no transactions; existing outputs retained")
+        if any(frame.empty for frame in outputs.values()):
+            raise IngestionError("No valid transactions after cleaning; existing outputs retained")
         if not senate_only and not house_only:
             merged = merge_to_csv(
                 senate_df=senate_df
@@ -82,9 +89,11 @@ def run(
                 house_df=house_df
                 if house_df is not None and not house_df.empty
                 else pd.DataFrame(),
+                write_output=False,
             )
-            merged.to_csv(OUTPUT_CSV, index=False)
+            outputs[OUTPUT_CSV] = merged
             print(f"Merged: {len(merged)} rows -> {OUTPUT_CSV}")
+        publish_csvs(outputs)
         return
 
     if senate_only:
