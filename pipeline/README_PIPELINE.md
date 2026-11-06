@@ -81,6 +81,7 @@ Options:
 - transaction_date
 - disclosure_date
 - ticker
+- corporate_entity
 - asset_description
 - asset_type
 - transaction_type
@@ -96,6 +97,14 @@ Options:
 - transaction_year
 - disclosure_year
 - comment
+
+### Normalized Asset Entity Linking
+
+The pipeline automatically resolves ticker symbols and links transactions to canonical corporate entities (`pipeline/entity_linking.py`):
+
+- **Ticker Symbol Resolution**: Normalizes explicit tickers, extracts embedded tickers via regex heuristics (parentheses, brackets, prefixes, labels, standalone tokens), and maps corporate entity names to standard ticker symbols.
+- **Corporate Entity Mapping**: Maps resolved tickers and descriptive company names to canonical corporate entities (e.g. `AAPL` -> `Apple Inc.`, `MSFT` -> `Microsoft Corporation`).
+- **Non-Equity Exclusion**: Filters out municipal bonds, treasury bills, corporate debt with coupons/maturities, and cryptocurrencies from equity ticker resolution.
 
 ## Tests
 

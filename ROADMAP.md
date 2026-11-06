@@ -5,7 +5,7 @@ Congressional financial disclosures and market analysis roadmap.
 ## v1.1 — Automated Disclosure Scraping
 
 - [x] **House & Senate PTR Ingestion**: High-reliability ingestion pipeline for periodic transaction reports.
-- [ ] **Normalized Asset Entity Linking**: Automated ticker symbol resolution and corporate entity mapping.
+- [x] **Normalized Asset Entity Linking**: Automated ticker symbol resolution and corporate entity mapping.
 
 ## v1.2 — Portfolio Backtesting & Signal Modeling
 

@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-11-06 — Automated ticker resolution and corporate entity mapping #milestone #decision
+
+Added `pipeline/entity_linking.py` to automate ticker symbol resolution and corporate entity mapping across raw Congressional disclosure filings. Raw House and Senate disclosures frequently lack standardized CUSIP or ticker identifiers, embedding symbols in descriptions (parentheses, brackets, prefixes, or standalone text) or disclosing company names without tickers. The module extracts valid exchange tickers using targeted regex heuristics and bidirectional corporate mapping (e.g. Apple Inc. -> AAPL, The Boeing Company -> BA), while strictly excluding non-equity assets (municipal bonds, treasury bills, corporate debt with coupon/maturity terms, and cryptocurrencies). Integrated entity linking into `pipeline/merge_to_csv.py` via `clean_dataframe`, added `corporate_entity` to canonical `COLUMN_ORDER`, and updated methodology documentation with 100% test coverage across all pipeline modules.
+
 ## 2026-11-06: Remove dead Stock Watcher S3 endpoints from configuration #cleanup #decision
 
 Issue #29 reported that the third-party Stock Watcher S3 buckets return 403 and its GitHub repository is stale. Live ingestion has already migrated to the official House Clerk and Senate eFD scrapers via `--use-official` (and automatic fallback when local JSON is missing). Cleaned up the unused `HOUSE_S3_URL`, `SENATE_S3_URL`, and `SENATE_RAW_URL` constants along with unused `requests` imports from `pipeline/config.py`, `pipeline/house_fetcher.py`, and `pipeline/senate_fetcher.py`.

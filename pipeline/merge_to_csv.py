@@ -6,6 +6,7 @@ from .config import OUTPUT_CSV
 from .senate_fetcher import _parse_amount_range, get_senate_df
 from .house_fetcher import get_house_df
 from .ingestion import publish_csvs
+from .entity_linking import link_dataframe_entities
 
 COLUMN_ORDER = [
     "chamber",
@@ -13,6 +14,7 @@ COLUMN_ORDER = [
     "transaction_date",
     "disclosure_date",
     "ticker",
+    "corporate_entity",
     "asset_description",
     "asset_type",
     "transaction_type",
@@ -48,10 +50,14 @@ def clean_dataframe(df):
         return v if v else None
 
     df["legislator_name"] = df["legislator_name"].apply(_normalize_string)
-    df["ticker"] = df["ticker"].apply(
-        lambda v: _normalize_string(v).upper() if _normalize_string(v) else None
-    )
-    df["ticker"] = df["ticker"].replace({"--": None, "N/A": None, "NA": None})
+    if "asset_description" in df.columns:
+        df["asset_description"] = df["asset_description"].apply(_normalize_string)
+
+    # Automated ticker symbol resolution and corporate entity mapping
+    df = link_dataframe_entities(df)
+    df["ticker"] = df["ticker"].replace({float("nan"): None})
+    if "corporate_entity" in df.columns:
+        df["corporate_entity"] = df["corporate_entity"].replace({float("nan"): None})
 
     transaction_map = {
         "p": "Purchase",
@@ -133,6 +139,8 @@ def merge_to_csv(
         merged = pd.concat(dfs, ignore_index=True)
     merged = clean_dataframe(merged)
     merged = merged.reindex(columns=COLUMN_ORDER).drop_duplicates().reset_index(drop=True)
+    merged["ticker"] = merged["ticker"].replace({float("nan"): None})
+    merged["corporate_entity"] = merged["corporate_entity"].replace({float("nan"): None})
 
     if write_output:
         publish_csvs({Path(output_path): merged})

@@ -9,14 +9,15 @@ Congressional stock disclosures are published under two distinct formats:
 - **Senate PTRs** (`efdsearch.senate.gov`): Digitized HTML tables with standard fields (`Transaction Date`, `Owner`, `Asset Name`, `Ticker`, `Amount`). Scraped via Playwright form interaction with a fallback JSON cache.
 - **House PTRs** (`disclosures-clerk.house.gov`): PDF scans containing structured tables. Extracted using `pdfplumber` table extraction and DataTables JavaScript execution overrides (`dt.page.len(-1).draw()`).
 
-### Ticker Resolution Heuristics
+### Ticker Resolution & Corporate Entity Mapping Heuristics
 
-Raw filings frequently omit CUSIP identifiers or standard ticker symbols (e.g. listing "Common Stock - Apple Inc."). The normalization module (`pipeline/merge_to_csv.py`):
+Raw filings frequently omit standard ticker symbols or corporate entity identifiers (e.g. listing "Common Stock - Apple Inc." or "OWENS & MINOR Rate/Coupon: 3.875%"). The normalization and entity linking modules (`pipeline/entity_linking.py` and `pipeline/merge_to_csv.py`):
 
-1. Strips descriptive prefixes (`Common Stock`, `Option`, `Bond`).
-2. Regex-matches ticker symbols enclosed in parentheses `\(([A-Z]{1,5})\)`.
-3. Validates ticker availability in `yfinance` history.
-4. Excludes ambiguous non-equity assets (private equity placements, municipal bonds, crypto).
+1. **Format Validation**: Validates tickers against standard 1–5 character exchange symbols (including share class suffixes like `.A`, `.B`, `-A`, `-B`).
+2. **Regex Extraction**: Extracts embedded tickers from asset descriptions using parenthesized `(TICKER)`, bracketed `[TICKER]`, leading prefix `TICKER - Company`, or explicit label `Ticker: TICKER` patterns.
+3. **Corporate Entity Lookup**: Maps known corporate entity names to canonical tickers and standardized corporate entity titles (e.g., `Apple Inc.` -> `AAPL`, `The Boeing Company` -> `BA`, `Microsoft Corporation` -> `MSFT`).
+4. **Descriptive Entity Normalization**: Strips descriptive prefixes (`Common Stock`, `Shares of`, `Option on`), share class notations, HTML markup, and transaction annotations to produce clean corporate entity names for unmapped equities.
+5. **Non-Equity Exclusion**: Excludes non-equity assets (municipal bonds, treasury notes/bills, corporate debentures with coupon/maturity metadata, cryptocurrencies, and scanned PDF placeholder notices) from equity ticker resolution.
 
 ## 2. Risk Adjustment Models
 
