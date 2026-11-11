@@ -17,6 +17,10 @@ docs/**/*.log
 docs/**/*.out
 docs/**/missfont.log
 
+# Derived research data; rebuild with the pipeline commands
+data/factors/
+data/purchase_events.csv
+
 Syllabus_Latest.pdf
 Presentations
 presentation_guide.md
