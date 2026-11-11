@@ -51,6 +51,7 @@ select = [
     "F7",
     "F82",
     "ANN401",
+    "UP",
 ]
 
 [tool.ruff.format]
