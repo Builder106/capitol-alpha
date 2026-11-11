@@ -45,19 +45,37 @@ from it. Keys refer to `references.bib`.
   committee jurisdictions. Finds no abnormal returns on committee-aligned
   trades and no change after hearings. The result holds across trade sizes
   and reporting delays.
-- `fischer2025democracy` (working paper): abstract not retrieved (SSRN
-  blocks automated access). It may be the closest recent study. Read it
-  before claiming anything is new.
+- `fischer2025democracy` (working paper, posted 2025-12-25, revised
+  2026-01-21; abstract read on SSRN on 2026-11-10): the closest recent
+  study. It follows the 15 largest traders by volume and treats 2020 as a
+  break, arguing that the dropped COVID-19 insider trading investigations
+  may have weakened deterrence. Congress does not significantly outperform
+  the market in any period. Mean buy-and-hold abnormal returns, for Congress
+  and for the high-volume traders, rose at 20, 60, and 127 days, and their
+  spread widened in 2020 to 2023 compared with 2012 to 2020. Sacerdote is
+  also an author of `belmont2022senators`.
 
 ## Where this paper fits
 
 The large abnormal returns are in data from before 2008. Studies of the
-years after the STOCK Act mostly find none. This paper covers 2020 to 2025
-for both chambers and asks a question most of these papers do not: what an
-outside investor earns by copying trades from the disclosure date. It also
-reports how long members take to disclose. Two checks come before stating
-the contribution: what Fischer and Sacerdote (2025) cover, and whether
-Belmont et al. (2022) measure returns from disclosure.
+years after the STOCK Act mostly find none. Fischer and Sacerdote (2025)
+already cover 2020 to 2023 at nearly the same horizons as this paper's
+plan (20, 62, and 125 trading days), so the post-2020 period alone is not
+new. What this paper can add, pending a read of their full text:
+
+- returns from the disclosure date, which is what an outside investor can
+  earn, if they measure from the transaction date;
+- a calendar-time factor regression in place of mean buy-and-hold
+  abnormal returns, whose inference problems `lyon1999improved` and
+  `mitchell2000managerial` document;
+- every member with a disclosed purchase, where they follow the 15
+  largest traders;
+- 2024 and 2025;
+- how long members take to disclose, and how often they file late.
+
+Before writing the introduction, read the full texts of
+`fischer2025democracy` and `belmont2022senators` and confirm which event
+date and benchmark each uses.
 
 ## Methods references
 
