@@ -105,8 +105,12 @@ def test_abnormal_returns_recovers_known_car():
     )
     cars = es.abnormal_returns(returns, factors, events, "date", horizons=(20, 62))
 
-    assert cars.loc[0, "car_20"] == pytest.approx(0.21)
-    assert cars.loc[0, "car_62"] == pytest.approx(0.21)
+    assert cars.loc[0, "car_20"] == pytest.approx(21 * (0.0005 + 0.01))
+    assert cars.loc[0, "car_62"] == pytest.approx(0.21 + 63 * 0.0005)
+    projected = es.abnormal_returns(
+        returns, factors, events, "date", horizons=(20,), project_alpha=True
+    )
+    assert projected.loc[0, "car_20"] == pytest.approx(0.21)
     assert cars.iloc[1:4].isna().all().all()
     assert math.isnan(cars.loc[4, "car_20"])
 

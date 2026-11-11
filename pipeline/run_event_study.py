@@ -58,7 +58,12 @@ def calendar_time_table(
     return pd.DataFrame(rows)
 
 
-def car_table(returns: pd.DataFrame, factors: pd.DataFrame, events: pd.DataFrame) -> pd.DataFrame:
+def car_table(
+    returns: pd.DataFrame,
+    factors: pd.DataFrame,
+    events: pd.DataFrame,
+    project_alpha: bool = False,
+) -> pd.DataFrame:
     """Mean four-factor CARs with two-way clustered errors and Holm-adjusted p-values."""
     samples = (
         ("disclosure", "disclosure_date", events[events["q1_eligible"]]),
@@ -66,7 +71,7 @@ def car_table(returns: pd.DataFrame, factors: pd.DataFrame, events: pd.DataFrame
     )
     rows = []
     for label, column, sample in samples:
-        cars = abnormal_returns(returns, factors, sample, column)
+        cars = abnormal_returns(returns, factors, sample, column, project_alpha=project_alpha)
         for horizon in HORIZONS:
             values = cars[f"car_{horizon}"].dropna()
             members = sample.loc[values.index, "legislator_name"]
@@ -131,6 +136,8 @@ def main(argv: list[str] | None = None) -> None:
     print(format_calendar(calendar_time_table(returns, factors, events)))
     print("\nEvent-level four-factor CARs (trading days)\n")
     print(format_cars(car_table(returns, factors, events)))
+    print("\nSame CARs with the pre-event intercept projected (first run, kept for disclosure)\n")
+    print(format_cars(car_table(returns, factors, events, project_alpha=True)))
 
 
 if __name__ == "__main__":

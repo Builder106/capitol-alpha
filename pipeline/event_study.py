@@ -85,10 +85,14 @@ def abnormal_returns(
     date_column: str,
     model: tuple[str, ...] = FOUR_FACTOR,
     horizons: Iterable[int] = HORIZONS,
+    project_alpha: bool = False,
 ) -> pd.DataFrame:
     """Cumulative abnormal returns over [0, h] trading days for each event.
 
     Betas come from trading days -250 to -30 and need at least 100 returns.
+    The abnormal return removes factor exposure only. ``project_alpha=True``
+    also subtracts the pre-event intercept, which pushes CARs down for stocks
+    bought after a run-up (the first run did this; see JOURNAL.md).
     A CAR is missing when any return inside its window is missing.
     """
     days = returns.index.intersection(factors.index)
@@ -107,7 +111,7 @@ def abnormal_returns(
         if usable.sum() < MIN_ESTIMATION_DAYS:
             continue
         coef, _ = ols(y[window][usable], loadings[window][usable])
-        expected = coef[0] + loadings @ coef[1:]
+        expected = loadings @ coef[1:] + (coef[0] if project_alpha else 0.0)
         for h in horizons:
             if zero + h < len(days):
                 span = slice(zero, zero + h + 1)

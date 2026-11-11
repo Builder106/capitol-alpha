@@ -68,3 +68,4 @@ def test_main_reads_fetched_files(tmp_path, monkeypatch, capsys):
     assert out.startswith("6 events, 3 stocks, returns 2020-01-02 to")
     assert "Q1: copy portfolio" in out
     assert "| transaction | 125 | 6 |" in out
+    assert "pre-event intercept projected" in out
