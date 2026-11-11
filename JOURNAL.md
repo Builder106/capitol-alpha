@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-11-11 — No outperformance; CARs now use betas only #milestone #decision
+
+The primary test is a null: the copy portfolio from disclosure earns -1.82% a year in four-factor alpha (t = -0.74, H = 62). The first run's event-level CARs were significantly negative, but that came from subtracting each stock's pre-event intercept, which the plan does not call for. Members buy stocks that had been beating the factor model, so the projected intercept averaged +1.65% over 63 days. `abnormal_returns` now removes factor exposure only, matching the plan's "betas", and every corrected CAR is insignificant. This change was made after seeing results, so the runner keeps printing the first run's table and `docs/results/event-study.md` reports both.
+
 ## 2026-11-11 — CRSP through WRDS is the price source #decision
 
 WRDS access through Wesleyan includes CRSP in the CIZ format, with daily data through 2025-12-31. Before computing any return, the plan now fixes how tickers map to `permno` (by the record that covers the transaction date, since `META` was an ETF before Meta took it), defines common stock as `EQTY`/`COM`/`NS` with ADRs counted and excluded, and keeps CIZ delisting rows because `dlyret` already includes the delisting return. CRSP prices stay on the build machine and never enter the repository.
