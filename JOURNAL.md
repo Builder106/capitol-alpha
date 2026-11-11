@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-11-11 — CRSP through WRDS is the price source #decision
+
+WRDS access through Wesleyan includes CRSP in the CIZ format, with daily data through 2025-12-31. Before computing any return, the plan now fixes how tickers map to `permno` (by the record that covers the transaction date, since `META` was an ETF before Meta took it), defines common stock as `EQTY`/`COM`/`NS` with ADRs counted and excluded, and keeps CIZ delisting rows because `dlyret` already includes the delisting return. CRSP prices stay on the build machine and never enter the repository.
+
 ## 2026-11-10 — Redo the headline as a pre-planned event study #decision #incident
 
 An audit of the +2.58% result found that it rests on 220 Senate-only trades. The notebook matched purchases with `Purchase|buy`, which drops every House `P` row, and priced only the 50 most-traded tickers. It measured returns from the transaction date, although the methodology says disclosure, and its "alpha" is trade return minus SPY with an implied beta of 1. The committed trade CSVs had also been replaced with three-line test output in `aac906f`. The full extract is restored from `821d6e5` as `data/snapshots/legislative_trades_821d6e5.csv`, and a hash test guards it. `docs/specs/event-study.md` fixes the sample, factor model, calendar-time test, and multiple-testing correction before any new return is computed. The new sample has 4,586 disclosed purchases for the primary test. The README and site still show the old number until the redo is finished.

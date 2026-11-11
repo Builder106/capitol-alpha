@@ -61,7 +61,21 @@ Q1 is the one confirmatory test. Everything else is reported as exploratory.
   House and Senate sites can serve as a later replication.
 - **Senate disclosure dates are missing** from the snapshot. Senate rows go
   into Q2 only, unless the filing date is recovered from each `ptr_link`.
-- **Prices.** Open decision, see below.
+- **Prices.** CRSP daily returns through WRDS, in the CIZ format
+  (`crsp.dsf_v2`, field `dlyret`), decided 2026-11-11 before any return was
+  computed. The subscription's daily data ends on 2025-12-31.
+- **Matching tickers to CRSP.** A ticker matches the `permno` whose
+  `crsp.stksecurityinfohist` record covers the transaction date. Tickers
+  move between firms (`META` was an ETF before Meta took it), so a match
+  without dates is wrong.
+- **Common stock.** `securitytype = 'EQTY'`, `securitysubtype = 'COM'`, and
+  `sharetype = 'NS'`. ADRs (`sharetype = 'AD'`) are left out because the
+  factors are built from US common stocks. The sample-flow table counts
+  them.
+- **Delisting.** In the CIZ format, `dlyret` already includes the delisting
+  return, on a row flagged `dlydelflg = 'Y'` dated after the last trading
+  day. Returns are taken by `permno` from `dsf_v2` with no date-window join,
+  so those rows stay in.
 - **Factors.** Daily Fama-French three factors and momentum from Kenneth
   French's data library, with the download date recorded. The five-factor
   model is a robustness check.
@@ -97,8 +111,11 @@ gives:
 | Disclosed more than 365 days later | 45 |
 | Eligible for Q1 | 4,586 |
 
-Price matching will remove more events. That count is reported once the
-price source is chosen.
+CRSP matching removes more events, and the sample-flow table reports how
+many. Because CRSP ends on 2025-12-31, an event-level CAR exists only when
+its whole window falls on or before that date, so the 125-day CAR drops
+events from about mid-2025 on. The calendar-time portfolio keeps every
+event and holds each stock until its holding period or the data ends.
 
 ## Model
 
@@ -133,10 +150,6 @@ can come from many sources, and the data cannot separate them.
 
 ## Open decisions
 
-- **Price source.** CRSP through WRDS includes delisted stocks and avoids
-  survivorship bias. Yahoo Finance is free, but it is missing delisted
-  tickers and its terms do not allow redistributing prices. If Yahoo is
-  used, report how many events are lost to missing tickers.
 - **Senate disclosure dates.** Recover them from the PTR pages, or limit
   Q1 to the House.
 
