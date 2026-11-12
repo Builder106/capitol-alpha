@@ -1,6 +1,6 @@
 # Event study results (Q1 and Q2)
 
-First full run of the plan in `docs/specs/event-study.md`, on 2026-11-11.
+Results of the plan in `docs/specs/event-study.md`, run on 2026-11-11.
 Prices are CRSP daily returns (CIZ, through 2025-12-31) from WRDS. Factors
 are Kenneth French's daily three factors and momentum, downloaded the same
 day. Reproduce on a machine with WRDS access:
@@ -27,9 +27,18 @@ detectable alpha.
 | Other share types (excluded) | 125 |
 | Matched to CRSP common stock | 4,456 |
 
-The matched events cover 1,010 stocks. Q1 uses the matched events that also
-have a disclosure 0 to 365 days after the trade. Those are House trades,
-because the snapshot has no Senate disclosure dates.
+Q1 uses the 3,942 matched purchases with a disclosure 0 to 365 days after
+the trade. Those are House trades, because the snapshot has no Senate
+disclosure dates. In 14 purchases, two CRSP common-stock records cover the
+trade date, and the lowest `permno` is kept.
+
+The 365 purchases with no record span 221 tickers. 108 of them have a fund,
+ETF, or trust description (SPY, IBIT, TNA, JEPI, ProShares short funds).
+Most of the rest are over-the-counter foreign shares (Nestle, Roche,
+Tencent, Fanuc) and closed-end funds or BDCs (Hercules Capital, Cohen &
+Steers). None of the most frequent ones is a listed US common stock with a
+wrong ticker. `excluded.csv` from `pipeline.crsp` lists every excluded event
+with its reason.
 
 ## Q1: copy portfolio from the disclosure date
 
@@ -39,9 +48,9 @@ Newey-West errors. H = 62 is the pre-declared primary test.
 
 | Holding days | Primary | Alpha (annual) | t | p | Days |
 | ---: | :---: | ---: | ---: | ---: | ---: |
-| 20 | | 1.93% | 0.60 | 0.550 | 1,505 |
-| 62 | yes | -1.82% | -0.74 | 0.460 | 1,505 |
-| 125 | | -1.81% | -0.79 | 0.431 | 1,505 |
+| 20 | | 1.95% | 0.60 | 0.547 | 1,505 |
+| 62 | yes | -1.82% | -0.74 | 0.461 | 1,505 |
+| 125 | | -1.81% | -0.78 | 0.433 | 1,505 |
 
 ## Event-level CARs
 
@@ -51,12 +60,15 @@ event month. Holm correction across the six tests.
 
 | Event date | Horizon | Events | Mean CAR | t | p | Holm p |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Disclosure | 20 | 3,795 | 0.00% | 0.01 | 0.989 | 1.000 |
-| Disclosure | 62 | 3,630 | -0.34% | -0.83 | 0.406 | 1.000 |
-| Disclosure | 125 | 3,140 | -0.68% | -1.90 | 0.057 | 0.343 |
-| Transaction | 20 | 4,372 | -0.04% | -0.18 | 0.855 | 1.000 |
-| Transaction | 62 | 4,161 | -0.04% | -0.12 | 0.905 | 1.000 |
-| Transaction | 125 | 3,932 | -0.21% | -0.58 | 0.562 | 1.000 |
+| Disclosure | 20 | 3,795 | 0.00% | 0.01 | 0.988 | 1.000 |
+| Disclosure | 62 | 3,630 | -0.34% | -0.83 | 0.404 | 1.000 |
+| Disclosure | 125 | 3,139 | -0.68% | -1.90 | 0.057 | 0.343 |
+| Transaction | 20 | 4,372 | -0.04% | -0.18 | 0.860 | 1.000 |
+| Transaction | 62 | 4,161 | -0.04% | -0.11 | 0.913 | 1.000 |
+| Transaction | 125 | 3,931 | -0.20% | -0.57 | 0.568 | 1.000 |
+
+With the market model in place of four factors, every CAR is also
+insignificant (means from -0.34% to +0.36%, all Holm p = 1.000).
 
 Fewer events have long-horizon CARs because CRSP ends on 2025-12-31.
 
@@ -74,12 +86,30 @@ table so the change can be checked, and the paper must report both.
 
 Members buying recent winners is itself a finding to report as exploratory.
 
+## Robustness
+
+The plan's checks, each on the 62-day copy portfolio with four-factor
+alpha. None is significant.
+
+| Check | Events | Alpha (annual) | t | p |
+| --- | ---: | ---: | ---: | ---: |
+| Primary: purchases from disclosure | 3,942 | -1.82% | -0.74 | 0.461 |
+| Leave out trades made in 2020 | 3,234 | -3.90% | -1.59 | 0.112 |
+| Drop the five most active members | 2,622 | -3.26% | -1.20 | 0.229 |
+| Weight by disclosed amount | 3,942 | 7.12% | 1.43 | 0.152 |
+| Members' own trades only | 1,861 | -5.08% | -1.54 | 0.123 |
+| House purchases from the trade date | 3,996 | -1.37% | -0.58 | 0.559 |
+| Senate purchases from the trade date | 460 | -0.95% | -0.10 | 0.920 |
+| Sales from disclosure | 4,284 | 0.85% | 0.30 | 0.762 |
+
+Two estimates are worth a sentence in the paper. Weighting by the disclosed
+amount turns the alpha positive (7.12% a year, t = 1.43), a hint that
+larger trades do better, though not a significant one. Members' own trades,
+without spouses and dependents, have the most negative estimate (-5.08%,
+t = -1.54). The Senate check has only 460 events over 288 trading days.
+
 ## Not yet done
 
-- The robustness checks in the plan: leave out 2020, House and Senate
-  separately, drop the five most active members, amount weighting, own
-  trades only, and sales.
-- The market-model version of the CARs.
 - Recovering Senate disclosure dates, which would add Senate trades to Q1.
-- Listing the 365 unmatched tickers to confirm they are funds and not
-  ticker errors.
+- Reading the full texts of the closest prior papers (see
+  `docs/paper/literature.md`).

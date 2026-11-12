@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-11-11 — Robustness checks hold the null; permno ties fixed #milestone #fix
+
+Every robustness check in the plan is insignificant, and so are the market-model CARs. Amount weighting gives the largest positive estimate (7.12% a year, t = 1.43). Two fetches gave slightly different results (20-day alpha 1.93% vs 1.96%) because 14 purchases had two CRSP common-stock records on the trade date and an unstable sort picked between them. The lowest permno now wins and the count is printed. The 365 unmatched purchases are mostly ETFs, over-the-counter foreign shares, and closed-end funds.
+
 ## 2026-11-11 — No outperformance; CARs now use betas only #milestone #decision
 
 The primary test is a null: the copy portfolio from disclosure earns -1.82% a year in four-factor alpha (t = -0.74, H = 62). The first run's event-level CARs were significantly negative, but that came from subtracting each stock's pre-event intercept, which the plan does not call for. Members buy stocks that had been beating the factor model, so the projected intercept averaged +1.65% over 63 days. `abnormal_returns` now removes factor exposure only, matching the plan's "betas", and every corrected CAR is insignificant. This change was made after seeing results, so the runner keeps printing the first run's table and `docs/results/event-study.md` reports both.
