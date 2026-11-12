@@ -191,6 +191,19 @@
     return `${weight} ${size}px 'Public Sans', system-ui, sans-serif`;
   }
 
+  // Text on a ground-colored box, so grid and marker lines never run through a label.
+  // haloAlpha lets a dimmed label keep a solid halo.
+  function label(content, x, y, haloAlpha) {
+    ctx.save();
+    if (haloAlpha !== undefined) ctx.globalAlpha = haloAlpha;
+    const m = ctx.measureText(content);
+    const left = ctx.textAlign === 'right' ? x - m.width : ctx.textAlign === 'center' ? x - m.width / 2 : x;
+    ctx.fillStyle = colors.ground;
+    ctx.fillRect(left - 3, y - m.actualBoundingBoxAscent - 3, m.width + 6, m.actualBoundingBoxAscent + m.actualBoundingBoxDescent + 6);
+    ctx.restore();
+    ctx.fillText(content, x, y);
+  }
+
   function draw() {
     if (!geo) return;
     const g = geo;
@@ -210,7 +223,16 @@
     ctx.font = font(g.narrow ? 11 : 13);
     ctx.fillStyle = colors.muted;
     ctx.textAlign = 'left';
-    if (!g.narrow) ctx.fillText('Model fit, days −250 to −30', g.x(-250) + 8, yTop + 18);
+    if (!g.narrow) {
+      // Keep the caption inside the shaded window: one line if it fits, else two.
+      const caption = 'Model fit, days −250 to −30';
+      const room = g.x(-30) - g.x(-250) - 16;
+      if (ctx.measureText(caption).width <= room) ctx.fillText(caption, g.x(-250) + 8, yTop + 18);
+      else {
+        ctx.fillText('Model fit,', g.x(-250) + 8, yTop + 18);
+        ctx.fillText('days −250 to −30', g.x(-250) + 8, yTop + 36);
+      }
+    }
     const t = ticks(r);
     ctx.textAlign = 'right';
     for (const v of t.values) {
@@ -230,7 +252,11 @@
     ctx.font = font(g.narrow ? 11 : 13);
     ctx.fillStyle = colors.muted;
     ctx.textAlign = 'center';
-    for (const d of [-250, -30, 0, 20, 62, 125]) ctx.fillText(signed(d), g.x(d), yBottom + (g.narrow ? 18 : 26));
+    for (const d of [-250, -30, 0, 20, 62, 125]) {
+      // The last tick sits on the plot's right edge, so it ends there instead of centering.
+      ctx.textAlign = d === 125 ? 'right' : 'center';
+      ctx.fillText(signed(d), d === 125 ? g.W - 2 : g.x(d), yBottom + (g.narrow ? 18 : 26));
+    }
     if (!g.narrow) {
       ctx.textAlign = 'right';
       ctx.fillText('Trading days from disclosure', g.W - g.right, yBottom + 42);
@@ -255,12 +281,17 @@
       ctx.lineTo(g.x(m.day), yBottom);
       ctx.stroke();
       ctx.setLineDash([]);
+    }
+    // Labels go in a second pass so no later marker line crosses an earlier label.
+    for (const m of MARKERS) {
+      ctx.globalAlpha = intro * (day >= m.day - 0.5 ? 1 : 0.3);
       if (!g.narrow || m.strong || m.accent) {
-        const before = m.day < 0;
-        ctx.textAlign = before ? 'right' : 'left';
+        // Labels sit right of their line, except before day 0 and at the plot's right edge.
+        const flip = m.day < 0 || m.day === 125;
+        ctx.textAlign = flip ? 'right' : 'left';
         ctx.font = font(g.narrow ? 11 : 13, m.strong || m.accent ? 650 : 500);
         ctx.fillStyle = m.accent ? colors.accent : m.strong ? colors.ink : colors.muted;
-        ctx.fillText(g.narrow && m.accent ? '+62' : m.label, g.x(m.day) + (before ? -7 : 7), yTop + (before ? 38 : 18));
+        label(g.narrow && m.accent ? '+62' : m.label, g.x(m.day) + (flip ? -7 : 7), yTop + (m.day < 0 ? 38 : 18), intro);
       }
     }
 
@@ -336,12 +367,13 @@
       const dx = right ? -12 - cloud : 12 + cloud;
       ctx.font = font(g.narrow ? 12 : 14, 700);
       ctx.fillStyle = colors.accent;
-      ctx.fillText(`Mean ${signed(mean * 100, 2)}%`, cx + dx, y(mean) - 12);
+      // Put the mean on the side of its dot away from the zero line, haloed against the band.
+      label(`Mean ${signed(mean * 100, 2)}%`, cx + dx, y(mean) + (mean < 0 ? 20 : -12));
       if (!g.narrow && zoom < 0.5) {
         ctx.font = font(13, 500);
         ctx.fillStyle = colors.muted;
         ctx.globalAlpha = intro * (1 - zoom * 2);
-        ctx.fillText(`Middle half: ${signed(spreadAt(day, 25) * 100, 1)}% to ${signed(spreadAt(day, 75) * 100, 1)}%`, cx + dx, y(spreadAt(day, 75)) - 10);
+        label(`Middle half: ${signed(spreadAt(day, 25) * 100, 1)}% to ${signed(spreadAt(day, 75) * 100, 1)}%`, cx + dx, y(spreadAt(day, 75)) - 10);
       }
     }
     ctx.globalAlpha = 1;
@@ -675,10 +707,14 @@
     forest(figures && figures.robustness);
     if (document.fonts) document.fonts.ready.then(render);
 
-    let width = window.innerWidth;
+    // Remeasure when the window width or the canvas size changes; a height-only window
+    // resize changes the canvas on desktop, while a phone's toolbar (svh units) does not.
+    let size = '';
     const resize = () => {
-      if (Math.abs(window.innerWidth - width) < 2 && geo) return;
-      width = window.innerWidth;
+      const rect = canvas ? canvas.getBoundingClientRect() : { width: 0, height: 0 };
+      const next = `${window.innerWidth}x${Math.round(rect.width)}x${Math.round(rect.height)}`;
+      if (next === size && geo) return;
+      size = next;
       mount();
       forest(figures && figures.robustness);
       filing(figures && figures.lag);
