@@ -173,3 +173,29 @@ def test_holm():
     adjusted = es.holm({"a": 0.01, "b": 0.04, "c": 0.03})
     assert adjusted == pytest.approx({"a": 0.03, "c": 0.06, "b": 0.06})
     assert es.holm({"x": 0.6, "y": 0.7}) == {"x": 1.0, "y": 1.0}
+
+
+def test_calendar_time_alpha_weights_events():
+    factors = constructed_market()
+    days = factors.index
+    rng = np.random.default_rng(5)
+    noise = rng.normal(0, 0.00005, (len(days), 2))
+    returns = pd.DataFrame(
+        {
+            "AAA": factors["RF"] + 0.002 + factors["Mkt-RF"] + noise[:, 0],
+            "BBB": factors["RF"] + factors["Mkt-RF"] + noise[:, 1],
+        }
+    )
+    returns.iloc[50, 1] = np.nan
+    events = pd.DataFrame(
+        {
+            "security": ["AAA", "BBB", "BBB"],
+            "date": [days[40], days[40], days[40]],
+            "weight": [3.0, 1.0, np.nan],
+        }
+    )
+    weighted = es.calendar_time_alpha(returns, factors, events, "date", 30, weight_column="weight")
+    equal = es.calendar_time_alpha(returns, factors, events, "date", 30)
+    assert weighted["alpha_daily"] == pytest.approx(0.0015, abs=1e-4)
+    assert equal["alpha_daily"] == pytest.approx(0.001, abs=1e-4)
+    assert weighted["days"] == equal["days"] == 30

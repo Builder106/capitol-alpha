@@ -147,19 +147,34 @@ def calendar_time_alpha(
     date_column: str,
     holding_days: int,
     model: tuple[str, ...] = FOUR_FACTOR,
+    weight_column: str | None = None,
 ) -> dict[str, float]:
-    """Alpha of an equal-weight portfolio of stocks bought in the last ``holding_days``.
+    """Alpha of a portfolio of stocks bought in the last ``holding_days``.
 
     A stock enters the day after its event date and stays for ``holding_days``
-    trading days. Each stock counts once per day however many events name it.
+    trading days. With no ``weight_column``, each held stock gets equal weight
+    however many events name it. Otherwise a stock's weight is the sum of its
+    active events' weights, and events with a missing weight are skipped.
     """
     days = returns.index.intersection(factors.index)
-    held = pd.DataFrame(False, index=days, columns=returns.columns)
-    for security, date in zip(events["security"], events[date_column], strict=True):
+    weights = (
+        events[weight_column] if weight_column else pd.Series(1.0, index=events.index)
+    ).to_numpy(dtype=float)
+    held = np.zeros((len(days), len(returns.columns)))
+    for security, date, weight in zip(
+        events["security"], events[date_column], weights, strict=True
+    ):
         zero = event_day(days, date)
-        if security in held.columns and zero is not None:
-            held.iloc[zero + 1 : zero + 1 + holding_days, held.columns.get_loc(security)] = True
-    portfolio = returns.loc[days].where(held).mean(axis=1).dropna()
+        if security in returns.columns and zero is not None and not np.isnan(weight):
+            held[zero + 1 : zero + 1 + holding_days, returns.columns.get_loc(security)] += weight
+    if not weight_column:
+        held = (held > 0).astype(float)
+    values = returns.loc[days].to_numpy()
+    active = np.where(np.isnan(values), 0.0, held)
+    total = active.sum(axis=1)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        daily = np.nansum(values * active, axis=1) / total
+    portfolio = pd.Series(daily, index=days)[total > 0]
     excess = portfolio - factors.loc[portfolio.index, "RF"]
     loadings = factors.loc[portfolio.index, list(model)].to_numpy()
     coef, resid = ols(excess.to_numpy(), loadings)
