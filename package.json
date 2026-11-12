@@ -7,7 +7,7 @@
     "test:e2e": "bddgen && playwright test"
   },
   "devDependencies": {
-    "@playwright/test": "1.64.1",
+    "@playwright/test": "1.65.0",
     "@types/node": "^26.6.6",
     "playwright-bdd": "^9.2.1",
     "typescript": "~7.0.2"
