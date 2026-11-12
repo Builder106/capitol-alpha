@@ -13,6 +13,7 @@
   --sheet: #eef2f8;
   --ink: #edf1f7;
   --muted: #9aa5ba;
+  --prose: #c4ccda;
   --line: #242d42;
   --accent: #7b93ff;
   --accent-soft: #a9b8ff;
@@ -471,6 +472,7 @@ html.motion .unit--question .scroll-cue {
    kind: tight within the heading group, wide between the number and the prose. */
 .unit:not(.unit--question) p:not(.unit__day, .stat) {
   max-width: 32rem;
+  color: var(--prose);
   font-size: 1.125rem;
   line-height: 1.7;
   text-wrap: pretty;
@@ -482,7 +484,8 @@ html.motion .unit--question .scroll-cue {
   max-width: 30rem;
   font-size: clamp(1.2rem, 1.45vw, 1.35rem);
   line-height: 1.5;
-  font-weight: 500;
+  font-weight: 400;
+  color: var(--ink);
 }
 
 .unit:not(.unit--question) p + p,
@@ -501,8 +504,10 @@ html.motion .unit--question .scroll-cue {
   color: var(--muted);
 }
 
+/* Bold needs a clear step: regular prose in a softer tone, bold at 750 in full ink. */
 .unit strong {
-  font-weight: 650;
+  font-weight: 750;
+  color: var(--ink);
   white-space: nowrap;
 }
 
