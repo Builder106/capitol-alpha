@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-11-11 — Site rebuilt around event time #milestone #decision
+
+The findings page still led with the retracted +2.58%, so it was rebuilt instead of patched. The page is now one event-study plot: scrolling moves through event time from the estimation window to day +125, and the mean abnormal return after disclosure draws itself inside its 95% band, which covers zero on all 126 days. The data comes from `pipeline.site_figures`, which writes aggregates only to `site/data/figures.json`; no CRSP stock-level return leaves the build machine. The Capitol dome, the filing stamp and the alpha mark were drawn in Glaxnimate; the stamp is a hand-keyed SMIL timeline that GSAP scrubs. Finance green went with the old claim, since it signalled a gain the study does not find. The spring 2025 PDFs stay on the site as a labelled archive. The GSAP files live in `site/lib/` because some sync tools skip folders named `vendor`, and the e2e server moved from port 8080 to 4317 to avoid a common clash.
+
 ## 2026-11-11 — Robustness checks hold the null; permno ties fixed #milestone #fix
 
 Every robustness check in the plan is insignificant, and so are the market-model CARs. Amount weighting gives the largest positive estimate (7.12% a year, t = 1.43). Two fetches gave slightly different results (20-day alpha 1.93% vs 1.96%) because 14 purchases had two CRSP common-stock records on the trade date and an unstable sort picked between them. The lowest permno now wins and the count is printed. The 365 unmatched purchases are mostly ETFs, over-the-counter foreign shares, and closed-end funds.
