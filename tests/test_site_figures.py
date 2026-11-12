@@ -35,6 +35,18 @@ def test_car_path_has_one_point_per_day():
     assert [point["day"] for point in path] == [0, 1, 2, 3, 4, 5]
     assert all(point["events"] == 6 for point in path)
     assert all(point["se"] >= 0 for point in path)
+    assert "p" not in path[0]
+
+
+def test_car_path_percentiles_are_ordered():
+    returns, factors, events = constructed_inputs()
+    purchases = events[events["side"] == "purchase"]
+    path = site_figures.car_path(
+        returns, factors, purchases, "transaction_date", last_day=2, percentiles=True
+    )
+    spread = path[-1]["p"]
+    assert len(spread) == 99
+    assert spread == sorted(spread)
 
 
 def test_car_path_skips_days_without_events():
@@ -76,6 +88,7 @@ def test_main_writes_valid_json(tmp_path, capsys):
 
     data = json.loads(out.read_text())
     assert len(data["car_disclosure"]) == 126
+    assert len(data["car_disclosure"][0]["p"]) == 99
     assert data["car_transaction"][0]["events"] == 6
     assert data["lag"]["median_days"] == 50.5
     assert data["lag"]["trades"] == 2

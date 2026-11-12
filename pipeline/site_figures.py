@@ -16,6 +16,7 @@ import argparse
 import json
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from .disclosure_lag import DEADLINE_DAYS, disclosure_lags
@@ -27,6 +28,7 @@ OUT = Path(__file__).resolve().parent.parent / "site" / "data" / "figures.json"
 LAST_DAY = max(HORIZONS)
 LAG_BIN_DAYS = 5
 LAG_CAP_DAYS = 90
+PERCENTILES = list(range(1, 100))
 
 
 def car_path(
@@ -35,11 +37,13 @@ def car_path(
     events: pd.DataFrame,
     date_column: str,
     last_day: int = LAST_DAY,
-) -> list[dict[str, float | int]]:
+    percentiles: bool = False,
+) -> list[dict[str, object]]:
     """Mean CAR over [0, d] for every trading day d, with two-way clustered errors.
 
     Each day uses every event that has returns through that day, so later days
-    rest on fewer events.
+    rest on fewer events. ``percentiles=True`` adds the 1st to 99th percentiles
+    of that day's CARs, which the site uses to draw the spread across purchases.
     """
     cars = abnormal_returns(returns, factors, events, date_column, horizons=range(last_day + 1))
     path = []
@@ -50,7 +54,10 @@ def car_path(
         members = events.loc[values.index, "legislator_name"]
         months = events.loc[values.index, date_column].dt.strftime("%Y-%m")
         mean, se = two_way_clustered_mean(values, members, months)
-        path.append({"day": day, "events": len(values), "mean": mean, "se": se})
+        point: dict[str, object] = {"day": day, "events": len(values), "mean": mean, "se": se}
+        if percentiles:
+            point["p"] = [round(float(v), 4) for v in np.percentile(values, PERCENTILES)]
+        path.append(point)
     return path
 
 
@@ -79,7 +86,9 @@ def figures(data_dir: Path, snapshot: Path = SNAPSHOT) -> dict[str, object]:
     disclosed = purchases[purchases["q1_eligible"]]
     lags, _ = disclosure_lags(load_snapshot(snapshot))
     return {
-        "car_disclosure": car_path(returns, factors, disclosed, "disclosure_date"),
+        "car_disclosure": car_path(
+            returns, factors, disclosed, "disclosure_date", percentiles=True
+        ),
         "car_transaction": car_path(returns, factors, purchases, "transaction_date"),
         "lag": {
             "deadline_days": DEADLINE_DAYS,
@@ -109,7 +118,9 @@ def main(argv: list[str] | None = None) -> None:
 
     data = figures(args.data_dir, args.snapshot)
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(data, indent=1, allow_nan=False, default=float) + "\n")
+    args.out.write_text(
+        json.dumps(data, separators=(",", ":"), allow_nan=False, default=float) + "\n"
+    )
     print(f"wrote {args.out}")
 
 
