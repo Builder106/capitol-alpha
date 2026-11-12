@@ -17,6 +17,7 @@ LINKS = [
     ("XYZ", 11111, "2000-01-01", "2025-12-31", "UG"),
     ("AAA", 22222, "2000-01-01", "2025-12-31", "AD"),
     ("AAA", 33333, "2000-01-01", "2025-12-31", "NS"),
+    ("AAA", 44444, "2000-01-01", "2025-12-31", "NS"),
 ]
 RETURN_ROWS = [
     (14593, "2021-03-02", Decimal("0.010")),
@@ -81,6 +82,7 @@ def test_link_events_matches_by_date_and_share_type():
         ("  ADR (excluded)", 1),
         ("  other share type (excluded)", 1),
         ("matched to CRSP common stock", 2),
+        ("  of which had more than one common record (lowest permno kept)", 1),
     ]
     assert excluded.to_dict("index") == {
         1: {"ticker": "META", "reason": crsp.NO_RECORD},

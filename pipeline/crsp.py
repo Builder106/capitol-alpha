@@ -97,11 +97,12 @@ def link_events(
     )
     merged = events.reset_index(names="event_id").merge(links, on="ticker", how="left")
     covered = merged["transaction_date"].between(merged["secinfostartdt"], merged["secinfoenddt"])
-    matched = (
-        merged[covered]
-        .sort_values(["event_id", "sharetype"], ascending=[True, False])
-        .drop_duplicates("event_id")
+    candidates = merged[covered].sort_values(
+        ["event_id", "sharetype", "permno"], ascending=[True, False, True], kind="stable"
     )
+    matched = candidates.drop_duplicates("event_id")
+    common_candidates = candidates[candidates["sharetype"] == COMMON_SHARE]
+    ambiguous = int(common_candidates["event_id"].duplicated().sum())
     common = matched[matched["sharetype"] == COMMON_SHARE]
 
     flow: Flow = [
@@ -113,6 +114,7 @@ def link_events(
             int((~matched["sharetype"].isin([COMMON_SHARE, ADR_SHARE])).sum()),
         ),
         ("matched to CRSP common stock", len(common)),
+        ("  of which had more than one common record (lowest permno kept)", ambiguous),
     ]
     linked = common.drop(columns=["secinfostartdt", "secinfoenddt", "sharetype"])
     linked = linked.rename(columns={"permno": "security"}).astype({"security": int})
