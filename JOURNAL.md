@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-11-11 — Site v2: one dot per purchase #decision #pivot
+
+The first rebuild read as timid once it was live: for half the page the plot was an empty grid with one dot on a line, and a flat mean line alone does not show why the null result is interesting. The stage is now a canvas where each of the 3,942 disclosed purchases is a dot. The dots fall onto the ground under the dome, leave for day 0 in filing order (drawn from the real lag histogram), then fan out into the day's spread of abnormal returns while the mean stays on zero; at day 62 the plot zooms in 18 times to the mean and its 95% band. `pipeline.site_figures` now also writes the 1st to 99th percentiles per day, still aggregates only. The palette went dark navy so the dots read as points of light. A shimmer on the dots was dropped because it cost too much frame time on phones.
+
 ## 2026-11-11 — Site rebuilt around event time #milestone #decision
 
 The findings page still led with the retracted +2.58%, so it was rebuilt instead of patched. The page is now one event-study plot: scrolling moves through event time from the estimation window to day +125, and the mean abnormal return after disclosure draws itself inside its 95% band, which covers zero on all 126 days. The data comes from `pipeline.site_figures`, which writes aggregates only to `site/data/figures.json`; no CRSP stock-level return leaves the build machine. The Capitol dome, the filing stamp and the alpha mark were drawn in Glaxnimate; the stamp is a hand-keyed SMIL timeline that GSAP scrubs. Finance green went with the old claim, since it signalled a gain the study does not find. The spring 2025 PDFs stay on the site as a labelled archive. The GSAP files live in `site/lib/` because some sync tools skip folders named `vendor`, and the e2e server moved from port 8080 to 4317 to avoid a common clash.
