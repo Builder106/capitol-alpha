@@ -25,7 +25,7 @@
   <link rel="canonical" href="https://capitolalpha.vercel.app/">
   <link rel="preload" href="/fonts/public-sans-100_900-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/data/figures.json" as="fetch" type="application/json" crossorigin>
-  <link rel="stylesheet" href="/style.css?v=3">
+  <link rel="stylesheet" href="/style.css?v=4">
   <script>
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
       document.documentElement.classList.add('motion');
@@ -132,9 +132,14 @@
           <p class="unit__day">Days &minus;250 to &minus;30</p>
           <h2 id="estimation-h">First, what each stock should have done</h2>
           <p class="stat"><span class="stat__num" data-count="221">221</span><span class="stat__label">trading days of history, fit for every stock</span></p>
-          <p>For every purchase, a four-factor model is fit on the stock's daily returns from 250 to 30 trading days
-            before the event: the market, small against large firms, value against growth, and momentum. The model
-            predicts each day's return from those factors.</p>
+          <p>For every purchase, a model is fit on the stock's daily returns from 250 to 30 trading days before the
+            event. It predicts each day's return from four factors:</p>
+          <ul class="factors">
+            <li>The market</li>
+            <li>Small against large firms</li>
+            <li>Value against growth</li>
+            <li>Momentum</li>
+          </ul>
           <p>The abnormal return is the actual return minus that prediction. If members know something the market does
             not, it shows up here.</p>
         </section>
@@ -154,8 +159,8 @@
           <h2 id="filing-h">The filing</h2>
           <p class="stat"><span class="stat__num" data-count="13">13</span><span class="stat__label">days, the median wait before a House member reported a trade</span></p>
           <p>The STOCK Act gives members 45 days to report a trade. House members took a median of
-            <strong>13 days</strong>. Of 1,965 House filings, 69 came in late. On the plot, the dots leave for day 0 in
-            the order members filed.</p>
+            <strong>13 days</strong>. Of 1,965 House filings, 69 came in late.</p>
+          <p class="cue">On the plot, the dots leave for day 0 in the order members filed.</p>
           <div class="filing">
             <svg class="filing__art" viewBox="0 0 220 240" data-glax-ms="1600" aria-hidden="true" focusable="false">
               <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -197,7 +202,7 @@
           <p>From here the trade is public. The test asks what a follower earns by buying the same stock the next
             trading day. <strong>3,942</strong> of the purchases have a disclosure date, all from the House; the Senate
             records used here carry no filing date.</p>
-          <p>Each dot on the plot stands for one of them. From here they spread out by how each did against the model,
+          <p class="cue">Each dot on the plot stands for one of them. From here they spread out by how each did against the model,
             and the shaded bands hold the middle half and the middle 80%. The blue line is their average.</p>
         </section>
 
@@ -205,16 +210,27 @@
           <p class="unit__day">Day +20</p>
           <h2 id="day-20-h">A month on, nothing</h2>
           <p class="stat"><span class="stat__num">0.00%</span><span class="stat__label">average abnormal return at day 20</span></p>
-          <p>The middle half of purchases already runs from &minus;4.7% to +4.4%, yet the average is
-            <strong>0.00%</strong> (t&nbsp;=&nbsp;0.01). Winners and losers cancel out. A portfolio holding each
-            disclosed purchase for 20 days earns 1.95% a year in four-factor alpha, with a p-value of 0.55.</p>
+          <p>Winners and losers cancel out. The middle half of purchases already runs from &minus;4.7% to +4.4%, yet
+            the average is <strong>0.00%</strong> (t&nbsp;=&nbsp;0.01).</p>
+          <p>A portfolio holding each disclosed purchase for 20 days does no better:</p>
+          <dl class="result result--compact">
+            <div>
+              <dt>Alpha a year</dt>
+              <dd>1.95%</dd>
+            </div>
+            <div>
+              <dt>p-value</dt>
+              <dd>0.55</dd>
+            </div>
+          </dl>
         </section>
 
         <section class="unit unit--primary" id="day-62" data-from="20" data-to="62" data-zoom-from="0" data-zoom="1" aria-labelledby="day-62-h">
           <p class="unit__day">Day +62, the primary test</p>
           <h2 id="day-62-h">The test chosen in advance</h2>
           <p>By day 62, one purchase in ten has gained more than 16% against the model and one in ten has lost nearly
-            18%. The plot now zooms in 18 times, past that spread, to the average and its 95% band.</p>
+            18%.</p>
+          <p class="cue">The plot now zooms in 18 times, past that spread, to the average and its 95% band.</p>
           <p>The plan named one test before the data came in: buy every disclosed purchase the day after disclosure,
             hold it for 62 trading days, and measure the portfolio's four-factor alpha with Newey-West errors.</p>
           <dl class="result">
@@ -242,8 +258,8 @@
           <p class="unit__day">Day +125</p>
           <h2 id="day-125-h">Six months on, still at zero</h2>
           <p class="stat"><span class="stat__num"><span data-count="-0.68" data-digits="2" data-sign="true">&minus;0.68</span>%</span><span class="stat__label">average at day 125, inside its 95% band</span></p>
-          <p>The average reaches &minus;0.68% at 125 days. With six tests run, the Holm-adjusted p-value is 0.34. On
-            every one of the 126 days after disclosure, the 95% band covers zero.</p>
+          <p>On every one of the 126 days after disclosure, the 95% band covers zero.</p>
+          <p>The average reaches &minus;0.68% at 125 days. With six tests run, the Holm-adjusted p-value is 0.34.</p>
           <p>Measured from the trade date instead, which the public cannot act on, the answer is the same. None of
             the three tested horizons shows a significant abnormal return after adjustment.</p>
         </section>

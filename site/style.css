@@ -465,8 +465,62 @@ html.motion .unit--question .scroll-cue {
   margin-top: 0.35em;
 }
 
-.unit p:not(.unit__day) {
+/* Unit prose: one idea per paragraph, a measure near 60 characters and open
+   leading. The first paragraph carries the takeaway; "cue" paragraphs explain
+   the plot and step back in size and color. Space grows with the change of
+   kind: tight within the heading group, wide between the number and the prose. */
+.unit:not(.unit--question) p:not(.unit__day, .stat) {
   max-width: 32rem;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+.unit:not(.unit--question) h2 + p:not(.cue),
+.unit:not(.unit--question) .stat + p:not(.cue) {
+  margin-top: 1.6rem;
+  max-width: 30rem;
+  font-size: clamp(1.2rem, 1.45vw, 1.35rem);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.unit:not(.unit--question) p + p,
+.unit p + ul,
+.unit ul + p {
+  margin-top: 1.4rem;
+}
+
+.unit .stat {
+  margin-top: 1.4rem;
+}
+
+.unit:not(.unit--question) p.cue {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.unit strong {
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.factors {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 32rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 var(--gutter);
+}
+
+.factors li {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  font-size: 1rem;
+  font-weight: 550;
 }
 
 .result {
@@ -492,6 +546,31 @@ html.motion .unit--question .scroll-cue {
 
 .result div:first-child dd {
   color: var(--accent);
+}
+
+.unit p + .result,
+.unit .result + p {
+  margin-top: 1.6rem;
+}
+
+.unit p + .result--compact {
+  margin-top: 0.8rem;
+}
+
+.result--compact {
+  max-width: 32rem;
+  padding: 12px 0;
+  border-block-width: 1px;
+  border-color: var(--line);
+}
+
+.result--compact dd {
+  font-size: clamp(1.25rem, 1.8vw, 1.6rem);
+}
+
+/* Accent marks the primary test only. */
+.result--compact div:first-child dd {
+  color: var(--ink);
 }
 
 /* Filing unit */
