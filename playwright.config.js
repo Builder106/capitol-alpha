@@ -14,7 +14,7 @@ module.exports = defineConfig({
   retries: 0,
   reporter: 'list',
   use: {
-    baseURL: 'http://localhost:8080',
+    baseURL: 'http://localhost:4317',
     trace: 'on-first-retry',
   },
   projects: [
@@ -24,8 +24,8 @@ module.exports = defineConfig({
     },
   ],
   webServer: {
-    command: 'python3 -m http.server 8080 --directory site',
-    url: 'http://localhost:8080',
+    command: 'python3 -m http.server 4317 --directory site',
+    url: 'http://localhost:4317',
     reuseExistingServer: !process.env.CI,
   },
 });

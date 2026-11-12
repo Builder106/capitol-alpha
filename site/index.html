@@ -4,340 +4,353 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CapitolAlpha — Equity research on 16,203 Congressional trades</title>
+  <title>CapitolAlpha: do members of Congress beat the market?</title>
   <meta name="description"
-    content="Equity research note: Members of Congress disclosed 16,203 stock trades between 2020 and 2024. Their purchases beat the S&P 500 by +2.58% over 90 days, statistically significant at p < 0.05. A QAC 420 project at Wesleyan.">
+    content="An event study of 4,456 congressional stock purchases, 2020 to 2025. Copying them once disclosed earned no four-factor alpha.">
   <meta name="author" content="Yinka Vaughan">
-  <meta name="theme-color" content="#0a1019" media="(prefers-color-scheme: dark)">
-  <meta name="theme-color" content="#fafbfc" media="(prefers-color-scheme: light)">
-  <meta property="og:title" content="CapitolAlpha — +2.58% alpha on Congressional purchases">
+  <meta name="theme-color" content="#eef1f4">
+  <meta property="og:title" content="CapitolAlpha: do members of Congress beat the market?">
   <meta property="og:description"
-    content="A reproducible research note on 16,203 disclosed Congressional trades (2020–2024). QAC 420, Wesleyan.">
+    content="4,456 congressional stock purchases, 2020 to 2025, tested under a plan written in advance. Copying them after disclosure earned no alpha.">
   <meta property="og:image" content="https://capitolalpha.vercel.app/social-card.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Capitol dome sitting on a flat line, beside the question: do members of Congress beat the market?">
   <meta property="og:url" content="https://capitolalpha.vercel.app/">
   <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://capitolalpha.vercel.app/social-card.png">
-  <link rel="icon" type="image/svg+xml" href="/favicon-v3.svg">
+  <link rel="icon" type="image/svg+xml" href="/favicon-v4.svg">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="canonical" href="https://capitolalpha.vercel.app/">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;0,700;1,400&display=swap"
-    rel="stylesheet">
+  <link rel="preload" href="/fonts/public-sans-100_900-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/data/figures.json" as="fetch" type="application/json" crossorigin>
   <link rel="stylesheet" href="/style.css">
+  <script>
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('motion');
+      window.__introGuard = setTimeout(function () { document.documentElement.classList.remove('motion'); }, 4000);
+    }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "Do members of Congress beat the market?",
+    "description": "A pre-planned event study of 4,456 congressional stock purchases, 2020 to 2025, on CRSP daily returns.",
+    "author": { "@type": "Person", "name": "Yinka Vaughan", "identifier": "https://orcid.org/0009-0005-8933-5396" },
+    "dateModified": "2026-11-11",
+    "url": "https://capitolalpha.vercel.app/",
+    "codeRepository": "https://github.com/Builder106/capitol-alpha"
+  }
+  </script>
+  <script defer src="/lib/gsap.min.js"></script>
+  <script defer src="/lib/ScrollTrigger.min.js"></script>
+  <script defer src="/lib/SplitText.min.js"></script>
+  <script defer src="/main.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 
 <body>
+  <a class="skip" href="#question">Skip to the question</a>
 
-  <div class="brand-strip" aria-hidden="true"></div>
-
-  <header class="report-header">
-    <div class="container">
-      <div class="report-meta">
-        <div class="meta-row">
-          <span class="report-tag">Research Note</span>
-          <span class="meta-sep">/</span>
-          <span>Wesleyan QAC 420 &mdash; <em>Data for Good</em></span>
-        </div>
-        <div class="meta-row">
-          <span>Issue 01</span>
-          <span class="meta-sep">/</span>
-          <span>Spring 2025</span>
-        </div>
-      </div>
-
-      <h1 class="title">CapitolAlpha</h1>
-      <p class="subtitle">An equity-research investigation into the Congressional trading edge.</p>
-
-      <dl class="report-spec">
-        <div class="spec-item">
-          <dt>Sector</dt>
-          <dd>Public records / political economy</dd>
-        </div>
-        <div class="spec-item">
-          <dt>Coverage</dt>
-          <dd>Senate &amp; House PTRs</dd>
-        </div>
-        <div class="spec-item">
-          <dt>Window</dt>
-          <dd>2020-01-01 &mdash; 2024-12-31</dd>
-        </div>
-        <div class="spec-item">
-          <dt>Sample</dt>
-          <dd>220 / 16,203 benchmarkable</dd>
-        </div>
-        <div class="spec-item">
-          <dt>Horizon</dt>
-          <dd>90 trading days</dd>
-        </div>
-        <div class="spec-item">
-          <dt>Benchmark</dt>
-          <dd>S&amp;P 500 (SPY)</dd>
-        </div>
-      </dl>
-    </div>
+  <header class="corner corner--top">
+    <a class="brand" href="#top" aria-label="CapitolAlpha, back to the top">
+      <svg class="brand__mark" viewBox="0 0 48 48" width="28" height="28" aria-hidden="true" focusable="false">
+        <rect width="48" height="48" rx="10" fill="currentColor" />
+        <path d="M35 11 C32 21 27 32 18.5 32 C12 32 9 27.5 9 22 C9 15.5 13.5 11 19 11 C26 11 30 21 33 28.5 C34.5 31.5 36.5 32.5 39.5 32"
+          fill="none" stroke="var(--ground)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M7 39.5 H41" fill="none" stroke="var(--accent-soft)" stroke-width="3" stroke-linecap="round" />
+      </svg>
+      <span class="brand__name">CapitolAlpha</span>
+    </a>
+    <button class="index-toggle" type="button" popovertarget="index" aria-label="Open the index of event days">
+      <span class="index-toggle__fill" aria-hidden="true"></span>
+      <span class="index-toggle__label">Index</span>
+    </button>
   </header>
 
-  <section class="verdict" aria-labelledby="verdict-h">
-    <div class="container">
-      <div class="verdict-panel">
-        <div class="verdict-text">
-          <p class="verdict-eyebrow" id="verdict-h">Headline finding</p>
-          <p class="verdict-rating">
-            <span class="rating-chip rating-chip--pos">
-              <span class="rating-arrow" aria-hidden="true">&#9650;</span>
-              Positive | Stat. Sig.
-            </span>
-          </p>
-          <p class="verdict-thesis">Disclosed Congressional <em>purchases</em> beat the S&amp;P&nbsp;500 by an average
-            of <strong>+2.58%</strong> over the following 90&nbsp;days &mdash; statistically significant at
-            <em>p</em>&nbsp;&lt;&nbsp;0.05 on a 1-sample <em>t</em>-test against zero alpha.</p>
-          <p class="verdict-caveat">Not investment advice. See <a href="#disclosures">important disclosures</a>.</p>
-        </div>
-        <div class="verdict-number-block">
-          <div class="verdict-number">
-            <span class="delta" aria-hidden="true">&#9650;</span><span class="digits">2.58</span><span
-              class="unit">%</span>
+  <nav id="index" class="index" popover aria-label="Index of event days">
+    <p class="index__title">Event days</p>
+    <ol class="index__list">
+      <li><a href="#question"><span class="index__day">Start</span><span class="index__name">The question</span></a></li>
+      <li><a href="#estimation"><span class="index__day">&minus;250</span><span class="index__name">What each stock should do</span></a></li>
+      <li><a href="#trade"><span class="index__day">&minus;9</span><span class="index__name">The trade</span></a></li>
+      <li><a href="#filing"><span class="index__day">&minus;9 to 0</span><span class="index__name">The filing</span></a></li>
+      <li><a href="#disclosure"><span class="index__day">0</span><span class="index__name">Disclosure</span></a></li>
+      <li><a href="#day-20"><span class="index__day">+20</span><span class="index__name">A month on</span></a></li>
+      <li><a href="#day-62"><span class="index__day">+62</span><span class="index__name">The test chosen in advance</span></a></li>
+      <li><a href="#day-125"><span class="index__day">+125</span><span class="index__name">Six months on</span></a></li>
+      <li><a href="#robustness"><span class="index__day">Appendix</span><span class="index__name">Eight more ways to ask</span></a></li>
+      <li><a href="#change"><span class="index__day">Appendix</span><span class="index__name">What changed</span></a></li>
+      <li><a href="#method"><span class="index__day">Appendix</span><span class="index__name">Data, method and limits</span></a></li>
+      <li><a href="#read"><span class="index__day">Appendix</span><span class="index__name">Read the work</span></a></li>
+    </ol>
+    <button class="index__close" type="button" popovertarget="index" popovertargetaction="hide">Close</button>
+  </nav>
+
+  <main id="top">
+    <div class="timeline">
+      <div class="stage" aria-hidden="true">
+        <div class="stage__inner">
+          <div class="dome-wrap">
+          <svg class="dome" viewBox="0 0 240 200" focusable="false">
+            <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path data-draw pathLength="1" d="M44 196 V150 H196 V196" />
+              <path data-draw pathLength="1" d="M40 150 H200 M44 145 H196" />
+              <path data-draw pathLength="1" d="M56 192 V154 M68 192 V154 M80 192 V154 M92 192 V154 M104 192 V154 M116 192 V154 M128 192 V154 M140 192 V154 M152 192 V154 M164 192 V154 M176 192 V154 M188 192 V154" />
+              <path data-draw pathLength="1" d="M62 145 V122 H178 V145 M58 122 H182" />
+              <path data-draw pathLength="1" d="M74 140 V128 M88 140 V128 M102 140 V128 M116 140 V128 M130 140 V128 M144 140 V128 M158 140 V128 M172 140 V128" />
+              <path data-draw pathLength="1" d="M66 122 C66 82 92 57 120 54 C148 57 174 82 174 122" />
+              <path data-draw pathLength="1" d="M94 122 C94 92 104 68 120 54 M146 122 C146 92 136 68 120 54 M120 122 V54" />
+              <path data-draw pathLength="1" d="M110 54 V36 H130 V54 M115 52 V39 M125 52 V39 M107 36 H133" />
+              <path data-draw pathLength="1" d="M109 36 C111 27 129 27 131 36" />
+              <path data-draw pathLength="1" d="M118 29 L119 17 H121 L122 29 Z M120 17 V13" />
+              <circle data-draw pathLength="1" cx="120" cy="11.5" r="1.8" />
+            </g>
+          </svg>
           </div>
-          <div class="verdict-label">90-day Jensen&rsquo;s &alpha; vs.&nbsp;S&amp;P&nbsp;500</div>
-          <div class="verdict-stats">
-            <span>t&nbsp;=&nbsp;2.51</span>
-            <span class="sep" aria-hidden="true">|</span>
-            <span>p&nbsp;=&nbsp;0.013</span>
-            <span class="sep" aria-hidden="true">|</span>
-            <span>n&nbsp;=&nbsp;220</span>
-          </div>
+          <svg class="plot" focusable="false"></svg>
+          <p class="counter"><span class="counter__label">Event day</span> <span class="counter__value">&minus;250</span></p>
         </div>
+      </div>
+
+      <div class="units">
+        <section class="unit unit--question" id="question" data-from="-250" data-to="-250" aria-labelledby="question-h">
+          <h1 id="question-h" class="question">Do members of Congress beat the market?</h1>
+          <p class="answer">No. Across 4,456 stock purchases members made from 2020 to 2025, copying each trade once it
+            was disclosed earned nothing beyond what the market, size, value and momentum explain.</p>
+          <p class="byline">An event study by <a href="https://orcid.org/0009-0005-8933-5396">Yinka Vaughan</a>,
+            tested under a <a href="https://github.com/Builder106/capitol-alpha/blob/main/docs/specs/event-study.md">plan
+              written before any return was computed</a>. Updated November 2026.</p>
+          <p class="scroll-cue" aria-hidden="true">Scroll to walk through event time</p>
+        </section>
+
+        <section class="unit" id="estimation" data-from="-250" data-to="-30" aria-labelledby="estimation-h">
+          <p class="unit__day">Days &minus;250 to &minus;30</p>
+          <h2 id="estimation-h">First, what each stock should have done</h2>
+          <p>For every purchase, a four-factor model is fit on the stock's daily returns from 250 to 30 trading days
+            before the event: the market, small against large firms, value against growth, and momentum. The model
+            predicts each day's return from those factors.</p>
+          <p>The abnormal return is the actual return minus that prediction. If members know something the market does
+            not, it shows up here.</p>
+        </section>
+
+        <section class="unit" id="trade" data-from="-30" data-to="-9" aria-labelledby="trade-h">
+          <p class="unit__day">Day &minus;9, in the median case</p>
+          <h2 id="trade-h">The trade</h2>
+          <p>A member, a spouse or a dependent buys a stock. The study covers <strong data-count="4456">4,456</strong>
+            purchases in 2020 to 2025 that match a common stock in CRSP, the standard academic price database.</p>
+          <p>Most claims that Congress beats the market start the clock here. Nobody outside the household can see the
+            trade yet, so a return measured from this day is one the public could never have earned.</p>
+        </section>
+
+        <section class="unit unit--filing" id="filing" data-from="-9" data-to="0" aria-labelledby="filing-h">
+          <p class="unit__day">Days &minus;9 to 0</p>
+          <h2 id="filing-h">The filing</h2>
+          <p>The STOCK Act gives members 45 days to report a trade. House members took a median of
+            <strong>13 days</strong>. Of 1,965 House filings, 69 came in late.</p>
+          <div class="filing">
+            <svg class="filing__art" viewBox="0 0 220 240" data-glax-ms="1600" aria-hidden="true" focusable="false">
+              <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M30 14 H170 L190 34 V226 H30 Z" fill="var(--sheet)" />
+                <path d="M170 14 V34 H190" />
+                <path d="M46 34 H140" stroke-width="3" />
+                <path d="M46 46 H112" />
+                <path d="M46 72 H98 M106 72 H174 M46 94 H98 M106 94 H174 M46 116 H174" stroke-width="1" />
+                <path d="M46 132 H174 V204 H46 Z M46 146 H174 M46 160 H174 M46 174 H174 M46 188 H174 M80 132 V204 M124 132 V204 M150 132 V204" stroke-width="1" />
+                <path d="M46 216 H104" stroke-width="1" />
+              </g>
+              <g transform="rotate(-7 130 170)" fill="none" stroke="var(--accent)" stroke-width="2">
+                <rect x="88" y="150" width="84" height="40" rx="3" />
+                <rect x="92" y="154" width="76" height="32" rx="2" stroke-width="1" />
+                <text x="130" y="171" text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="var(--accent)" stroke="none">DISCLOSED</text>
+                <text x="130" y="181" text-anchor="middle" font-size="6" font-weight="600" letter-spacing="1" fill="var(--accent)" stroke="none">EVENT DAY 0</text>
+                <animate values="0;1;1" keyTimes="0;0.45;1" dur="1600ms" begin="0ms" repeatCount="1" fill="freeze" calcMode="discrete" attributeName="opacity" />
+              </g>
+              <g fill="var(--sheet)" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+                <rect x="86" y="180" width="88" height="10" rx="1" fill="var(--accent)" />
+                <rect x="90" y="160" width="80" height="20" rx="3" />
+                <path d="M120 160 V132 H140 V160" />
+                <ellipse cx="130" cy="124" rx="20" ry="11" />
+                <animateTransform values="0 -210;0 -210;0 0;0 0;0 -210" keyTimes="0;0.12;0.45;0.6;1" dur="1600ms" begin="0ms" repeatCount="1" fill="freeze" calcMode="spline" keySplines="0 0 1 1;0.55 0 0.9 0.6;0 0 1 1;0.2 0.6 0.35 1" additive="replace" attributeName="transform" type="translate" />
+              </g>
+            </svg>
+            <figure class="lags">
+              <svg class="lags__chart" role="img" aria-labelledby="lags-cap"></svg>
+              <figcaption id="lags-cap">Days from trade to report, 12,650 House trades. Most land well inside the
+                45-day deadline; a few filings list hundreds of late trades.</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section class="unit" id="disclosure" data-from="0" data-to="0" aria-labelledby="disclosure-h">
+          <p class="unit__day">Day 0</p>
+          <h2 id="disclosure-h">Disclosure: now anyone can copy it</h2>
+          <p>From here the trade is public. The test asks what a follower earns by buying the same stock the next
+            trading day. <strong>3,942</strong> of the purchases have a disclosure date, all from the House; the Senate
+            records used here carry no filing date.</p>
+          <p>The blue line on the plot is the average abnormal return of those purchases from this day on. The shaded
+            band is its 95% interval, with errors clustered by member and by month.</p>
+        </section>
+
+        <section class="unit" id="day-20" data-from="0" data-to="20" aria-labelledby="day-20-h">
+          <p class="unit__day">Day +20</p>
+          <h2 id="day-20-h">A month on, nothing</h2>
+          <p>After 20 trading days the average abnormal return is <strong>0.00%</strong> (t&nbsp;=&nbsp;0.01). A
+            portfolio holding each disclosed purchase for 20 days earns 1.95% a year in four-factor alpha, with a
+            p-value of 0.55.</p>
+        </section>
+
+        <section class="unit unit--primary" id="day-62" data-from="20" data-to="62" aria-labelledby="day-62-h">
+          <p class="unit__day">Day +62, the primary test</p>
+          <h2 id="day-62-h">The test chosen in advance</h2>
+          <p>The plan named one test before the data came in: buy every disclosed purchase the day after disclosure,
+            hold it for 62 trading days, and measure the portfolio's four-factor alpha with Newey-West errors.</p>
+          <dl class="result">
+            <div>
+              <dt>Alpha a year</dt>
+              <dd>&minus;1.82%</dd>
+            </div>
+            <div>
+              <dt>t-statistic</dt>
+              <dd>&minus;0.74</dd>
+            </div>
+            <div>
+              <dt>p-value</dt>
+              <dd>0.46</dd>
+            </div>
+            <div>
+              <dt>Trading days</dt>
+              <dd>1,505</dd>
+            </div>
+          </dl>
+          <p>Event by event, the average abnormal return at day 62 is &minus;0.34% (t&nbsp;=&nbsp;&minus;0.83).</p>
+        </section>
+
+        <section class="unit" id="day-125" data-from="62" data-to="125" aria-labelledby="day-125-h">
+          <p class="unit__day">Day +125</p>
+          <h2 id="day-125-h">Six months on, still at zero</h2>
+          <p>The average reaches &minus;0.68% at 125 days. With six tests run, the Holm-adjusted p-value is 0.34. On
+            every one of the 126 days after disclosure, the 95% band covers zero.</p>
+          <p>Measured from the trade date instead, which the public cannot act on, the answer is the same. None of
+            the three tested horizons shows a significant abnormal return after adjustment.</p>
+        </section>
       </div>
     </div>
-  </section>
 
-  <aside class="ticker" aria-hidden="true">
-    <div class="ticker-track">
-      <span class="ticker-item up">NVDA <span class="tick">&#9650;</span></span>
-      <span class="ticker-item up">AAPL <span class="tick">&#9650;</span></span>
-      <span class="ticker-item up">MSFT <span class="tick">&#9650;</span></span>
-      <span class="ticker-item">SPY</span>
-      <span class="ticker-item up">COST <span class="tick">&#9650;</span></span>
-      <span class="ticker-item up">ICE <span class="tick">&#9650;</span></span>
-      <span class="ticker-item down">BYND <span class="tick">&#9660;</span></span>
-      <span class="ticker-item up">V <span class="tick">&#9650;</span></span>
-      <span class="ticker-item">CDLX</span>
-      <span class="ticker-item up">TMO <span class="tick">&#9650;</span></span>
-      <span class="ticker-item">NFLX</span>
-      <span class="ticker-item down">BA <span class="tick">&#9660;</span></span>
-      <span class="ticker-item up">DIS <span class="tick">&#9650;</span></span>
-      <span class="ticker-item">PRU</span>
-      <span class="ticker-item">AIZ</span>
-      <!-- Loop duplicate -->
-      <span class="ticker-item up">NVDA <span class="tick">&#9650;</span></span>
-      <span class="ticker-item up">AAPL <span class="tick">&#9650;</span></span>
-      <span class="ticker-item up">MSFT <span class="tick">&#9650;</span></span>
-      <span class="ticker-item">SPY</span>
-      <span class="ticker-item up">COST <span class="tick">&#9650;</span></span>
-      <span class="ticker-item up">ICE <span class="tick">&#9650;</span></span>
-      <span class="ticker-item down">BYND <span class="tick">&#9660;</span></span>
-      <span class="ticker-item up">V <span class="tick">&#9650;</span></span>
-      <span class="ticker-item">CDLX</span>
-      <span class="ticker-item up">TMO <span class="tick">&#9650;</span></span>
-      <span class="ticker-item">NFLX</span>
-      <span class="ticker-item down">BA <span class="tick">&#9660;</span></span>
-      <span class="ticker-item up">DIS <span class="tick">&#9650;</span></span>
-      <span class="ticker-item">PRU</span>
-      <span class="ticker-item">AIZ</span>
-    </div>
-  </aside>
+    <div class="appendix">
+      <section class="block block--robust" id="robustness" aria-labelledby="robustness-h">
+        <div class="block__head">
+          <h2 id="robustness-h">Eight more ways to ask</h2>
+          <p>Each check reruns the 62-day copy portfolio on a different slice. Bars show the 95% interval for annual
+            alpha; none of them clears zero.</p>
+        </div>
+        <figure class="forest">
+          <svg class="forest__chart" role="img" aria-labelledby="forest-cap"></svg>
+          <figcaption id="forest-cap">Annual four-factor alpha with 95% intervals, 62-day holding. The table below holds
+            the same numbers.</figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table class="checks">
+            <caption class="visually-hidden">Robustness checks on the 62-day copy portfolio</caption>
+            <thead>
+              <tr>
+                <th scope="col">Check</th>
+                <th scope="col">Events</th>
+                <th scope="col">Alpha a year</th>
+                <th scope="col">t</th>
+                <th scope="col">p</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Primary: purchases from disclosure</th><td>3,942</td><td>&minus;1.82%</td><td>&minus;0.74</td><td>0.461</td></tr>
+              <tr><th scope="row">Leave out trades made in 2020</th><td>3,234</td><td>&minus;3.90%</td><td>&minus;1.59</td><td>0.112</td></tr>
+              <tr><th scope="row">Drop the five most active members</th><td>2,622</td><td>&minus;3.26%</td><td>&minus;1.20</td><td>0.229</td></tr>
+              <tr><th scope="row">Weight by disclosed amount</th><td>3,942</td><td>7.12%</td><td>1.43</td><td>0.152</td></tr>
+              <tr><th scope="row">Members' own trades only</th><td>1,861</td><td>&minus;5.08%</td><td>&minus;1.54</td><td>0.123</td></tr>
+              <tr><th scope="row">House purchases from the trade date</th><td>3,996</td><td>&minus;1.37%</td><td>&minus;0.58</td><td>0.559</td></tr>
+              <tr><th scope="row">Senate purchases from the trade date</th><td>460</td><td>&minus;0.95%</td><td>&minus;0.10</td><td>0.920</td></tr>
+              <tr><th scope="row">Sales from disclosure</th><td>4,284</td><td>0.85%</td><td>0.30</td><td>0.762</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Weighting by the disclosed amount gives the largest estimate, a hint that bigger trades do
+          better, but it is not significant. One pattern did stand out: members tend to buy stocks that had been
+          beating the factor model before the trade. That is reported as exploratory.</p>
+      </section>
 
-  <main class="container">
+      <section class="block" id="change" aria-labelledby="change-h">
+        <h2 id="change-h">What changed from the class version</h2>
+        <div class="block__cols">
+          <p>This page first went up in spring 2025 as a course project for QAC&nbsp;420 at Wesleyan, and it reported
+            that members' purchases beat the S&amp;P&nbsp;500. An audit in November 2026 found that the result did not
+            hold. A text filter had dropped every House purchase, leaving about 220 Senate trades. Only the 50
+            most-traded stocks had prices. Returns started on the trade date, and the "alpha" assumed every stock
+            moved one for one with the market.</p>
+          <p>The redo fixes the sample, the prices and the model, and its plan was committed before any new return was
+            computed. One change came after seeing results: the first run also subtracted each stock's pre-event
+            trend, which the plan does not call for. That run is still printed by the code and reported in the
+            results, so the change can be checked.</p>
+        </div>
+      </section>
 
-    <section class="exec-summary">
-      <h2 class="section-h">Executive summary</h2>
-      <p>Members of Congress disclosed <strong>16,203 stock trades</strong> between 2020 and 2024. The 220 purchases we
-        could cleanly benchmark against the S&amp;P&nbsp;500 beat the index by an average of <strong>+2.58%</strong>
-        over the following 90 days &mdash; statistically significant at <em>p</em>&nbsp;&lt;&nbsp;0.05. The same group
-        of legislators&rsquo; <em>sales</em> underperformed by <strong>-1.67%</strong> over the same horizon, suggesting
-        timing skill is concentrated on the entry side.</p>
-      <p class="byline">By <strong>Yinka Vaughan</strong>. Code, dataset, and statistical workup on <a
-          href="https://github.com/Builder106/capitol-alpha">GitHub</a>. A semester project for <a
-          href="https://www.wesleyan.edu/qac/">QAC 420 &mdash; <em>Data for Good</em></a>.</p>
-    </section>
-
-    <section class="kpi">
-      <h2 class="section-h">Key statistics</h2>
-      <div class="kpi-row">
-        <div class="kpi-item kpi-item--pos">
-          <div class="kpi-value">
-            <span class="kpi-arrow" aria-hidden="true">&#9650;</span>2.58<small>%</small>
+      <section class="block" id="method" aria-labelledby="method-h">
+        <h2 id="method-h">Data, method and limits</h2>
+        <dl class="facts">
+          <div>
+            <dt>Trades</dt>
+            <dd>House and Senate periodic transaction reports, scraped past the House site's 50-row page limit and
+              parsed from PDFs.</dd>
           </div>
-          <div class="kpi-label">90-day &alpha;</div>
-          <div class="kpi-sub">vs. S&amp;P&nbsp;500 | <em>p</em>&nbsp;=&nbsp;0.013</div>
-        </div>
-        <div class="kpi-item kpi-item--pos">
-          <div class="kpi-value">13.74<small>%</small></div>
-          <div class="kpi-label">90-day ROI</div>
-          <div class="kpi-sub">averaged across 220 purchases</div>
-        </div>
-        <div class="kpi-item">
-          <div class="kpi-value">2.51</div>
-          <div class="kpi-label">t-statistic</div>
-          <div class="kpi-sub">1-sample test vs. zero excess return</div>
-        </div>
-        <div class="kpi-item">
-          <div class="kpi-value">16,203</div>
-          <div class="kpi-label">total trades</div>
-          <div class="kpi-sub">Senate + House PTRs, 2020&ndash;2024</div>
-        </div>
-      </div>
-    </section>
+          <div>
+            <dt>Prices</dt>
+            <dd>CRSP daily returns through WRDS, through 31 December 2025, delisting returns included. CRSP data is
+              licensed and is not published here.</dd>
+          </div>
+          <div>
+            <dt>Model</dt>
+            <dd>Fama-French three factors plus momentum from Kenneth French's data library.</dd>
+          </div>
+          <div>
+            <dt>Inference</dt>
+            <dd>Newey-West errors for the portfolio, errors clustered by member and month for event averages, Holm
+              correction across the six event tests.</dd>
+          </div>
+          <div>
+            <dt>Limits</dt>
+            <dd>Only House trades have disclosure dates, so the primary test is House only. The trade records were
+              collected in April 2026, so some filings for late 2025 trades are missing. This is research, not
+              investment advice.</dd>
+          </div>
+        </dl>
+      </section>
 
-    <section class="essay">
-      <h2 class="section-h">Methodology</h2>
-      <p>For each disclosed purchase with a resolvable ticker and sufficient price history, we computed the buy-and-hold
-        return over 30, 90, and 180 days from the <em>transaction</em> date. We subtracted the S&amp;P&nbsp;500&rsquo;s
-        return over the same window to isolate the excess return, then ran a one-sample <em>t</em>-test against a null
-        of zero alpha.</p>
-      <p>The 90-day window was the pre-registered horizon. 30- and 180-day results are reported but should be treated as
-        exploratory &mdash; no multiple-testing correction.</p>
-    </section>
-
-    <section class="fig">
-      <div class="fig-head">
-        <span class="fig-num">Exhibit&nbsp;1</span>
-        <span class="fig-title">Distribution of 90-day returns &mdash; Congressional purchases vs.
-          S&amp;P&nbsp;500</span>
-      </div>
-      <figure>
-        <img src="/charts/returns_kde.png"
-          alt="Kernel density estimate of 90-day buy-and-hold returns on Congressional purchases, with the S&P 500's average return marked for comparison. The mass of the distribution sits to the right of the benchmark."
-          loading="lazy">
-      </figure>
-      <p class="fig-caption">The mass of Congressional purchase returns sits to the right of the S&amp;P&nbsp;500 over
-        the same windows. The +2.58 percentage-point gap is the area between the two means.</p>
-      <p class="fig-source"><span>Source:</span> efdsearch.senate.gov, disclosures-clerk.house.gov, Yahoo Finance
-        (yfinance). Author calculations.</p>
-    </section>
-
-    <section class="fig">
-      <div class="fig-head">
-        <span class="fig-num">Exhibit&nbsp;2</span>
-        <span class="fig-title">Top-10 traded assets by volume</span>
-      </div>
-      <figure>
-        <img src="/charts/top_assets.png"
-          alt="Top traded assets across the 2020–2024 window, ranked by trade count. Large-cap tech (Apple, Microsoft, NVIDIA) and broad-market ETFs dominate."
-          loading="lazy">
-      </figure>
-      <p class="fig-caption">Large-cap tech and broad-market ETFs dominate the leaderboard. Concentration is a confound
-        for the alpha number &mdash; sector tilt alone explains part of the outperformance.</p>
-      <p class="fig-source"><span>Source:</span> efdsearch.senate.gov, disclosures-clerk.house.gov. Author calculations.
-      </p>
-    </section>
-
-    <section class="fig">
-      <div class="fig-head">
-        <span class="fig-num">Exhibit&nbsp;3</span>
-        <span class="fig-title">Congressional tech purchases through the cycle</span>
-      </div>
-      <figure>
-        <img src="/charts/tech_purchases.png"
-          alt="Monthly count of Congressional purchases in the top tech tickers across 2020–2024, showing buying concentration during the 2020 COVID drawdown and the 2023 rally."
-          loading="lazy">
-      </figure>
-      <p class="fig-caption">Tech purchase volume clusters around two regimes &mdash; the 2020 drawdown and the 2023
-        rally. Buyers were on the right side of both.</p>
-      <p class="fig-source"><span>Source:</span> efdsearch.senate.gov, disclosures-clerk.house.gov, Yahoo Finance
-        (yfinance). Author calculations.</p>
-    </section>
-
-    <section class="fig">
-      <div class="fig-head">
-        <span class="fig-num">Exhibit&nbsp;4</span>
-        <span class="fig-title">Sell-offs into the Q1&nbsp;2020 COVID crash</span>
-      </div>
-      <figure>
-        <img src="/charts/covid_crash_sales.png"
-          alt="Senate sale transactions in the weeks before the February 20, 2020 COVID market crash, with a vertical line marking the crash. A noticeable cluster of sales sits in the two weeks before the line."
-          loading="lazy">
-      </figure>
-      <p class="fig-caption">The top 5% of sellers concentrated their exits in the two weeks before
-        February&nbsp;20,&nbsp;2020. Suggestive of foreknowledge &mdash; but the data alone cannot distinguish that from
-        sector rotation, age-and-wealth effects, or skilled advisors.</p>
-      <p class="fig-source"><span>Source:</span> efdsearch.senate.gov, disclosures-clerk.house.gov. Author calculations.
-      </p>
-    </section>
-
-    <section class="disclosures" id="disclosures">
-      <h2 class="section-h section-h--inverse">Important disclosures &amp; limitations</h2>
-      <ol class="footnotes">
-        <li><strong>Disclosure lag is large.</strong> PTRs can be filed up to 30&ndash;45 days after a trade, so the
-          90-day alpha measured from the transaction date is <em>not</em> a 90-day alpha available to a public follower
-          in real time. The signal is retrospective.</li>
-        <li><strong>Selection bias on the benchmarked subset.</strong> Only 220 of 16,203 raw trades had a clean ticker,
-          sufficient price history, and a clean entry/exit window. Heavy-tail trades (private placements, fund-of-fund
-          holdings, options) are excluded.</li>
-        <li><strong>No multiple-testing correction.</strong> 30- and 180-day horizons and per-legislator slices were
-          explored; only the 90-day headline was pre-registered.</li>
-        <li><strong>Causality is unidentified.</strong> Outperformance is consistent with non-public information, but
-          also with sector concentration, age/wealth effects, or skilled advisors. The data cannot distinguish them.
-        </li>
-        <li><strong>Not investment research.</strong> This document is an undergraduate course project submitted for
-          QAC&nbsp;420 at Wesleyan University. It is not investment advice and the findings are not actionable trading
-          signals.</li>
-      </ol>
-      <p class="disclosure-foot">The <a href="/docs/final-reflection.pdf">Final Reflection</a> expands on items
-        1&ndash;4.</p>
-    </section>
-
-    <section class="further">
-      <h2 class="section-h">Further reading</h2>
-      <ul class="docs">
-        <li>
-          <span class="doc-tag">Paper</span>
-          <a href="/docs/abstract.pdf">Abstract</a>
-          <span class="doc-desc">&mdash; 1-page academic summary.</span>
-        </li>
-        <li>
-          <span class="doc-tag">Paper</span>
-          <a href="/docs/statistics.pdf">Statistics writeup</a>
-          <span class="doc-desc">&mdash; the formal statistical workup behind the alpha number.</span>
-        </li>
-        <li>
-          <span class="doc-tag">Paper</span>
-          <a href="/docs/final-reflection.pdf">Final Reflection</a>
-          <span class="doc-desc">&mdash; 5-page essay on method, ethics, and future work.</span>
-        </li>
-        <li>
-          <span class="doc-tag doc-tag--repo">Repo</span>
-          <a href="https://github.com/Builder106/capitol-alpha">Source code &amp; dataset</a>
-          <span class="doc-desc">on GitHub.</span>
-        </li>
-      </ul>
-    </section>
-
+      <section class="block" id="read" aria-labelledby="read-h">
+        <h2 id="read-h">Read the work</h2>
+        <ul class="reading">
+          <li><a class="go" href="https://github.com/Builder106/capitol-alpha/blob/main/docs/results/event-study.md"><span>Full results</span></a> Every table, the first run, and the excluded tickers.</li>
+          <li><a class="go" href="https://github.com/Builder106/capitol-alpha/blob/main/docs/specs/event-study.md"><span>Analysis plan</span></a> The sample, model and tests, fixed in advance.</li>
+          <li><a class="go" href="https://github.com/Builder106/capitol-alpha/blob/main/docs/results/disclosure-lag.md"><span>Disclosure delays</span></a> Filing lags by year, and who filed late.</li>
+          <li><a class="go" href="https://github.com/Builder106/capitol-alpha"><span>Code</span></a> The scrapers, the pipeline and the tests.</li>
+        </ul>
+        <p class="archive">Spring 2025 course write-ups, kept as a record and superseded by this study:
+          <a href="/docs/abstract.pdf">abstract</a>, <a href="/docs/statistics.pdf">statistics</a> and
+          <a href="/docs/final-reflection.pdf">final reflection</a>.</p>
+      </section>
+    </div>
   </main>
 
   <footer class="colophon">
-    <div class="container">
-      <p class="colophon-line"><strong>CapitolAlpha</strong> | Yinka Vaughan | Wesleyan University, QAC&nbsp;420, Spring
-        2025.</p>
-      <p>Released under the <a
-          href="https://github.com/Builder106/capitol-alpha/blob/main/LICENSE">MIT&nbsp;License</a>. Built on disclosure
-        data from <a href="https://efdsearch.senate.gov/">efdsearch.senate.gov</a> and <a
-          href="https://disclosures-clerk.house.gov/">disclosures-clerk.house.gov</a>.</p>
-      <p class="disclaimer">This is an undergraduate research note, not investment research. The author has no positions
-        in any securities mentioned. No part of this analysis should be construed as a recommendation to buy or sell any
-        security.</p>
-      <p class="set-in">Set in <em>IBM&nbsp;Plex&nbsp;Serif</em>, <em>IBM&nbsp;Plex&nbsp;Sans</em>, and
-        <em>IBM&nbsp;Plex&nbsp;Mono</em>.</p>
-    </div>
+    <p class="colophon__name">CapitolAlpha</p>
+    <p>Yinka Vaughan, Wesleyan University. <a href="https://orcid.org/0009-0005-8933-5396">ORCID 0009-0005-8933-5396</a>.
+      Code under the <a href="https://github.com/Builder106/capitol-alpha/blob/main/LICENSE">MIT License</a>. Disclosures
+      from <a href="https://disclosures-clerk.house.gov/">disclosures-clerk.house.gov</a> and
+      <a href="https://efdsearch.senate.gov/">efdsearch.senate.gov</a>. Factors from
+      <a href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">Kenneth French's data library</a>.</p>
+    <p class="colophon__small">Set in Public Sans. The author holds no positions in the securities studied.</p>
   </footer>
-
 </body>
 
 </html>
