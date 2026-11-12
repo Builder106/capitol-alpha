@@ -55,7 +55,7 @@ Escape hatch: the Index popover lists every unit by event day with real anchor l
   sites), self-hosted variable 100 to 900. One family; weight and size carry
   hierarchy. Figures are tabular. Display 600, tracking -0.035em, leading 0.95.
 - Grid: 12 columns, 24 px gutter, 1440 max. Units take columns 1 to 5, the
-  stage 6 to 12. Phone: one column, the stage sticks to the top 42svh.
+  stage 6 to 12. Phone: one column, the stage sticks to the top 48svh.
 - Shape: 2 px radius on controls, 0 on figures.
 - Motion: ease `power3.out` for entrances, `none` for scrubbed values,
   0.5 to 1.2 s; small things move first. Hovers: an accent rule draws left
@@ -75,7 +75,7 @@ desktop                                          phone
 | alpha CapitolAlpha            Index (pop)  |   | alpha CA   Index |
 |--------------------------------------------|   |------------------|
 | unit: question (h1)  | STAGE (pinned)      |   | STAGE (sticky)   |
-| unit: day -250       |  dome on zero line  |   |  42svh plot      |
+| unit: day -250       |  dome on zero line  |   |  48svh plot      |
 | unit: the trade      |  -> axis, band,     |   |------------------|
 | unit: the filing     |     line to day d   |   | unit             |
 | unit: day 0          |  now marker         |   | unit             |
