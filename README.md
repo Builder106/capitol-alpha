@@ -3,7 +3,7 @@
   <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg" type="image/svg+xml">
   <source media="(prefers-color-scheme: dark)"  srcset="assets/banner-dark.png">
   <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.png">
-  <img alt="CapitolAlpha: Congressional stock purchases beat the S&amp;P 500 by 2.58% over 90 days (13.74% vs 11.16%, p = 0.013)" src="assets/banner-dark.svg">
+  <img alt="CapitolAlpha: do members of Congress beat the market? No. The Capitol dome sits on a flat line that becomes the mean abnormal return after disclosure, which stays near zero." src="assets/banner-light.svg">
 </picture>
 
 [![CI](https://github.com/Builder106/capitol-alpha/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/capitol-alpha/actions/workflows/ci.yml)
@@ -13,50 +13,44 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](#license)
 [![Course](https://img.shields.io/badge/Wesleyan-QAC%20420-CC0000.svg)](https://www.wesleyan.edu/qac/)
 
-> **Analyzing whether Congressional stock trades beat the market.** An open research pipeline tracking 16,000 politician stock disclosures against the S&P 500.
+> **Do members of Congress beat the market?** An event study of 4,456 congressional stock purchases, 2020 to 2025, on CRSP data. Copying them once they were disclosed earned no four-factor alpha.
 
 <p align="center">
-  <img src="assets/screenshot.png" alt="The CapitolAlpha research note: the title, a summary strip of sector, coverage, window, sample, horizon and benchmark, and a headline finding that disclosed Congressional purchases beat the S&P 500 by an average of 2.58% over 90 days." width="880">
+  <img src="assets/screenshot.png" alt="The CapitolAlpha site: the question 'Do members of Congress beat the market?' beside a line drawing of the Capitol dome sitting on a long zero line, with the answer below." width="880">
 </p>
 
-## 💡 What is CapitolAlpha?
+## What is CapitolAlpha?
 
-Do members of Congress make better stock market trades than ordinary investors? CapitolAlpha is an open data pipeline that automatically collects and analyzes over 16,000 stock trades reported by federal politicians. It compares their financial returns against the general stock market (S&P 500) to determine whether politicians have an abnormal trading advantage.
+Members of Congress have to disclose their stock trades, and a popular claim says they beat the market. CapitolAlpha collects those disclosures from the House and Senate and tests the claim the way finance research tests events: it measures each purchase's return against what a four-factor model predicts, starting on the day the public could first see the trade.
 
-Members of Congress disclosed **16,203 stock trades** between 2020 and 2024. Their *purchases* beat the S&P 500 by an average of **+2.58%** over the following 90 days (statistically significant at p < 0.05). This repository contains the end-to-end pipeline behind that finding.
+The answer is no. A portfolio that buys every disclosed purchase the day after disclosure and holds it for 62 trading days, the test fixed in advance, earns a four-factor alpha of -1.82% a year (t = -0.74, p = 0.46). Average abnormal returns after disclosure stay inside a 95% band that covers zero on every one of the first 126 trading days, and eight robustness checks agree.
 
-**Findings page:** [capitolalpha.vercel.app](https://capitolalpha.vercel.app) (the headline statistics, interactive charts, and formal writeup in one place).
+**Site:** [capitolalpha.vercel.app](https://capitolalpha.vercel.app) walks through the study in event time.
 
-## 🛠 Project Overview
+## Project history
 
-A semester project for **QAC 420 (Data for Good)** at Wesleyan University using public data for civic accountability.
+CapitolAlpha started in spring 2025 as a semester project for **QAC 420 (Data for Good)** at Wesleyan University. That version reported that purchases beat the S&P 500. An audit in November 2026 found it did not hold: a text filter dropped every House purchase, leaving about 220 Senate trades; only the 50 most-traded tickers had prices; returns started on the trade date; and the "alpha" assumed a beta of one. The [journal](JOURNAL.md) records the details.
 
-The answer is a reproducible Python pipeline that:
+The redo follows a plan committed before any new return was computed: [`docs/specs/event-study.md`](docs/specs/event-study.md). One change was made after seeing results (abnormal returns now remove factor exposure only, as the plan says), and the first run's numbers are still printed and reported.
 
-1. Scrapes Senate stock disclosure reports (Periodic Transaction Reports) directly from **efdsearch.senate.gov** using automated browser scripts.
-2. Extracts House disclosure PDFs from **disclosures-clerk.house.gov** via table extraction tools.
-3. Normalizes filings from both chambers into a single unified dataset (`legislative_trades.csv` with 16,203 rows across 2020 to 2024).
-4. Pulls historical market prices via Yahoo Finance and calculates risk-adjusted excess returns (Jensen's alpha) over 30, 90, and 180-day holding periods compared to the S&P 500.
-
-Full deliverables:
-
-- **[Abstract](docs/abstract/abstract.pdf)**: 1-page academic abstract.
-- **[Final Reflection](docs/Final_Reflection/Final_Reflection.pdf)**: 5-page essay on methodology, ethics, and future research.
-- **[Statistics writeup](docs/statistics/statistics.pdf)**: Formal statistical workup behind the market-outperformance findings.
+The spring 2025 course write-ups are kept as a record and are superseded by the event study: [abstract](docs/abstract/abstract.pdf), [final reflection](docs/Final_Reflection/Final_Reflection.pdf), [statistics](docs/statistics/statistics.pdf).
 
 ## Key findings
 
-| Metric | Congressional purchases | S&P 500 (market benchmark) | Effect |
-| --- | --- | --- | --- |
-| Average 90-day return on investment | **13.74%** | ~11.16% | +2.58 percentage points |
-| **Risk-adjusted excess return (Jensen's alpha)** | — | — | **+2.58%** (statistically significant, p < 0.05) |
-| Pre-crash sell concentration | Top **5%** of sellers timed market exits before Feb 20, 2020 | — | Suggestive of timing, not definitive proof of cause |
-| Analyzed trades | **220 benchmarkable purchases** out of 16,203 raw rows | — | Strict criteria requiring clear public ticker symbols |
-| Time window | 2020-01-01 to 2024-12-31 | — | Spans the COVID-19 market drop and recovery |
+Full tables: [`docs/results/event-study.md`](docs/results/event-study.md) and [`docs/results/disclosure-lag.md`](docs/results/disclosure-lag.md).
 
-*Note on terms:* **Jensen's alpha** measures how much an investment outperformed what would normally be expected given its market risk. A positive value (+2.58%) indicates that politician purchases gained more than expected compared to the general stock market.
+| Question | Result |
+| --- | --- |
+| Copy portfolio from disclosure, 62-day hold (primary) | Alpha -1.82% a year, t = -0.74, p = 0.461, 3,942 House purchases |
+| Same portfolio, 20 and 125 days | 1.95% (p = 0.547) and -1.81% (p = 0.433) |
+| Mean CAR after disclosure, days 20, 62 and 125 | 0.00%, -0.34%, -0.68%; smallest Holm-adjusted p = 0.343 |
+| Mean CAR after the trade date | No horizon significant after Holm correction |
+| Eight robustness checks | All insignificant; largest is amount-weighted, 7.12% a year (t = 1.43) |
+| Disclosure delay (House) | Median 13 days; 69 of 1,965 filings were late under the STOCK Act's 45 days |
 
-The statistical details (t-statistics, confidence intervals, risk-adjusted Sharpe ratios, and return distributions) are available in [`notebooks/Financial_Analysis.ipynb`](notebooks/Financial_Analysis.ipynb).
+Sample: 5,137 purchases after the plan's rules, of which 4,456 match CRSP common stock on the trade date. ETFs, funds, ADRs and over-the-counter foreign shares are excluded and listed with reasons.
+
+One exploratory pattern: members tend to buy stocks that had been beating the factor model before the trade.
 
 ## Pipeline
 
@@ -74,45 +68,40 @@ Senate and House filings are fetched separately and merged into one 16,203-row t
 ## Reproducing the analysis
 
 ```bash
-# 1. Setup environment
 uv sync --group dev
 uv run playwright install chromium
 
-# 2. Fetch data (Option A: scrape official sites)
 python -m pipeline.run_pipeline --use-official
+uv run python -m pipeline.disclosure_lag
 
-# 2b. (Option B: pre-aggregated dataset fallback)
-python -m pipeline.run_pipeline
+uv run --with "psycopg[binary]" python -m pipeline.crsp --user WRDS_USER --out-dir DIR
+uv run python -m pipeline.run_event_study --data-dir DIR
+uv run python -m pipeline.site_figures --data-dir DIR
 
-# 3. Run test suite
-pytest
-
-# 4. Open the analysis notebooks
-jupyter lab notebooks/Financial_Analysis.ipynb
+uv run pytest
 ```
 
-Pipeline options (`--fresh`, `--senate-only`, `--house-only`) and fallback settings are documented in [`pipeline/README_PIPELINE.md`](pipeline/README_PIPELINE.md).
+The event study needs a WRDS account with CRSP access. `pipeline.crsp` reads the password from your own `~/.pgpass`. CRSP data is licensed, so the extract in `DIR` stays out of the repository; `pipeline.site_figures` writes only aggregates to `site/data/figures.json`.
 
-## Research caveats
+Pipeline options (`--fresh`, `--senate-only`, `--house-only`) are documented in [`pipeline/README_PIPELINE.md`](pipeline/README_PIPELINE.md).
 
-This is an academic study based on public filings. The findings are best read as an exploratory investigation:
+## Limits
 
-- **Filing delay:** Politicians can disclose trades up to 30 to 45 days after they happen, meaning the public cannot copy these trades in real time.
-- **Sample selection:** Only 220 trades out of 16,203 had clear stock ticker symbols and reliable price data across the analysis window. Private investments, real estate, and derivatives were excluded.
-- **Statistical assumptions:** The risk adjustment model assumes standard market pricing models, which may vary during volatile periods like the early COVID pandemic.
-- **Correlation vs. causation:** Beating the market can happen for multiple reasons, including personal wealth advisors, sector choices, or general market trends. The data shows correlation, not proof of insider knowledge.
-
-The [Final Reflection PDF](docs/Final_Reflection/Final_Reflection.pdf) expands on all of these.
+- **House only for the primary test.** The Senate records in the snapshot carry no disclosure date, so Senate purchases appear only in the trade-date checks.
+- **Late filings are right-censored.** The trade snapshot dates from April 2026, so some filings for late 2025 trades are missing.
+- **Prices end on 31 December 2025.** Later purchases have shorter horizons, so fewer events reach day 125.
+- **A null is not proof of no information.** The test asks whether a public follower could profit. It says nothing about what any member knew.
 
 ## Tech stack
 
-- **Python 3.11+** with `pandas`, `scipy`, `matplotlib`, `seaborn`
+- **Python 3.11+** with `pandas` and `numpy` for the event study, plus `scipy`, `matplotlib` and `seaborn` in the notebooks
+- **CRSP through WRDS** for daily returns, and Kenneth French's data library for the factors
 - **Playwright** for browser automation on JavaScript-rendered disclosure sites
 - **pdfplumber** for House PTR PDF table extraction
-- **yfinance** for SPY and per-ticker price history
+- **yfinance** in the spring 2025 notebooks only
 - **pytest** for unit tests on the fetchers and merge step
 - **Jupyter** for the EDA and financial-analysis notebooks
-- **Flourish** for the presentation visualization
+- **GSAP** and Glaxnimate-drawn SVG for the site
 
 ## Acknowledgments
 
