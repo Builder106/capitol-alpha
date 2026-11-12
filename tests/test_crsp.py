@@ -70,7 +70,7 @@ def test_query_builds_frame():
 
 def test_link_events_matches_by_date_and_share_type():
     links = pd.DataFrame(LINKS, columns=LINK_COLUMNS)
-    linked, flow = crsp.link_events(events_frame(), links)
+    linked, flow, excluded = crsp.link_events(events_frame(), links)
 
     assert list(linked["ticker"]) == ["AAPL", "AAA"]
     assert list(linked["security"]) == [14593, 33333]
@@ -82,6 +82,12 @@ def test_link_events_matches_by_date_and_share_type():
         ("  other share type (excluded)", 1),
         ("matched to CRSP common stock", 2),
     ]
+    assert excluded.to_dict("index") == {
+        1: {"ticker": "META", "reason": crsp.NO_RECORD},
+        2: {"ticker": "TSM", "reason": "ADR"},
+        3: {"ticker": "XYZ", "reason": "other share type"},
+        5: {"ticker": "ZZZ", "reason": crsp.NO_RECORD},
+    }
 
 
 def test_wide_returns_pivots_decimal_returns():
@@ -104,21 +110,19 @@ def test_connect_uses_wrds_settings(monkeypatch):
 
 def test_main_writes_outputs(tmp_path, monkeypatch, capsys):
     snapshot = tmp_path / "snapshot.csv"
-    pd.DataFrame(
-        [
-            {
-                "legislator_name": "A",
-                "owner": "Sp",
-                "ticker": "AAPL",
-                "transaction_date": "03/02/2021",
-                "disclosure_date": "03/16/2021",
-                "asset_description": "Apple Inc.",
-                "asset_type": "",
-                "transaction_type": "P",
-                "amount_range": "$1,001 - $15,000",
-            }
-        ]
-    ).to_csv(snapshot, index=False)
+    row = {
+        "legislator_name": "A",
+        "owner": "Sp",
+        "ticker": "AAPL",
+        "transaction_date": "03/02/2021",
+        "disclosure_date": "03/16/2021",
+        "asset_description": "Apple Inc.",
+        "asset_type": "",
+        "transaction_type": "P",
+        "amount_range": "$1,001 - $15,000",
+    }
+    sale = {**row, "ticker": "ZZZ", "asset_description": "Unknown Fund", "transaction_type": "S"}
+    pd.DataFrame([row, sale]).to_csv(snapshot, index=False)
     connection = FakeConnection()
     monkeypatch.setattr(crsp, "connect", lambda user: connection)
 
@@ -128,8 +132,13 @@ def test_main_writes_outputs(tmp_path, monkeypatch, capsys):
     assert connection.closed
     events = pd.read_csv(out / "events.csv")
     assert list(events["security"]) == [14593]
+    assert list(events["side"]) == ["purchase"]
+    excluded = pd.read_csv(out / "excluded.csv")
+    assert excluded.loc[0, ["ticker", "side", "reason"]].tolist() == ["ZZZ", "sale", crsp.NO_RECORD]
     assert len(pd.read_csv(out / "returns.csv.gz")) == len(RETURN_ROWS)
-    assert "matched to CRSP common stock" in capsys.readouterr().out
+    out_text = capsys.readouterr().out
+    assert "[purchase] matched to CRSP common stock" in out_text
+    assert "[sale] events" in out_text
 
 
 def test_main_requires_user(tmp_path, monkeypatch):

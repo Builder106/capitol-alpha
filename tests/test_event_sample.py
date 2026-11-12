@@ -120,3 +120,11 @@ def test_main_writes_events(tmp_path, capsys):
     written = load_snapshot(out)
     assert written.loc[0, "transaction_date"] == "2021-03-02"
     assert written.loc[0, "q1_eligible"] == "True"
+
+
+def test_build_events_sale_side():
+    rows = [trade(transaction_type=code) for code in ("S", "s (partial)", "Sale", "P")]
+    rows = [{**row, "ticker": ticker} for row, ticker in zip(rows, ["A", "B", "C", "D"])]
+    events, flow = build_events(pd.DataFrame(rows, columns=COLUMNS), side="sale")
+    assert flow[1] == ("sales (S, S (partial), or Sale)", 3)
+    assert set(events["side"]) == {"sale"}

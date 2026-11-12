@@ -17,7 +17,16 @@ from typing import Protocol
 
 import pandas as pd
 
-from .event_sample import END, SNAPSHOT, START, Flow, build_events, format_flow, load_snapshot
+from .event_sample import (
+    END,
+    SIDES,
+    SNAPSHOT,
+    START,
+    Flow,
+    build_events,
+    format_flow,
+    load_snapshot,
+)
 
 WRDS = {
     "host": "wrds-pgdata.wharton.upenn.edu",
@@ -40,6 +49,10 @@ WHERE permno = ANY(%s) AND dlycaldt BETWEEN %s AND %s
 COMMON_SHARE = "NS"
 ADR_SHARE = "AD"
 ESTIMATION_BUFFER = pd.Timedelta(days=400)
+NO_RECORD = "no CRSP common or ADR record on the trade date"
+OTHER_SHARE = "other share type"
+COMMON_REASON = "common"
+SHARE_REASONS = {COMMON_SHARE: COMMON_REASON, ADR_SHARE: "ADR"}
 RETURNS_END = pd.Timestamp("2026-12-31")
 
 
@@ -70,10 +83,13 @@ def query(conn: Connection, sql: str, params: tuple) -> pd.DataFrame:
     return pd.DataFrame(cursor.fetchall(), columns=columns)
 
 
-def link_events(events: pd.DataFrame, links: pd.DataFrame) -> tuple[pd.DataFrame, Flow]:
+def link_events(
+    events: pd.DataFrame, links: pd.DataFrame
+) -> tuple[pd.DataFrame, Flow, pd.DataFrame]:
     """Attach the permno whose record covers each transaction date.
 
-    Returns common-stock events with a ``security`` column, and the counts.
+    Returns common-stock events with a ``security`` column, the counts, and
+    the excluded events with the reason for each.
     """
     links = links.assign(
         secinfostartdt=pd.to_datetime(links["secinfostartdt"]),
@@ -90,7 +106,7 @@ def link_events(events: pd.DataFrame, links: pd.DataFrame) -> tuple[pd.DataFrame
 
     flow: Flow = [
         ("events", len(events)),
-        ("  no CRSP common or ADR record on the trade date", len(events) - len(matched)),
+        (f"  {NO_RECORD}", len(events) - len(matched)),
         ("  ADR (excluded)", int((matched["sharetype"] == ADR_SHARE).sum())),
         (
             "  other share type (excluded)",
@@ -102,7 +118,13 @@ def link_events(events: pd.DataFrame, links: pd.DataFrame) -> tuple[pd.DataFrame
     linked = linked.rename(columns={"permno": "security"}).astype({"security": int})
     linked = linked.set_index("event_id")
     linked.index.name = None
-    return linked.sort_index(), flow
+
+    share = matched.set_index("event_id")["sharetype"]
+    reason = pd.Series(NO_RECORD, index=events.index)
+    reason[share.index] = share.map(lambda s: SHARE_REASONS.get(s, OTHER_SHARE))
+    labelled = events[["ticker"]].assign(reason=reason)
+    excluded = labelled[labelled["reason"] != COMMON_REASON]
+    return linked.sort_index(), flow, excluded
 
 
 def wide_returns(long: pd.DataFrame) -> pd.DataFrame:
@@ -117,7 +139,7 @@ def wide_returns(long: pd.DataFrame) -> pd.DataFrame:
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description="Fetch CRSP returns for the purchase events.")
+    parser = argparse.ArgumentParser(description="Fetch CRSP returns for purchase and sale events.")
     parser.add_argument("--user", default=os.environ.get("WRDS_USER"))
     parser.add_argument("--out-dir", type=Path, required=True)
     parser.add_argument("--snapshot", type=Path, default=SNAPSHOT)
@@ -125,11 +147,22 @@ def main(argv: list[str] | None = None) -> None:
     if not args.user:
         parser.error("--user or WRDS_USER is required")
 
-    events, sample_flow = build_events(load_snapshot(args.snapshot))
+    snapshot = load_snapshot(args.snapshot)
+    built = [build_events(snapshot, side) for side in SIDES]
+    events = pd.concat([frame for frame, _ in built], ignore_index=True)
     conn = connect(args.user)
     tickers = sorted(events["ticker"].unique())
     links = query(conn, LINKS_SQL, (tickers, START.date(), END.date()))
-    linked, link_flow = link_events(events, links)
+
+    flows: Flow = []
+    linked_parts, excluded_parts = [], []
+    for (_, sample_flow), side in zip(built, SIDES, strict=True):
+        linked_side, link_flow, excluded_side = link_events(events[events["side"] == side], links)
+        flows += [(f"[{side}] {label}", count) for label, count in sample_flow + link_flow]
+        linked_parts.append(linked_side)
+        excluded_parts.append(excluded_side)
+    linked = pd.concat(linked_parts).sort_index()
+    excluded = pd.concat(excluded_parts).join(events[["side", "asset_description"]])
 
     first = linked["transaction_date"].min() - ESTIMATION_BUFFER
     permnos = sorted(int(p) for p in linked["security"].unique())
@@ -139,7 +172,8 @@ def main(argv: list[str] | None = None) -> None:
     args.out_dir.mkdir(parents=True, exist_ok=True)
     linked.to_csv(args.out_dir / "events.csv", index_label="event_id", date_format="%Y-%m-%d")
     returns.to_csv(args.out_dir / "returns.csv.gz", index=False)
-    print(format_flow(sample_flow + link_flow))
+    excluded.to_csv(args.out_dir / "excluded.csv", index_label="event_id")
+    print(format_flow(flows))
     print(f"\n{len(returns):,} daily returns for {len(permnos):,} stocks -> {args.out_dir}")
 
 

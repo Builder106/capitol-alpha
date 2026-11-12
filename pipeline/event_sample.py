@@ -20,6 +20,10 @@ SNAPSHOT = DATA_DIR / "snapshots" / "legislative_trades_821d6e5.csv"
 EVENTS = DATA_DIR / "purchase_events.csv"
 
 PURCHASE_CODES = {"p", "purchase"}
+SIDES = {
+    "purchase": (PURCHASE_CODES, "purchases (P or Purchase)"),
+    "sale": ({"s", "s (partial)", "sale"}, "sales (S, S (partial), or Sale)"),
+}
 NON_STOCK_TYPES = {"stock option", "other securities"}
 TICKER = r"[A-Z]{1,5}"
 OPTION = r"\boptions?\b"
@@ -54,8 +58,9 @@ def load_snapshot(path: Path = SNAPSHOT) -> pd.DataFrame:
     return pd.read_csv(path, dtype=str, keep_default_na=False)
 
 
-def build_events(trades: pd.DataFrame) -> tuple[pd.DataFrame, Flow]:
+def build_events(trades: pd.DataFrame, side: str = "purchase") -> tuple[pd.DataFrame, Flow]:
     """Apply the sample rules in order and count the rows left after each."""
+    codes, side_label = SIDES[side]
     df = trades
     flow: Flow = [("rows in snapshot", len(df))]
 
@@ -64,7 +69,7 @@ def build_events(trades: pd.DataFrame) -> tuple[pd.DataFrame, Flow]:
         df = df[mask]
         flow.append((label, len(df)))
 
-    keep(df["transaction_type"].str.lower().isin(PURCHASE_CODES), "purchases (P or Purchase)")
+    keep(df["transaction_type"].str.lower().isin(codes), side_label)
     keep(df["ticker"].str.fullmatch(TICKER), "valid ticker")
     keep(
         ~df["asset_type"].str.lower().isin(NON_STOCK_TYPES)
@@ -75,7 +80,7 @@ def build_events(trades: pd.DataFrame) -> tuple[pd.DataFrame, Flow]:
     keep(transacted.between(START, END), "transaction date 2020-01-01 to 2025-12-31")
     keep(~df.duplicated(EVENT_KEY), "after removing duplicates")
 
-    events = df.copy()
+    events = df.assign(side=side)
     events["transaction_date"] = pd.to_datetime(events["transaction_date"], format=DATE_FORMAT)
     events["disclosure_date"] = pd.to_datetime(
         events["disclosure_date"], format=DATE_FORMAT, errors="coerce"
