@@ -77,8 +77,9 @@
 
   // Value at percentile p (0 to 100) on a given day, from the 1st to 99th percentiles.
   const quantile = (p, ps) => {
-    if (p <= 1) return ps[0] - (ps[0] - ps[4]) * (1 - p) * 0.25;
-    if (p >= 99) return ps[98] + (ps[98] - ps[94]) * (p - 99) * 0.25;
+    // Beyond the 1st and 99th percentiles, stretch the tail by twice the 1-to-5 gap.
+    if (p <= 1) return ps[0] - (ps[4] - ps[0]) * 2 * (1 - p);
+    if (p >= 99) return ps[98] + (ps[98] - ps[94]) * 2 * (p - 99);
     const i = Math.floor(p) - 1;
     return lerp(ps[i], ps[i + 1], p - Math.floor(p));
   };
@@ -364,7 +365,11 @@
     const cx0 = g.x(today);
     const groundY = g.zeroY - g.dot - 0.5;
     const s = g.dot;
-    ctx.globalAlpha = 0.72 * (1 - smooth(zoom) * 0.75);
+    const alpha = 0.72 * (1 - smooth(clamp(zoom * 1.25)));
+    if (alpha <= 0.01) return;
+    const yTop = g.zeroY - g.half;
+    const yBottom = g.zeroY + g.half;
+    ctx.globalAlpha = alpha;
     ctx.fillStyle = colors.ink;
     ctx.beginPath();
     for (let i = 0; i < dots.length; i += 1) {
@@ -381,6 +386,7 @@
         x = lerp(x, cx0 + (d.u - 0.5) * w, h);
         yy = lerp(yy, g.zeroY - value * pxPerValue, h);
       }
+      if (h > 0 && (yy < yTop || yy > yBottom)) continue;
       if (yy < -10 || yy > g.H + 10) continue;
       ctx.rect(x - s / 2, yy - s / 2, s, s);
     }
