@@ -5,7 +5,7 @@
     <text x="64" y="84" font-size="18" font-weight="700" fill="#111418">CapitolAlpha</text>
     <text x="64" y="150" font-size="48" font-weight="700" letter-spacing="-1.4" fill="#111418">Do members of</text>
     <text x="64" y="202" font-size="48" font-weight="700" letter-spacing="-1.4" fill="#111418">Congress beat</text>
-    <text x="64" y="254" font-size="48" font-weight="700" letter-spacing="-1.4" fill="#111418">the market? No.</text>
+    <text x="64" y="254" font-size="48" font-weight="700" letter-spacing="-1.4" fill="#111418">the market? <tspan fill="#1f44d6">No.</tspan></text>
     <text x="64" y="304" font-size="17" fill="#4f5864">4,456 purchases, 2020 to 2025. Copying</text>
     <text x="64" y="328" font-size="17" fill="#4f5864">them after disclosure earned no alpha.</text>
     <text x="710" y="374" font-size="13" fill="#4f5864">0</text>

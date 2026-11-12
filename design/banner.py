@@ -21,8 +21,8 @@ FONT = "'Public Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif"
 THEMES = {
     "light": {"ground": "#eef1f4", "ink": "#111418", "muted": "#4f5864", "line": "#c9d0d8",
               "accent": "#1f44d6", "band": "rgba(31,68,214,0.14)"},
-    "dark": {"ground": "#0e1116", "ink": "#eef1f4", "muted": "#a3acb8", "line": "#2a313b",
-             "accent": "#7d95ff", "band": "rgba(125,149,255,0.18)"},
+    "dark": {"ground": "#0a0f1d", "ink": "#edf1f7", "muted": "#9aa5ba", "line": "#242d42",
+             "accent": "#7b93ff", "band": "rgba(123,147,255,0.2)"},
 }
 
 
@@ -48,6 +48,17 @@ def plot(path: list[dict], x0: float, x1: float, zero: float, k: float) -> tuple
     return "M" + "L".join(upper + lower) + "Z", "M" + "L".join(line)
 
 
+def fan(path: list[dict], lo: int, hi: int, x0: float, x1: float, zero: float, k: float) -> str:
+    """Area between two percentiles (1 to 99) of the CAR spread across purchases."""
+    last = path[-1]["day"]
+    top = [f"{x0 + (x1 - x0) * q['day'] / last:.1f},{zero - q['p'][hi - 1] * 100 * k:.1f}" for q in path]
+    bottom = [
+        f"{x0 + (x1 - x0) * q['day'] / last:.1f},{zero - q['p'][lo - 1] * 100 * k:.1f}"
+        for q in reversed(path)
+    ]
+    return "M" + "L".join(top + bottom) + "Z"
+
+
 def banner(theme: dict[str, str], path: list[dict]) -> str:
     band, line = plot(path, 710, 1140, 300, 34)
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420">
@@ -57,7 +68,7 @@ def banner(theme: dict[str, str], path: list[dict]) -> str:
     <text x="64" y="84" font-size="18" font-weight="700" fill="{theme['ink']}">CapitolAlpha</text>
     <text x="64" y="150" font-size="48" font-weight="700" letter-spacing="-1.4" fill="{theme['ink']}">Do members of</text>
     <text x="64" y="202" font-size="48" font-weight="700" letter-spacing="-1.4" fill="{theme['ink']}">Congress beat</text>
-    <text x="64" y="254" font-size="48" font-weight="700" letter-spacing="-1.4" fill="{theme['ink']}">the market? No.</text>
+    <text x="64" y="254" font-size="48" font-weight="700" letter-spacing="-1.4" fill="{theme['ink']}">the market? <tspan fill="{theme['accent']}">No.</tspan></text>
     <text x="64" y="304" font-size="17" fill="{theme['muted']}">4,456 purchases, 2020 to 2025. Copying</text>
     <text x="64" y="328" font-size="17" fill="{theme['muted']}">them after disclosure earned no alpha.</text>
     <text x="710" y="374" font-size="13" fill="{theme['muted']}">0</text>
@@ -76,24 +87,27 @@ def banner(theme: dict[str, str], path: list[dict]) -> str:
 
 
 def social(theme: dict[str, str], path: list[dict]) -> str:
-    band, line = plot(path, 840, 1136, 470, 40)
+    _, line = plot(path, 840, 1136, 470, 4.2)
+    wide = fan(path, 10, 90, 840, 1136, 470, 4.2)
+    middle = fan(path, 25, 75, 840, 1136, 470, 4.2)
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <rect width="1200" height="630" fill="{theme['ground']}"/>
   <g font-family="{FONT}">
     <text x="64" y="96" font-size="24" font-weight="700" fill="{theme['ink']}">CapitolAlpha</text>
     <text x="64" y="206" font-size="68" font-weight="700" letter-spacing="-2.2" fill="{theme['ink']}">Do members of</text>
     <text x="64" y="278" font-size="68" font-weight="700" letter-spacing="-2.2" fill="{theme['ink']}">Congress beat</text>
-    <text x="64" y="350" font-size="68" font-weight="700" letter-spacing="-2.2" fill="{theme['ink']}">the market? No.</text>
+    <text x="64" y="350" font-size="68" font-weight="700" letter-spacing="-2.2" fill="{theme['ink']}">the market? <tspan fill="{theme['accent']}">No.</tspan></text>
     <text x="64" y="420" font-size="22" fill="{theme['muted']}">4,456 purchases, 2020 to 2025. Copying them</text>
     <text x="64" y="452" font-size="22" fill="{theme['muted']}">after disclosure earned no four-factor alpha.</text>
-    <text x="840" y="562" font-size="16" fill="{theme['muted']}">Mean abnormal return, days 0 to 125</text>
-    <text x="840" y="586" font-size="16" fill="{theme['muted']}">after disclosure, with its 95% band</text>
+    <text x="840" y="596" font-size="16" fill="{theme['muted']}">Spread across purchases, days 0 to 125;</text>
+    <text x="840" y="618" font-size="16" fill="{theme['muted']}">the blue line is their average</text>
   </g>
   <g transform="translate(560 214) scale(1.3)" fill="none" stroke="{theme['ink']}" stroke-width="1.3"
      stroke-linecap="round" stroke-linejoin="round">
     {dome_paths()}
   </g>
-  <path d="{band}" fill="{theme['band']}"/>
+  <path d="{wide}" fill="{theme['ink']}" fill-opacity="0.08"/>
+  <path d="{middle}" fill="{theme['ink']}" fill-opacity="0.12"/>
   <line x1="560" y1="470" x2="1136" y2="470" stroke="{theme['ink']}" stroke-width="2"/>
   <path d="{line}" fill="none" stroke="{theme['accent']}" stroke-width="3" stroke-linejoin="round"/>
 </svg>
@@ -104,7 +118,7 @@ def main() -> None:
     path = json.loads(FIGURES.read_text())["car_disclosure"]
     for name, theme in THEMES.items():
         (ROOT / "assets" / f"banner-{name}.svg").write_text(banner(theme, path))
-    (ROOT / "assets" / "social-card.svg").write_text(social(THEMES["light"], path))
+    (ROOT / "assets" / "social-card.svg").write_text(social(THEMES["dark"], path))
 
 
 if __name__ == "__main__":

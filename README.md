@@ -16,7 +16,7 @@
 > **Do members of Congress beat the market?** An event study of 4,456 congressional stock purchases, 2020 to 2025, on CRSP data. Copying them once they were disclosed earned no four-factor alpha.
 
 <p align="center">
-  <img src="assets/screenshot.png" alt="The CapitolAlpha site: the question 'Do members of Congress beat the market?' beside a line drawing of the Capitol dome sitting on a long zero line, with the answer below." width="880">
+  <img src="assets/screenshot.png" alt="The CapitolAlpha site: the question 'Do members of Congress beat the market?' and a large 'No.' beside a line drawing of the Capitol dome standing on a line made of thousands of dots, one per disclosed purchase." width="880">
 </p>
 
 ## What is CapitolAlpha?
