@@ -4,7 +4,7 @@ Feature: CapitolAlpha research site
     Given I am on the research site
     Then the page title contains "CapitolAlpha"
     And the question asks whether members beat the market
-    And the answer starts with "No."
+    And the answer reads "No."
 
   Scenario: The primary test shows the pre-planned result
     Given I am on the research site
@@ -13,7 +13,7 @@ Feature: CapitolAlpha research site
 
   Scenario: The event-time plot is drawn from the figure data
     Given I am on the research site
-    Then the plot draws the mean abnormal return line and its band
+    Then the event-time plot is painted
 
   Scenario: Every robustness check is listed
     Given I am on the research site

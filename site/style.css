@@ -8,19 +8,21 @@
 }
 
 :root {
-  --ground: #eef1f4;
-  --sheet: #ffffff;
-  --ink: #111418;
-  --muted: #4f5864;
-  --line: #c9d0d8;
-  --accent: #1f44d6;
-  --accent-soft: #7d95ff;
-  --band: rgba(31, 68, 214, 0.12);
+  --ground: #0a0f1d;
+  --ground-2: #111829;
+  --sheet: #eef2f8;
+  --ink: #edf1f7;
+  --muted: #9aa5ba;
+  --line: #242d42;
+  --accent: #7b93ff;
+  --accent-soft: #a9b8ff;
+  --band: rgba(123, 147, 255, 0.2);
+  --paper-ink: #111418;
   --font: 'Public Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   --gutter: clamp(16px, 2.2vw, 32px);
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --corner-h: 64px;
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 *,
@@ -47,7 +49,7 @@ body {
 
 ::selection {
   background: var(--accent);
-  color: #fff;
+  color: var(--ground);
 }
 
 a {
@@ -207,13 +209,13 @@ strong {
   overflow: auto;
   padding: 20px 22px 18px;
   color: var(--ink);
-  background: var(--sheet);
+  background: var(--ground-2);
   border: 1.5px solid var(--ink);
   border-radius: 2px;
 }
 
 .index::backdrop {
-  background: rgba(17, 20, 24, 0.18);
+  background: rgba(4, 7, 14, 0.6);
 }
 
 .index__title {
@@ -309,7 +311,7 @@ strong {
   inset: 0;
   width: 100%;
   height: 100%;
-  overflow: visible;
+  display: block;
 }
 
 .dome-wrap {
@@ -335,7 +337,7 @@ html.motion .dome [data-draw] {
   stroke-dashoffset: 1;
 }
 
-html.motion .unit--question .answer,
+html.motion .no,
 html.motion .unit--question .byline,
 html.motion .unit--question .scroll-cue {
   opacity: 0;
@@ -379,14 +381,14 @@ html.motion .unit--question .scroll-cue {
 
 .unit--question {
   min-height: 100svh;
-  padding-top: calc(var(--corner-h) + 12svh);
+  padding-top: calc(var(--corner-h) + 8svh);
   max-width: none;
   position: relative;
   z-index: 2;
 }
 
 .question {
-  font-size: clamp(2.75rem, 6.6vw, 7.25rem);
+  font-size: clamp(2.5rem, 5.2vw, 5.75rem);
   font-weight: 650;
   line-height: 0.94;
   letter-spacing: -0.045em;
@@ -395,8 +397,18 @@ html.motion .unit--question .scroll-cue {
   text-wrap: balance;
 }
 
+.no {
+  margin-top: 0.12em;
+  font-size: clamp(5rem, 15vw, 15rem);
+  font-weight: 750;
+  line-height: 0.82;
+  letter-spacing: -0.065em;
+  margin-left: -0.06em;
+  color: var(--accent);
+}
+
 .answer {
-  margin-top: 1.4em;
+  margin-top: 0.6em;
   max-width: 30rem;
   font-size: clamp(1.125rem, 1.4vw, 1.3rem);
   line-height: 1.45;
@@ -419,6 +431,28 @@ html.motion .unit--question .scroll-cue {
   font-size: 14px;
   font-weight: 650;
   color: var(--accent);
+}
+
+.stat {
+  display: grid;
+  gap: 6px;
+  margin-top: 1.1em;
+}
+
+.stat__num {
+  font-size: clamp(3.5rem, 7vw, 7rem);
+  font-weight: 750;
+  line-height: 0.88;
+  letter-spacing: -0.055em;
+  margin-left: -0.05em;
+  color: var(--ink);
+}
+
+.stat__label {
+  max-width: 22rem;
+  font-size: 15px;
+  font-weight: 550;
+  color: var(--muted);
 }
 
 .unit h2,
@@ -473,8 +507,9 @@ html.motion .unit--question .scroll-cue {
 .filing__art {
   width: 100%;
   height: auto;
-  color: var(--ink);
+  color: var(--paper-ink);
   overflow: hidden;
+  --accent: #1f44d6;
 }
 
 .lags__chart {
@@ -691,7 +726,7 @@ html.motion .unit--question .scroll-cue {
   .stage {
     position: sticky;
     top: 0;
-    height: 44svh;
+    height: 48svh;
     z-index: 5;
     background: var(--ground);
     border-bottom: 1px solid var(--line);
@@ -726,8 +761,16 @@ html.motion .unit--question .scroll-cue {
   }
 
   .question {
-    font-size: clamp(2.6rem, 12.5vw, 4.5rem);
+    font-size: clamp(2.4rem, 11vw, 4rem);
     width: auto;
+  }
+
+  .no {
+    font-size: clamp(5rem, 34vw, 9rem);
+  }
+
+  .stat__num {
+    font-size: clamp(3rem, 17vw, 5rem);
   }
 
   .filing {

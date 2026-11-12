@@ -26,8 +26,8 @@ Then('the question asks whether members beat the market', async ({ page }) => {
   await expect(page.locator('h1.question')).toContainText('beat the market');
 });
 
-Then('the answer starts with {string}', async ({ page }, text) => {
-  await expect(page.locator('.unit--question .answer')).toHaveText(new RegExp(`^${text.replace('.', '\\.')}`));
+Then('the answer reads {string}', async ({ page }, text) => {
+  await expect(page.locator('.unit--question .no')).toHaveText(text);
 });
 
 Then('the primary result shows {string} alpha a year', async ({ page }, value) => {
@@ -38,12 +38,14 @@ Then('the primary result shows a p-value of {string}', async ({ page }, value) =
   await expect(page.locator('#day-62 .result dd').nth(2)).toHaveText(value);
 });
 
-Then('the plot draws the mean abnormal return line and its band', async ({ page }) => {
-  const paths = page.locator('.plot g[clip-path] path');
-  await expect(paths).toHaveCount(2);
-  for (const index of [0, 1]) {
-    await expect(paths.nth(index)).toHaveAttribute('d', /^M[\d.]+,[\d.]+L/);
-  }
+Then('the event-time plot is painted', async ({ page }) => {
+  await page.locator('#day-62').scrollIntoViewIfNeeded();
+  await expect.poll(() => page.locator('canvas.plot').evaluate((canvas) => {
+    const { data } = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+    let painted = 0;
+    for (let i = 3; i < data.length; i += 16) if (data[i] > 0) painted += 1;
+    return painted;
+  }), { timeout: 10_000 }).toBeGreaterThan(1000);
 });
 
 Then('the robustness table has {int} checks', async ({ page }, count) => {

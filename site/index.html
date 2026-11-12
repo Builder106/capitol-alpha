@@ -8,7 +8,7 @@
   <meta name="description"
     content="An event study of 4,456 congressional stock purchases, 2020 to 2025. Copying them once disclosed earned no four-factor alpha.">
   <meta name="author" content="Yinka Vaughan">
-  <meta name="theme-color" content="#eef1f4">
+  <meta name="theme-color" content="#0a0f1d">
   <meta property="og:title" content="CapitolAlpha: do members of Congress beat the market?">
   <meta property="og:description"
     content="4,456 congressional stock purchases, 2020 to 2025, tested under a plan written in advance. Copying them after disclosure earned no alpha.">
@@ -111,7 +111,7 @@
             </g>
           </svg>
           </div>
-          <svg class="plot" focusable="false"></svg>
+          <canvas class="plot"></canvas>
           <p class="counter"><span class="counter__label">Event day</span> <span class="counter__value">&minus;250</span></p>
         </div>
       </div>
@@ -119,7 +119,8 @@
       <div class="units">
         <section class="unit unit--question" id="question" data-from="-250" data-to="-250" aria-labelledby="question-h">
           <h1 id="question-h" class="question">Do members of Congress beat the market?</h1>
-          <p class="answer">No. Across 4,456 stock purchases members made from 2020 to 2025, copying each trade once it
+          <p class="no">No.</p>
+          <p class="answer">Across 4,456 stock purchases members made from 2020 to 2025, copying each trade once it
             was disclosed earned nothing beyond what the market, size, value and momentum explain.</p>
           <p class="byline">An event study by <a href="https://orcid.org/0009-0005-8933-5396">Yinka Vaughan</a>,
             tested under a <a href="https://github.com/Builder106/capitol-alpha/blob/main/docs/specs/event-study.md">plan
@@ -130,6 +131,7 @@
         <section class="unit" id="estimation" data-from="-250" data-to="-30" aria-labelledby="estimation-h">
           <p class="unit__day">Days &minus;250 to &minus;30</p>
           <h2 id="estimation-h">First, what each stock should have done</h2>
+          <p class="stat"><span class="stat__num" data-count="221">221</span><span class="stat__label">trading days of history, fit for every stock</span></p>
           <p>For every purchase, a four-factor model is fit on the stock's daily returns from 250 to 30 trading days
             before the event: the market, small against large firms, value against growth, and momentum. The model
             predicts each day's return from those factors.</p>
@@ -140,7 +142,8 @@
         <section class="unit" id="trade" data-from="-30" data-to="-9" aria-labelledby="trade-h">
           <p class="unit__day">Day &minus;9, in the median case</p>
           <h2 id="trade-h">The trade</h2>
-          <p>A member, a spouse or a dependent buys a stock. The study covers <strong data-count="4456">4,456</strong>
+          <p class="stat"><span class="stat__num" data-count="4456">4,456</span><span class="stat__label">purchases matched to CRSP common stock</span></p>
+          <p>A member, a spouse or a dependent buys a stock. The study covers <strong>4,456</strong>
             purchases in 2020 to 2025 that match a common stock in CRSP, the standard academic price database.</p>
           <p>Most claims that Congress beats the market start the clock here. Nobody outside the household can see the
             trade yet, so a return measured from this day is one the public could never have earned.</p>
@@ -149,8 +152,10 @@
         <section class="unit unit--filing" id="filing" data-from="-9" data-to="0" aria-labelledby="filing-h">
           <p class="unit__day">Days &minus;9 to 0</p>
           <h2 id="filing-h">The filing</h2>
+          <p class="stat"><span class="stat__num" data-count="13">13</span><span class="stat__label">days, the median wait before a House member reported a trade</span></p>
           <p>The STOCK Act gives members 45 days to report a trade. House members took a median of
-            <strong>13 days</strong>. Of 1,965 House filings, 69 came in late.</p>
+            <strong>13 days</strong>. Of 1,965 House filings, 69 came in late. On the plot, the dots leave for day 0 in
+            the order members filed.</p>
           <div class="filing">
             <svg class="filing__art" viewBox="0 0 220 240" data-glax-ms="1600" aria-hidden="true" focusable="false">
               <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -188,30 +193,34 @@
         <section class="unit" id="disclosure" data-from="0" data-to="0" aria-labelledby="disclosure-h">
           <p class="unit__day">Day 0</p>
           <h2 id="disclosure-h">Disclosure: now anyone can copy it</h2>
+          <p class="stat"><span class="stat__num" data-count="3942">3,942</span><span class="stat__label">purchases a follower could have copied</span></p>
           <p>From here the trade is public. The test asks what a follower earns by buying the same stock the next
             trading day. <strong>3,942</strong> of the purchases have a disclosure date, all from the House; the Senate
             records used here carry no filing date.</p>
-          <p>The blue line on the plot is the average abnormal return of those purchases from this day on. The shaded
-            band is its 95% interval, with errors clustered by member and by month.</p>
+          <p>Each dot on the plot stands for one of them. From here they spread out by how each did against the model,
+            and the shaded bands hold the middle half and the middle 80%. The blue line is their average.</p>
         </section>
 
         <section class="unit" id="day-20" data-from="0" data-to="20" aria-labelledby="day-20-h">
           <p class="unit__day">Day +20</p>
           <h2 id="day-20-h">A month on, nothing</h2>
-          <p>After 20 trading days the average abnormal return is <strong>0.00%</strong> (t&nbsp;=&nbsp;0.01). A
-            portfolio holding each disclosed purchase for 20 days earns 1.95% a year in four-factor alpha, with a
-            p-value of 0.55.</p>
+          <p class="stat"><span class="stat__num">0.00%</span><span class="stat__label">average abnormal return at day 20</span></p>
+          <p>The middle half of purchases already runs from &minus;4.7% to +4.4%, yet the average is
+            <strong>0.00%</strong> (t&nbsp;=&nbsp;0.01). Winners and losers cancel out. A portfolio holding each
+            disclosed purchase for 20 days earns 1.95% a year in four-factor alpha, with a p-value of 0.55.</p>
         </section>
 
-        <section class="unit unit--primary" id="day-62" data-from="20" data-to="62" aria-labelledby="day-62-h">
+        <section class="unit unit--primary" id="day-62" data-from="20" data-to="62" data-zoom-from="0" data-zoom="1" aria-labelledby="day-62-h">
           <p class="unit__day">Day +62, the primary test</p>
           <h2 id="day-62-h">The test chosen in advance</h2>
+          <p>By day 62, one purchase in ten has gained more than 16% against the model and one in ten has lost nearly
+            18%. The plot now zooms in 18 times, past that spread, to the average and its 95% band.</p>
           <p>The plan named one test before the data came in: buy every disclosed purchase the day after disclosure,
             hold it for 62 trading days, and measure the portfolio's four-factor alpha with Newey-West errors.</p>
           <dl class="result">
             <div>
               <dt>Alpha a year</dt>
-              <dd>&minus;1.82%</dd>
+              <dd><span data-count="-1.82" data-digits="2" data-sign="true">&minus;1.82</span>%</dd>
             </div>
             <div>
               <dt>t-statistic</dt>
@@ -229,9 +238,10 @@
           <p>Event by event, the average abnormal return at day 62 is &minus;0.34% (t&nbsp;=&nbsp;&minus;0.83).</p>
         </section>
 
-        <section class="unit" id="day-125" data-from="62" data-to="125" aria-labelledby="day-125-h">
+        <section class="unit" id="day-125" data-from="62" data-to="125" data-zoom="1" aria-labelledby="day-125-h">
           <p class="unit__day">Day +125</p>
           <h2 id="day-125-h">Six months on, still at zero</h2>
+          <p class="stat"><span class="stat__num"><span data-count="-0.68" data-digits="2" data-sign="true">&minus;0.68</span>%</span><span class="stat__label">average at day 125, inside its 95% band</span></p>
           <p>The average reaches &minus;0.68% at 125 days. With six tests run, the Holm-adjusted p-value is 0.34. On
             every one of the 126 days after disclosure, the 95% band covers zero.</p>
           <p>Measured from the trade date instead, which the public cannot act on, the answer is the same. None of
@@ -317,6 +327,12 @@
             <dt>Inference</dt>
             <dd>Newey-West errors for the portfolio, errors clustered by member and month for event averages, Holm
               correction across the six event tests.</dd>
+          </div>
+          <div>
+            <dt>The dots</dt>
+            <dd>One dot per disclosed purchase. From day 0 the dots sit at the percentiles of that day's abnormal
+              returns, so each shows where one purchase in 3,942 falls, not a particular trade. Later days have fewer
+              purchases with prices, and the dots spread over those.</dd>
           </div>
           <div>
             <dt>Limits</dt>

@@ -33,7 +33,7 @@ the filing unit, where a stamp marks event day 0.
 ```
 Idea:        One line in event time. It begins as the ground under the Capitol and becomes the average abnormal return of copied purchases, which never leaves zero.
 Metaphor:    an event-study plot: day 0, an estimation window, horizons, a band around zero
-Signature:   the pinned plot; scrolling advances the event day, the line draws to that day, the corner counter reads it
+Signature:   3,942 dots, one per disclosed purchase. They fall onto the ground under the dome, leave for day 0 in filing order, then fan out into the real spread of returns while their average stays on zero; at day 62 the plot zooms in 18 times to the mean and its 95% band
 Emotion:     calm and certain; a claim checked properly
 Motion verb: plot: things draw left to right along the axis and settle on the line
 Screenshot:  the dome sitting on a long zero line next to the question
@@ -43,14 +43,14 @@ Escape hatch: the Index popover lists every unit by event day with real anchor l
 
 ## System
 
-- Palette (light, single committed theme):
-  - ground `#eef1f4` (cool form paper)
-  - sheet `#ffffff`
-  - ink `#111418`
-  - muted `#4f5864` (7.0:1 on ground)
-  - line `#c9d0d8`
-  - accent `#1f44d6` (the measured line, the stamp, focus)
-  - band `rgba(31, 68, 214, 0.12)`
+- Palette (dark, single committed theme; v2 after the light v1 read as timid):
+  - ground `#0a0f1d` (deep navy, so thousands of dots read as points of light)
+  - ground-2 `#111829` (popover surface)
+  - ink `#edf1f7`
+  - muted `#9aa5ba`
+  - line `#242d42`
+  - accent `#7b93ff` (the mean line, "No.", focus)
+  - sheet `#eef2f8` with paper ink `#111418` for the filing drawing
 - Type: Public Sans (the typeface the US government designed for its own
   sites), self-hosted variable 100 to 900. One family; weight and size carry
   hierarchy. Figures are tabular. Display 600, tracking -0.035em, leading 0.95.
@@ -60,9 +60,12 @@ Escape hatch: the Index popover lists every unit by event day with real anchor l
 - Motion: ease `power3.out` for entrances, `none` for scrubbed values,
   0.5 to 1.2 s; small things move first. Hovers: an accent rule draws left
   to right under primary links; Index entries slide their day label.
-- Idle: the plot holds still at rest on purpose (a null result is a line that
-  does not move). The "now" marker on the line pulses slowly while the stage
-  is pinned and on screen, off under reduced motion.
+- Idle: the stage holds still at rest. A shimmer on the dots cost too much
+  frame time on phones, and a null result reads better as a still mean line;
+  the intro fall, the scroll-driven spread and the zoom carry the motion.
+- Stage: one canvas, drawn only when the driver changes. Each dot's value and
+  local spacing per day are precomputed from the 1st to 99th percentiles in
+  `figures.json`, and dots are drawn in one batched path.
 
 ## Structure plan
 
@@ -87,8 +90,9 @@ desktop                                          phone
 +--------------------------------------------+   +------------------+
 ```
 
-Reduced motion and no-JS: no pin and no scrub. Every unit is visible, the
-plot shows the full line (with JS), and the stamp shows its last frame.
+Reduced motion and no-JS: no scrub and no tweens. Each unit sets the plot to
+its state at once (zoomed for days 62 and 125), every unit is visible, and
+the stamp shows its last frame.
 Without JS the charts are absent, but every number is in the HTML text.
 
 ## Genericness check
