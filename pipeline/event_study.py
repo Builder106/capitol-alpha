@@ -214,6 +214,7 @@ def copy_portfolio(
     holding_days: int,
     weight_column: str | None = None,
     start_offset: int = 0,
+    entry_returns: pd.DataFrame | None = None,
 ) -> pd.Series:
     """Daily return of a portfolio of stocks bought in the last ``holding_days``.
 
@@ -221,7 +222,12 @@ def copy_portfolio(
     (``entry_day``) and stays for ``holding_days`` trading days. Daily returns
     are close to close, so the first day's return includes the overnight move
     before the open; ``start_offset=1`` instead buys at that day's close and
-    counts returns from the next day. With no
+    counts returns from the next day. ``entry_returns`` (open-to-close returns
+    with the same columns) instead buys at the open: on a day a stock enters
+    the portfolio, its return is taken from that frame.
+
+    Weights are reset every day, so the portfolio is rebalanced daily. A held
+    stock with no return on a day drops out of that day's average. With no
     ``weight_column``, each held stock gets equal weight however many events
     name it (equal weight by stock, not by purchase). Otherwise a stock's
     weight is the sum of its active events' weights, and events with a
@@ -242,6 +248,10 @@ def copy_portfolio(
     if not weight_column:
         held = (held > 0).astype(float)
     values = returns.loc[days].to_numpy()
+    if entry_returns is not None:
+        on_entry = entry_returns.reindex(index=days, columns=returns.columns).to_numpy()
+        entering = (held > 0) & ~np.vstack([np.zeros((1, held.shape[1]), bool), held[:-1] > 0])
+        values = np.where(entering, on_entry, values)
     active = np.where(np.isnan(values), 0.0, held)
     total = active.sum(axis=1)
     with np.errstate(invalid="ignore", divide="ignore"):
@@ -285,10 +295,18 @@ def calendar_time_alpha(
     weight_column: str | None = None,
     lag: int | None = None,
     start_offset: int = 0,
+    entry_returns: pd.DataFrame | None = None,
 ) -> dict[str, float]:
     """Alpha of the copy portfolio (``copy_portfolio``) on the factors."""
     portfolio = copy_portfolio(
-        returns, factors, events, date_column, holding_days, weight_column, start_offset
+        returns,
+        factors,
+        events,
+        date_column,
+        holding_days,
+        weight_column,
+        start_offset,
+        entry_returns,
     )
     excess = portfolio - factors.loc[portfolio.index, "RF"]
     return factor_alpha(excess, factors, model, lag)

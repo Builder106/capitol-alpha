@@ -42,12 +42,14 @@ WHERE ticker = ANY(%s)
   AND secinfoenddt >= %s AND secinfostartdt <= %s
 """
 RETURNS_SQL = """
-SELECT permno, dlycaldt, dlyret
+SELECT permno, dlycaldt, dlyret, dlyopen, dlyclose
 FROM crsp.dsf_v2
 WHERE permno = ANY(%s) AND dlycaldt BETWEEN %s AND %s
 """
 COMMON_SHARE = "NS"
 ADR_SHARE = "AD"
+# Prefer ordinary shares, then ADRs, then anything else, whatever the codes' sort order.
+SHARE_PRIORITY = {COMMON_SHARE: 0, ADR_SHARE: 1}
 ESTIMATION_BUFFER = pd.Timedelta(days=400)
 NO_RECORD = "no CRSP common or ADR record on the trade date"
 OTHER_SHARE = "other share type"
@@ -97,8 +99,11 @@ def link_events(
     )
     merged = events.reset_index(names="event_id").merge(links, on="ticker", how="left")
     covered = merged["transaction_date"].between(merged["secinfostartdt"], merged["secinfoenddt"])
-    candidates = merged[covered].sort_values(
-        ["event_id", "sharetype", "permno"], ascending=[True, False, True], kind="stable"
+    candidates = (
+        merged[covered]
+        .assign(_priority=lambda frame: frame["sharetype"].map(SHARE_PRIORITY).fillna(2))
+        .sort_values(["event_id", "_priority", "permno"], kind="stable")
+        .drop(columns="_priority")
     )
     matched = candidates.drop_duplicates("event_id")
     common_candidates = candidates[candidates["sharetype"] == COMMON_SHARE]
@@ -138,6 +143,19 @@ def wide_returns(long: pd.DataFrame) -> pd.DataFrame:
     wide.index.name = None
     wide.columns.name = None
     return wide.sort_index()
+
+
+def wide_open_to_close(long: pd.DataFrame) -> pd.DataFrame | None:
+    """Open-to-close returns (``dlyclose / dlyopen - 1``), one column per permno.
+
+    This is what a copier who buys at the open earns on the day they buy.
+    Returns None for an extract fetched before opening prices were added.
+    """
+    if not {"dlyopen", "dlyclose"} <= set(long.columns):
+        return None
+    opened = pd.to_numeric(long["dlyopen"])
+    ratio = pd.to_numeric(long["dlyclose"]) / opened.where(opened > 0)
+    return wide_returns(long.assign(dlyret=ratio - 1)[["permno", "dlycaldt", "dlyret"]])
 
 
 def main(argv: list[str] | None = None) -> None:

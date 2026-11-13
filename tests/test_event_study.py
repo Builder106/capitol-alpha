@@ -104,6 +104,26 @@ def test_weekend_disclosure_enters_on_monday():
     assert list(at_close.index) == list(days[days > saturday][1:4])
 
 
+def test_open_entry_uses_open_to_close_on_the_entry_day_only():
+    factors = constructed_market()
+    days = factors.index
+    returns = pd.DataFrame({"AAA": 0.01, "BBB": 0.03}, index=days)
+    open_to_close = pd.DataFrame({"AAA": 0.004, "BBB": -0.02}, index=days)
+    events = pd.DataFrame(
+        {"security": ["AAA", "BBB", "AAA"], "date": [days[10], days[11], days[12]]}
+    )
+    portfolio = es.copy_portfolio(
+        returns, factors, events, "date", holding_days=3, entry_returns=open_to_close
+    )
+    assert portfolio[days[11]] == pytest.approx(0.004)
+    assert portfolio[days[12]] == pytest.approx((0.01 - 0.02) / 2)
+    assert portfolio[days[13]] == pytest.approx((0.01 + 0.03) / 2)
+    result = es.calendar_time_alpha(
+        returns, factors, events, "date", holding_days=3, entry_returns=open_to_close
+    )
+    assert result["days"] == len(portfolio)
+
+
 def test_ols_recovers_exact_coefficients():
     x = np.array([[1.0, 2.0], [2.0, 1.0], [3.0, 5.0], [4.0, 3.0]])
     y = 0.5 + x @ np.array([2.0, -1.0])

@@ -19,10 +19,11 @@ LINKS = [
     ("AAA", 33333, "2000-01-01", "2025-12-31", "NS", "N"),
     ("AAA", 44444, "2000-01-01", "2025-12-31", "NS", "Y"),
 ]
+RETURN_COLUMNS = ["permno", "dlycaldt", "dlyret", "dlyopen", "dlyclose"]
 RETURN_ROWS = [
-    (14593, "2021-03-02", Decimal("0.010")),
-    (14593, "2021-03-03", Decimal("-0.005")),
-    (33333, "2021-03-02", Decimal("0.002")),
+    (14593, "2021-03-02", Decimal("0.010"), Decimal("100"), Decimal("102")),
+    (14593, "2021-03-03", Decimal("-0.005"), Decimal("0"), Decimal("101")),
+    (33333, "2021-03-02", Decimal("0.002"), None, Decimal("50")),
 ]
 
 
@@ -36,7 +37,7 @@ class FakeCursor:
             self.description = [(name,) for name in LINK_COLUMNS]
             self.rows = LINKS
         else:
-            self.description = [("permno",), ("dlycaldt",), ("dlyret",)]
+            self.description = [(name,) for name in RETURN_COLUMNS]
             self.rows = RETURN_ROWS
 
     def fetchall(self) -> list[tuple]:
@@ -94,11 +95,42 @@ def test_link_events_matches_by_date_and_share_type():
 
 
 def test_wide_returns_pivots_decimal_returns():
-    long = pd.DataFrame(RETURN_ROWS, columns=["permno", "dlycaldt", "dlyret"])
+    long = pd.DataFrame(RETURN_ROWS, columns=RETURN_COLUMNS)
     wide = crsp.wide_returns(long)
     assert list(wide.columns) == [14593, 33333]
     assert wide.loc["2021-03-03", 14593] == pytest.approx(-0.005)
     assert pd.isna(wide.loc["2021-03-03", 33333])
+
+
+def test_wide_open_to_close():
+    long = pd.DataFrame(RETURN_ROWS, columns=RETURN_COLUMNS)
+    wide = crsp.wide_open_to_close(long)
+    assert wide is not None
+    wide = wide.reindex(index=pd.to_datetime(["2021-03-02", "2021-03-03"]), columns=[14593, 33333])
+    assert wide.loc["2021-03-02", 14593] == pytest.approx(0.02)
+    assert pd.isna(wide.loc["2021-03-03", 14593])
+    assert pd.isna(wide.loc["2021-03-02", 33333])
+    assert crsp.wide_open_to_close(long[["permno", "dlycaldt", "dlyret"]]) is None
+
+
+def test_link_events_prefers_ordinary_shares_over_other_codes():
+    links = pd.DataFrame(
+        [
+            ("DOC", 55555, "2000-01-01", "2025-12-31", "SB", "Y"),
+            ("DOC", 66666, "2000-01-01", "2025-12-31", "NS", "Y"),
+        ],
+        columns=LINK_COLUMNS,
+    )
+    events = pd.DataFrame(
+        {
+            "ticker": ["DOC"],
+            "transaction_date": pd.to_datetime(["2021-03-02"]),
+            "legislator_name": ["A"],
+        }
+    )
+    linked, flow, excluded = crsp.link_events(events, links)
+    assert list(linked["security"]) == [66666]
+    assert excluded.empty
 
 
 def test_connect_uses_wrds_settings(monkeypatch):

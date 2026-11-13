@@ -69,7 +69,7 @@ def test_main_reads_fetched_files(tmp_path, monkeypatch, capsys):
         tmp_path / "events.csv", index_label="event_id", date_format="%Y-%m-%d"
     )
     long = returns.stack().rename("dlyret").rename_axis(["dlycaldt", "permno"]).reset_index()
-    long.to_csv(tmp_path / "returns.csv.gz", index=False)
+    long.assign(dlyopen=100.0, dlyclose=100.5).to_csv(tmp_path / "returns.csv.gz", index=False)
     extra = np.random.default_rng(13).normal(0, 0.01, (len(factors), 2))
     five = factors.assign(RMW=extra[:, 0], CMA=extra[:, 1])
     monkeypatch.setattr(
@@ -90,6 +90,7 @@ def test_main_reads_fetched_files(tmp_path, monkeypatch, capsys):
     assert "five-factor" in out
     assert "Censoring" in out
     assert "close of the first trading day" in out
+    assert "open of the first trading day" in out
     assert "US-incorporated" in out
 
 
@@ -121,6 +122,8 @@ def test_review_summaries():
     assert difference["days"] > 0
     at_close = runner.close_entry_table(returns, factors, purchases)
     assert list(at_close["holding_days"]) == [20, 62, 125]
+    at_open = runner.open_entry_table(returns, factors, purchases, returns * 0.5)
+    assert list(at_open["holding_days"]) == [20, 62, 125]
     assert runner.us_incorporated_check(returns, factors, purchases) is None
     flagged = purchases.assign(usincflg=["Y", "Y", "N", "Y", "N", "Y"])
     incorporated = runner.us_incorporated_check(returns, factors, flagged)

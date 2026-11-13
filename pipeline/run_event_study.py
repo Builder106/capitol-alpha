@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .crsp import wide_returns
+from .crsp import wide_open_to_close, wide_returns
 from .event_study import (
     FIVE_FACTOR,
     FIVE_FACTOR_FILES,
@@ -51,6 +51,12 @@ def load_inputs(data_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     )
     returns = wide_returns(pd.read_csv(data_dir / "returns.csv.gz"))
     return events, returns.loc[:ANALYSIS_END]
+
+
+def load_open_to_close(data_dir: Path) -> pd.DataFrame | None:
+    """Open-to-close returns from the extract, or None if it has no opening prices."""
+    frame = wide_open_to_close(pd.read_csv(data_dir / "returns.csv.gz"))
+    return None if frame is None else frame.loc[:ANALYSIS_END]
 
 
 def calendar_time_table(
@@ -209,6 +215,30 @@ def close_entry_table(
     for holding in HORIZONS:
         result = calendar_time_alpha(
             returns, factors, disclosed, "disclosure_date", holding, start_offset=1
+        )
+        rows.append(
+            {
+                "holding_days": holding,
+                "primary": False,
+                "alpha_annual": result["alpha_daily"] * DAYS_PER_YEAR,
+                **result,
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def open_entry_table(
+    returns: pd.DataFrame,
+    factors: pd.DataFrame,
+    events: pd.DataFrame,
+    open_to_close: pd.DataFrame,
+) -> pd.DataFrame:
+    """Q1 alpha when the copier buys at the open of the first trading day after disclosure."""
+    disclosed = events[events["q1_eligible"]]
+    rows = []
+    for holding in HORIZONS:
+        result = calendar_time_alpha(
+            returns, factors, disclosed, "disclosure_date", holding, entry_returns=open_to_close
         )
         rows.append(
             {
@@ -422,6 +452,10 @@ def main(argv: list[str] | None = None) -> None:
     print(format_calendar(five_factor_table(returns, five, events).assign(primary=False)))
     print("\nAdded after review: amount-weighted minus equal-weighted, 62 days\n")
     print(format_summary(weighting_difference(returns, factors, events)))
+    open_to_close = load_open_to_close(args.data_dir)
+    if open_to_close is not None:
+        print("\nAdded after review: buy at the open of the first trading day after disclosure\n")
+        print(format_calendar(open_entry_table(returns, factors, events, open_to_close)))
     print("\nAdded after review: buy at the close of the first trading day after disclosure\n")
     print(format_calendar(close_entry_table(returns, factors, events)))
     incorporated = us_incorporated_check(returns, factors, events)
