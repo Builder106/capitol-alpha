@@ -6,7 +6,7 @@
   "publication_date": "2026-11-12",
   "creators": [
     {
-      "name": "Vaughan, Yinka",
+      "name": "Vaughan, Olayinka David",
       "affiliation": "Wesleyan University",
       "orcid": "0009-0005-8933-5396"
     }
@@ -24,6 +24,11 @@
   "related_identifiers": [
     {
       "identifier": "https://github.com/Builder106/capitol-alpha",
+      "relation": "isSupplementedBy",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://github.com/Builder106/capitol-alpha/tree/1a5b53a2b207d3c6532e8c1c2a4189cd3dd305c9",
       "relation": "isSupplementedBy",
       "resource_type": "software"
     }
