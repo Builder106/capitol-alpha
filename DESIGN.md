@@ -7,7 +7,7 @@ after the audit retracted that page's headline.
 ## Brief
 
 - Subject: CapitolAlpha, a pre-planned event study of congressional stock
-  purchases (2020 to 2025) by Yinka Vaughan.
+  purchases (2020 to 2025) by Olayinka Vaughan.
 - Audience: research faculty, quant and analyst recruiters, curious readers
   who arrive from a resume or LinkedIn link.
 - Job: state the answer in three seconds (no detectable alpha), then show
