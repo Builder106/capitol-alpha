@@ -6,18 +6,18 @@ This guide describes the data normalization heuristics, ticker resolution rules,
 
 Congressional stock disclosures are published in two formats:
 
-- **Senate PTRs** (`efdsearch.senate.gov`): Digitized HTML tables with standard fields (`Transaction Date`, `Owner`, `Asset Name`, `Ticker`, `Amount`). Scraped via Playwright form interaction with a fallback JSON cache.
-- **House PTRs** (`disclosures-clerk.house.gov`): PDF scans containing structured tables. Extracted using `pdfplumber` table extraction and DataTables JavaScript execution overrides (`dt.page.len(-1).draw()`).
+- **Senate PTRs** (`efdsearch.senate.gov`): Digitized HTML tables with standard fields (`Transaction Date`, `Owner`, `Asset Name`, `Ticker`, `Amount`). Playwright interacts with the search form; a JSON cache provides a fallback.
+- **House PTRs** (`disclosures-clerk.house.gov`): PDF scans containing structured tables. The pipeline uses `pdfplumber` to extract tables and runs DataTables JavaScript (`dt.page.len(-1).draw()`) to show all search results.
 
 ### Ticker Resolution & Corporate Entity Mapping Heuristics
 
-Raw filings frequently omit standard ticker symbols or corporate entity identifiers (e.g. listing "Common Stock - Apple Inc." or "OWENS & MINOR Rate/Coupon: 3.875%"). The normalization and entity linking modules (`pipeline/entity_linking.py` and `pipeline/merge_to_csv.py`):
+Filings often omit standard ticker symbols or corporate identifiers. An asset may appear as "Common Stock - Apple Inc." or "OWENS & MINOR Rate/Coupon: 3.875%" instead. The normalization and entity linking modules (`pipeline/entity_linking.py` and `pipeline/merge_to_csv.py`) handle these descriptions in several steps:
 
-1. **Format Validation**: Validates tickers against standard 1–5 character exchange symbols (including share class suffixes like `.A`, `.B`, `-A`, `-B`).
-2. **Regex Extraction**: Extracts embedded tickers from asset descriptions using parenthesized `(TICKER)`, bracketed `[TICKER]`, leading prefix `TICKER - Company`, or explicit label `Ticker: TICKER` patterns.
-3. **Corporate Entity Lookup**: Maps known corporate entity names to canonical tickers and standardized corporate entity titles (e.g., `Apple Inc.` -> `AAPL`, `The Boeing Company` -> `BA`, `Microsoft Corporation` -> `MSFT`).
-4. **Descriptive Entity Normalization**: Strips descriptive prefixes (`Common Stock`, `Shares of`, `Option on`), share class notations, HTML markup, and transaction annotations to produce clean corporate entity names for unmapped equities.
-5. **Non-Equity Exclusion**: Excludes non-equity assets (municipal bonds, treasury notes/bills, corporate debentures with coupon/maturity metadata, cryptocurrencies, and scanned PDF placeholder notices) from equity ticker resolution.
+1. Validate tickers against standard 1–5 character exchange symbols, including share class suffixes such as `.A`, `.B`, `-A`, and `-B`.
+2. Extract tickers from asset descriptions when they appear in parentheses `(TICKER)`, brackets `[TICKER]`, a leading prefix `TICKER - Company`, or an explicit label `Ticker: TICKER`.
+3. Map known company names to canonical tickers and standardized names (e.g., `Apple Inc.` -> `AAPL`, `The Boeing Company` -> `BA`, `Microsoft Corporation` -> `MSFT`).
+4. Remove descriptive prefixes (`Common Stock`, `Shares of`, `Option on`), share class notations, HTML markup, and transaction annotations to produce company names for unmapped equities.
+5. Exclude non-equity assets from ticker resolution, including municipal bonds, treasury notes/bills, corporate debentures with coupon/maturity metadata, cryptocurrencies, and scanned PDF placeholder notices.
 
 ## 2. Risk Adjustment Models
 
@@ -27,7 +27,7 @@ Returns are measured over 30, 90, and 180-day buy-and-hold windows following dis
 
 $$\alpha = R_i - [R_f + \beta (R_m - R_f)]$$
 
-Where $R_i$ represents the 90-day ROI of Congressional stock purchases and $R_m$ represents the S&P 500 benchmark return over the identical window.
+Here $R_i$ represents the 90-day ROI of Congressional stock purchases, and $R_m$ represents the S&P 500 benchmark return over the same window.
 
 ### Fama-French Multi-Factor Adjustment
 
@@ -37,9 +37,9 @@ $$\alpha_{FF} = \alpha_{CAPM} - (s \cdot SMB + h \cdot HML)$$
 
 ## 3. Caveats & Ethical Guardrails
 
-1. **Disclosure Lag**: Filings occur up to 30–45 days after trade execution.
-2. **Selection Bias**: Only clean equity trades matching market price history are benchmarked.
-3. **Public Data Ethos**: Automated ingestion processes legally public disclosures without bypassing CAPTCHAs or non-public endpoints.
+1. **Disclosure lag:** Filings occur up to 30–45 days after trade execution.
+2. **Selection bias:** Only clean equity trades matching market price history are benchmarked.
+3. **Public data:** Automated ingestion processes legally public disclosures without bypassing CAPTCHAs or non-public endpoints.
 
 ## 4. Committee Trade Correlation Analysis
 
