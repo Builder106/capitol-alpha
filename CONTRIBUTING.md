@@ -2,7 +2,7 @@
 
 This repo is the submission for **QAC 420 (*Data for Good*)** at Wesleyan, Spring 2025. The findings and the deliverables in `docs/` reflect what was submitted at end of term and are not changing.
 
-That said, the pipeline is open source and reusable. Bug fixes, fetcher resilience improvements, and follow-on analyses are welcome.
+The pipeline is open source and reusable. Bug fixes, fetcher resilience improvements, and follow-on analyses are welcome.
 
 ## Development setup
 
@@ -33,9 +33,9 @@ Pipeline-level options (`--fresh`, `--senate-only`, `--house-only`, `--use-offic
 
 ## Project-specific guardrails
 
-- **The official scrapers are the contract.** `efdsearch.senate.gov`and`disclosures-clerk.house.gov`change their HTML and PDF layouts roughly twice a year; when a fetcher breaks, the fix lives next to the selector logic in`pipeline/senate_fetcher.py`or`pipeline/house_fetcher.py`. Don't smuggle in a third-party paid API as the new primary source &mdash; the *Data for Good* frame is "public data, public methods."
+- **The official scrapers are the contract.** `efdsearch.senate.gov` and `disclosures-clerk.house.gov` change their HTML and PDF layouts roughly twice a year. When a fetcher breaks, fix it next to the selector logic in `pipeline/senate_fetcher.py` or `pipeline/house_fetcher.py`. Don't make a third-party paid API the primary source; the *Data for Good* frame is "public data, public methods."
 - **PTR amount ranges are ranges, not point estimates.** Many disclosure forms report a band ("$15,001 &ndash; $50,000"). The pipeline keeps `amount_min`, `amount_max`, and a derived `amount_avg`; analyses should declare which one they use and never silently swap.
-- **Ticker resolution is best-effort.** Asset descriptions are free text. The current matcher resolves common cases and drops ambiguous ones. Don't relax that into a fuzzy match without a deliberate audit &mdash; quiet false matches will silently corrupt the alpha calculation.
+- **Ticker resolution is best-effort.** Asset descriptions are free text. The current matcher resolves common cases and drops ambiguous ones. Don't introduce fuzzy matching without a deliberate audit; false matches can corrupt the alpha calculation without an obvious error.
 - **Tests use cached HTML/PDF fixtures, not live HTTP.** New fetcher tests should add a fixture under `tests/fixtures/`, not hit the network.
 - **The cleaned `data/legislative_trades.csv` is the analysis surface.** Notebooks read from it, not from the raw scraper output. If you change the schema, update the notebooks in the same PR.
 
@@ -66,7 +66,7 @@ Match that. No Conventional Commits prefix. No AI co-author trailer.
 - Resilience against HTML/PDF layout changes on the official disclosure sites.
 - Test coverage expansions (new fixture-based tests).
 - Performance improvements that don't change results.
-- New analyses in `notebooks/`that use the existing`legislative_trades.csv` schema unchanged.
+- New analyses in `notebooks/` that use the existing `legislative_trades.csv` schema unchanged.
 - Documentation and README clarifications.
 
 **Out of scope:**

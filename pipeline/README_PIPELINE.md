@@ -1,6 +1,6 @@
 # Capitol Alpha – Data collection & pipeline
 
-Pipeline for fetching and merging U.S. Congress (Senate and House) stock trade disclosures into a single CSV.
+This pipeline fetches and merges U.S. Senate and House stock trade disclosures into a single CSV.
 
 ## Setup
 
@@ -65,11 +65,11 @@ Options:
 - `--fresh` – Re-read local JSON (official scraping always reads the sources).
 - `--senate-only` – Only Senate (scrape or API).
 - `--house-only` – Only House (scrape or API).
-- `--use-official` – Scrape **efdsearch.senate.gov**and**disclosures-clerk.house.gov** (requires Playwright).
+- `--use-official` – Scrape **efdsearch.senate.gov** and **disclosures-clerk.house.gov** (requires Playwright).
 
 ## Data sources
 
-- **Official (--use-official):**Direct scraping of**efdsearch.senate.gov**(Senate) and**disclosures-clerk.house.gov/FinancialDisclosure** (House), as in your problem statement.
+- **Official (--use-official):** Scrapes **efdsearch.senate.gov** (Senate) and **disclosures-clerk.house.gov/FinancialDisclosure** (House), as described in the problem statement.
 - **Cached input (default):** Local pre-aggregated Senate/House JSON. The checked-in Senate cache originated from Senate Stock Watcher. Missing caches select official scraping.
 
 ## Output schema

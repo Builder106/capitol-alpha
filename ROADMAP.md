@@ -1,16 +1,16 @@
 # Capitol-Alpha Roadmap
 
-Congressional financial disclosures and market analysis roadmap.
+Plans for congressional financial disclosure and market analysis.
 
 ## v1.1 — Automated Disclosure Scraping
 
-- [x] **House & Senate PTR Ingestion**: High-reliability ingestion pipeline for periodic transaction reports.
-- [x] **Normalized Asset Entity Linking**: Automated ticker symbol resolution and corporate entity mapping.
+- [x] **House & Senate PTR Ingestion**: Reliably ingest periodic transaction reports.
+- [x] **Normalized Asset Entity Linking**: Resolve ticker symbols and map corporate entities automatically.
 
 ## v1.2 — Portfolio Backtesting & Signal Modeling
 
-- [x] **Committee Trade Correlation Analysis**: Sector-specific trading signal generation based on committee assignments.
-- [ ] **Interactive Visual Explorer**: Accessible chart visualizer for member trading histories.
+- [x] **Committee Trade Correlation Analysis**: Generate sector-specific trading signals based on committee assignments.
+- [ ] **Interactive Visual Explorer**: Make member trading histories available in accessible charts.
 
 ## Out of Scope
 
