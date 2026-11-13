@@ -68,7 +68,11 @@ def test_main_reads_fetched_files(tmp_path, monkeypatch, capsys):
     events.to_csv(tmp_path / "events.csv", index_label="event_id", date_format="%Y-%m-%d")
     long = returns.stack().rename("dlyret").rename_axis(["dlycaldt", "permno"]).reset_index()
     long.to_csv(tmp_path / "returns.csv.gz", index=False)
-    monkeypatch.setattr(runner, "download_factors", lambda path: factors)
+    extra = np.random.default_rng(13).normal(0, 0.01, (len(factors), 2))
+    five = factors.assign(RMW=extra[:, 0], CMA=extra[:, 1])
+    monkeypatch.setattr(
+        runner, "download_factors", lambda path, files=None: five if files else factors
+    )
 
     runner.main(["--data-dir", str(tmp_path)])
 
@@ -78,7 +82,39 @@ def test_main_reads_fetched_files(tmp_path, monkeypatch, capsys):
     assert "| transaction | 125 | 6 |" in out
     assert "pre-event intercept projected" in out
     assert "market-model CARs" in out
-    assert "| Sales from disclosure | 2 |" in out
+    assert f"| {runner.SALES_CHECK} | 2 |" in out
+    assert "copier's holding window" in out
+    assert "| after disclosure | 20 |" in out
+    assert "five-factor" in out
+    assert "Censoring" in out
+
+
+def test_load_inputs_stops_at_analysis_end(tmp_path):
+    returns, _, events = constructed_inputs()
+    late = returns.copy()
+    late.index = late.index + pd.DateOffset(years=5)
+    events.to_csv(tmp_path / "events.csv", index_label="event_id", date_format="%Y-%m-%d")
+    long = late.stack().rename("dlyret").rename_axis(["dlycaldt", "permno"]).reset_index()
+    long.to_csv(tmp_path / "returns.csv.gz", index=False)
+    _, loaded = runner.load_inputs(tmp_path)
+    assert loaded.index.max() <= runner.ANALYSIS_END
+
+
+def test_review_summaries():
+    returns, factors, events = constructed_inputs()
+    purchases = purchases_only(events)
+    gap = runner.gap_summary(returns, factors, purchases)
+    assert gap["events"] == 5
+    assert gap["median_days"] == 11
+    censored = runner.censoring_summary(returns, purchases)
+    assert censored == {"eligible": 5, "entered": 5, "never_entered": 0, "partial": 0}
+    table = runner.investable_car_table(returns, factors, purchases)
+    assert list(table["horizon"]) == [20, 62, 125]
+    assert (table["p_holm"] >= table["p"]).all()
+    lags = runner.lag_sensitivity_table(returns, factors, purchases)
+    assert list(lags["lag"][:3])[1:] == [21, 62]
+    difference = runner.weighting_difference(returns, factors, purchases)
+    assert difference["days"] > 0
 
 
 def test_amount_midpoint():
