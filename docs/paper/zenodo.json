@@ -28,7 +28,12 @@
       "resource_type": "software"
     },
     {
-      "identifier": "https://github.com/Builder106/capitol-alpha/tree/588ce0178c9e1a26df12eb911594bce260b29665",
+      "identifier": "10.5281/zenodo.24197346",
+      "relation": "isSupplementedBy",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://github.com/Builder106/capitol-alpha/tree/18596e35b89c279cdeb313cfbadd532a4fd90c5c",
       "relation": "isSupplementedBy",
       "resource_type": "software"
     }

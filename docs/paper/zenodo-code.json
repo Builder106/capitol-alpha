@@ -1,0 +1,34 @@
+{
+  "upload_type": "software",
+  "title": "CapitolAlpha: code, trade snapshot and aggregate results for \"Copying Congress after disclosure\"",
+  "description": "<p>Source code, the cleaned trade snapshot and the aggregate results behind the working paper \"Copying Congress after disclosure: a pre-specified event study of congressional purchases, 2020-2025\". The code builds the purchase sample, matches it to CRSP returns, runs the calendar-time and event-level tests, and writes the aggregate figures.</p><p>CRSP price data are licensed through Wharton Research Data Services and are not included. A reader with CRSP access can rebuild every table with <code>pipeline.crsp</code> and <code>pipeline.run_event_study</code>. The trade snapshot is a copy of public periodic transaction reports.</p><p>Use of AI tools: I used Claude (Anthropic) to assist with writing the analysis code and the manuscript. I reviewed all code, text and results and take full responsibility for the content.</p>",
+  "publication_date": "2026-11-13",
+  "creators": [
+    {
+      "name": "Vaughan, Olayinka",
+      "affiliation": "Wesleyan University",
+      "orcid": "0009-0005-8933-5396"
+    }
+  ],
+  "access_right": "open",
+  "license": "mit",
+  "keywords": [
+    "congressional trading",
+    "STOCK Act",
+    "event study",
+    "reproducibility"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.24185824",
+      "relation": "isSupplementTo",
+      "resource_type": "publication-workingpaper"
+    },
+    {
+      "identifier": "https://github.com/Builder106/capitol-alpha/tree/18596e35b89c279cdeb313cfbadd532a4fd90c5c",
+      "relation": "isDerivedFrom",
+      "resource_type": "software"
+    }
+  ],
+  "version": "18596e3"
+}
