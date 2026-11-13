@@ -83,10 +83,13 @@ Fewer events have long-horizon CARs because CRSP ends on 2025-12-31.
 ## A change made after the first run
 
 The first run also subtracted each stock's pre-event intercept (its alpha
-from days -250 to -30) when computing abnormal returns. The plan specifies
-betas only. That run reported significantly negative CARs, for example
--1.98% at 62 days from disclosure (t = -3.86). A diagnostic showed the
-projected intercept averaged +1.65% over 63 days (median +0.83%), because
+from days -250 to -30) when computing abnormal returns. The plan says to
+estimate betas over that window but does not say whether the intercept is
+also subtracted, so dropping it was a choice made after seeing results.
+That run reported significantly negative CARs, for example -1.98% at 62
+days from disclosure (t = -3.87). A diagnostic showed the projected
+intercept averaged +1.67% over 63 days (median +0.79%, 3,871
+disclosure-date events), because
 members tend to buy stocks that had been beating the factor model. Removing
 it brings the CARs to the values above, in line with the calendar-time test,
 which has no pre-event intercept. The runner still prints the first run's
@@ -202,6 +205,33 @@ for every table (downloaded 2026-11-12 and again 2026-11-13, identical):
 | --- | --- | --- |
 | `french_daily.csv` (three factors and momentum) | 1926-11-03 to 2026-09-30 | `a15652ef7d2ea1d3f41f863fabf04dfb0da9269bf2be29ca55c4cb007cd632fe` |
 | `french_5_daily.csv` (five factors) | 1963-07-01 to 2026-09-30 | `1d88e48794a5ec0c402c1f889eae5c272bcfdfdb36fd06c95619df94b85f0226` |
+
+## Third review (2026-11-13)
+
+**Executable entry.** Buying at the open of the first trading day after
+disclosure, and earning that day's open-to-close return (CRSP `dlyopen`,
+`dlyclose`), is the version an outside investor could execute:
+
+| Holding days | Alpha (annual) | t | p |
+| ---: | ---: | ---: | ---: |
+| 20 | 1.57% | 0.48 | 0.629 |
+| 62 | -1.66% | -0.67 | 0.504 |
+| 125 | -1.57% | -0.68 | 0.497 |
+
+The planned portfolio, which earns the entry day's close-to-close return,
+measures post-disclosure returns rather than a strictly executable strategy;
+at 62 days the two differ by 0.03 points a year.
+
+**Share-type ranking.** `link_events` sorted candidate CRSP records by the
+share-type code in descending order, so a code such as `SB` or `UG` sorted
+ahead of `NS`. Ordinary shares are now ranked first explicitly. Three
+tickers (COLD, DOC, RPT) had both an `NS` and an `SB` record, but the
+refetched extract (with opening and closing prices added) matched the
+previous one exactly, so no event changed.
+
+**Missing returns.** A held stock with no return on a day drops out of that
+day's equal-weighted average. This affects 155 of 168,541 held stock-days
+(0.09%, four stocks). The portfolio is rebalanced daily and ignores costs.
 
 ## Not yet done
 

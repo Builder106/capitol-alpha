@@ -21,9 +21,9 @@
 
 ## What is CapitolAlpha?
 
-Members of Congress have to disclose their stock trades, and a popular claim says they beat the market. CapitolAlpha collects those disclosures from the House and Senate and tests the claim the way finance research tests events: it measures each purchase's return against what a four-factor model predicts, starting on the day the public could first see the trade.
+Members of Congress have to disclose their stock trades. CapitolAlpha collects House and Senate disclosures to test a popular claim: that those trades beat the market. It compares each purchase's return with the return predicted by a four-factor model, starting when the public could first see the trade.
 
-The answer is no. A portfolio that buys every disclosed purchase on the first trading day after disclosure and holds it for 62 trading days, the test fixed in advance, earns a four-factor alpha of -1.63% a year (t = -0.66, p = 0.51). Average abnormal returns after disclosure stay inside a 95% band that covers zero on every one of the first 126 trading days, and seven robustness checks agree.
+In the primary test, the answer is no. A portfolio that buys every disclosed purchase on the first trading day after disclosure and holds it for 62 trading days earns a four-factor alpha of -1.63% a year (t = -0.66, p = 0.51). This test was fixed in advance. The 95% band around average abnormal returns after disclosure covers zero on each of the first 126 trading days, and seven robustness checks also find no significant alpha.
 
 **Site:** [capitolalpha.vercel.app](https://capitolalpha.vercel.app) walks through the study in event time.
 
@@ -31,7 +31,7 @@ The answer is no. A portfolio that buys every disclosed purchase on the first tr
 
 CapitolAlpha started in spring 2025 as a semester project for **QAC 420 (Data for Good)** at Wesleyan University. That version reported that purchases beat the S&P 500. An audit in November 2026 found it did not hold: a text filter dropped every House purchase, leaving about 220 Senate trades; only the 50 most-traded tickers had prices; returns started on the trade date; and the "alpha" assumed a beta of one. The [journal](JOURNAL.md) records the details.
 
-The redo follows a plan committed before any new return was computed: [`docs/specs/event-study.md`](docs/specs/event-study.md). One change was made after seeing results (abnormal returns now remove factor exposure only, as the plan says), and the first run's numbers are still printed and reported. An outside review later found that the portfolio entered a day late after weekend and holiday disclosures; the fix moved the primary alpha from -1.82% to -1.63% a year.
+The redo follows a plan committed before any new return was computed: [`docs/specs/event-study.md`](docs/specs/event-study.md). After seeing the first results, the calculation was changed to remove factor exposure only. The plan names the betas to estimate but does not say how to treat the pre-event intercept, so this was a post-results choice, and the event-level results are exploratory; the primary portfolio test was fully specified in advance. The first run's numbers are still printed and reported. An outside review later found that the portfolio entered a day late after weekend and holiday disclosures; correcting that moved the primary alpha from -1.82% to -1.63% a year.
 
 The spring 2025 course write-ups are kept as a record and are superseded by the event study: [abstract](docs/abstract/abstract.pdf), [final reflection](docs/Final_Reflection/Final_Reflection.pdf), [statistics](docs/statistics/statistics.pdf).
 
@@ -63,7 +63,7 @@ Senate and House filings are fetched separately and merged into one 16,203-row t
 
 [Edit the diagram](assets/diagrams/pipeline.html).
 
-[`run_pipeline.py`](run_pipeline.py) orchestrates data extraction; individual modules live in [`pipeline/`](pipeline/). Automated tests for data extractors and data cleaning are in [`tests/`](tests/).
+[`run_pipeline.py`](run_pipeline.py) runs data extraction through the modules in [`pipeline/`](pipeline/). The [`tests/`](tests/) directory covers the extractors and data cleaning.
 
 ## Reproducing the analysis
 
