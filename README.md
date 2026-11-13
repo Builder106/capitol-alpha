@@ -23,7 +23,7 @@
 
 Members of Congress have to disclose their stock trades, and a popular claim says they beat the market. CapitolAlpha collects those disclosures from the House and Senate and tests the claim the way finance research tests events: it measures each purchase's return against what a four-factor model predicts, starting on the day the public could first see the trade.
 
-The answer is no. A portfolio that buys every disclosed purchase the day after disclosure and holds it for 62 trading days, the test fixed in advance, earns a four-factor alpha of -1.82% a year (t = -0.74, p = 0.46). Average abnormal returns after disclosure stay inside a 95% band that covers zero on every one of the first 126 trading days, and eight robustness checks agree.
+The answer is no. A portfolio that buys every disclosed purchase on the first trading day after disclosure and holds it for 62 trading days, the test fixed in advance, earns a four-factor alpha of -1.63% a year (t = -0.66, p = 0.51). Average abnormal returns after disclosure stay inside a 95% band that covers zero on every one of the first 126 trading days, and seven robustness checks agree.
 
 **Site:** [capitolalpha.vercel.app](https://capitolalpha.vercel.app) walks through the study in event time.
 
@@ -31,7 +31,7 @@ The answer is no. A portfolio that buys every disclosed purchase the day after d
 
 CapitolAlpha started in spring 2025 as a semester project for **QAC 420 (Data for Good)** at Wesleyan University. That version reported that purchases beat the S&P 500. An audit in November 2026 found it did not hold: a text filter dropped every House purchase, leaving about 220 Senate trades; only the 50 most-traded tickers had prices; returns started on the trade date; and the "alpha" assumed a beta of one. The [journal](JOURNAL.md) records the details.
 
-The redo follows a plan committed before any new return was computed: [`docs/specs/event-study.md`](docs/specs/event-study.md). One change was made after seeing results (abnormal returns now remove factor exposure only, as the plan says), and the first run's numbers are still printed and reported.
+The redo follows a plan committed before any new return was computed: [`docs/specs/event-study.md`](docs/specs/event-study.md). One change was made after seeing results (abnormal returns now remove factor exposure only, as the plan says), and the first run's numbers are still printed and reported. An outside review later found that the portfolio entered a day late after weekend and holiday disclosures; the fix moved the primary alpha from -1.82% to -1.63% a year.
 
 The spring 2025 course write-ups are kept as a record and are superseded by the event study: [abstract](docs/abstract/abstract.pdf), [final reflection](docs/Final_Reflection/Final_Reflection.pdf), [statistics](docs/statistics/statistics.pdf).
 
@@ -41,12 +41,12 @@ Full tables: [`docs/results/event-study.md`](docs/results/event-study.md) and [`
 
 | Question | Result |
 | --- | --- |
-| Copy portfolio from disclosure, 62-day hold (primary) | Alpha -1.82% a year, t = -0.74, p = 0.461, 3,942 House purchases |
-| Same portfolio, 20 and 125 days | 1.95% (p = 0.547) and -1.81% (p = 0.433) |
+| Copy portfolio from disclosure, 62-day hold (primary) | Alpha -1.63% a year, t = -0.66, p = 0.509, 3,942 House purchases |
+| Same portfolio, 20 and 125 days | 2.08% (p = 0.520) and -1.67% (p = 0.470) |
 | Mean CAR after disclosure, days 20, 62 and 125 | 0.00%, -0.34%, -0.68%; smallest Holm-adjusted p = 0.343 |
 | Mean CAR after the trade date | No horizon significant after Holm correction |
-| Eight robustness checks | All insignificant; largest is amount-weighted, 7.12% a year (t = 1.43) |
-| Disclosure delay (House) | Median 13 days; 69 of 1,965 filings were late under the STOCK Act's 45 days |
+| Seven robustness checks and the five-factor model | All insignificant; largest is amount-weighted, 7.19% a year (t = 1.45) |
+| Disclosure delay (House) | Median 13 days; 69 of 1,965 filings listed a trade reported more than 45 days after it |
 
 Sample: 5,137 purchases after the plan's rules, of which 4,456 match CRSP common stock on the trade date. ETFs, funds, ADRs and over-the-counter foreign shares are excluded and listed with reasons.
 

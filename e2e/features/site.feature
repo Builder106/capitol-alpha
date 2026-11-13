@@ -8,8 +8,8 @@ Feature: CapitolAlpha research site
 
   Scenario: The primary test shows the pre-planned result
     Given I am on the research site
-    Then the primary result shows "1.82%" alpha a year
-    And the primary result shows a p-value of "0.46"
+    Then the primary result shows "1.63%" alpha a year
+    And the primary result shows a p-value of "0.51"
 
   Scenario: The event-time plot is drawn from the figure data
     Given I am on the research site

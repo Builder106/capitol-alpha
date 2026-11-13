@@ -82,7 +82,7 @@
       <li><a href="#day-20"><span class="index__day">+20</span><span class="index__name">A month on</span></a></li>
       <li><a href="#day-62"><span class="index__day">+62</span><span class="index__name">The test chosen in advance</span></a></li>
       <li><a href="#day-125"><span class="index__day">+125</span><span class="index__name">Six months on</span></a></li>
-      <li><a href="#robustness"><span class="index__day">Appendix</span><span class="index__name">Eight more ways to ask</span></a></li>
+      <li><a href="#robustness"><span class="index__day">Appendix</span><span class="index__name">Seven more ways to ask</span></a></li>
       <li><a href="#change"><span class="index__day">Appendix</span><span class="index__name">What changed</span></a></li>
       <li><a href="#method"><span class="index__day">Appendix</span><span class="index__name">Data, method and limits</span></a></li>
       <li><a href="#read"><span class="index__day">Appendix</span><span class="index__name">Read the work</span></a></li>
@@ -158,8 +158,8 @@
           <p class="unit__day">Days &minus;9 to 0</p>
           <h2 id="filing-h">The filing</h2>
           <p class="stat"><span class="stat__num" data-count="13">13</span><span class="stat__label">days, the median wait before a House member reported a trade</span></p>
-          <p>The STOCK Act gives members 45 days to report a trade. House members took a median of
-            <strong>13 days</strong>. Of 1,965 House filings, 69 came in late.</p>
+          <p>The STOCK Act gives members at most 45 days to report a trade. House members took a median of
+            <strong>13 days</strong>. Of 1,965 House filings, 69 listed a trade reported after 45 days.</p>
           <p class="cue">On the plot, the dots leave for day 0 in the order members filed.</p>
           <div class="filing">
             <svg class="filing__art" viewBox="0 0 220 240" data-glax-ms="1600" aria-hidden="true" focusable="false">
@@ -190,7 +190,7 @@
             <figure class="lags">
               <svg class="lags__chart" role="img" aria-labelledby="lags-cap"></svg>
               <figcaption id="lags-cap">Days from trade to report, 12,650 House trades. Most land well inside the
-                45-day deadline; a few filings list hundreds of late trades.</figcaption>
+                45-day limit; a few filings list hundreds of trades reported after it.</figcaption>
             </figure>
           </div>
         </section>
@@ -231,20 +231,20 @@
           <p>By day 62, one purchase in ten has gained more than 16% against the model and one in ten has lost nearly
             18%.</p>
           <p class="cue">The plot now zooms in 18 times, past that spread, to the average and its 95% band.</p>
-          <p>The plan named one test before the data came in: buy every disclosed purchase the day after disclosure,
+          <p>The plan named one test before the data came in: buy every disclosed purchase on the first trading day after disclosure,
             hold it for 62 trading days, and measure the portfolio's four-factor alpha with Newey-West errors.</p>
           <dl class="result">
             <div>
               <dt>Alpha a year</dt>
-              <dd><span data-count="-1.82" data-digits="2" data-sign="true">&minus;1.82</span>%</dd>
+              <dd><span data-count="-1.63" data-digits="2" data-sign="true">&minus;1.63</span>%</dd>
             </div>
             <div>
               <dt>t-statistic</dt>
-              <dd>&minus;0.74</dd>
+              <dd>&minus;0.66</dd>
             </div>
             <div>
               <dt>p-value</dt>
-              <dd>0.46</dd>
+              <dd>0.51</dd>
             </div>
             <div>
               <dt>Trading days</dt>
@@ -269,7 +269,7 @@
     <div class="appendix">
       <section class="block block--robust" id="robustness" aria-labelledby="robustness-h">
         <div class="block__head">
-          <h2 id="robustness-h">Eight more ways to ask</h2>
+          <h2 id="robustness-h">Seven more ways to ask</h2>
           <p>Each check reruns the 62-day copy portfolio on a different slice. Bars show the 95% interval for annual
             alpha; none of them clears zero.</p>
         </div>
@@ -291,14 +291,14 @@
               </tr>
             </thead>
             <tbody>
-              <tr><th scope="row">Primary: purchases from disclosure</th><td>3,942</td><td>&minus;1.82%</td><td>&minus;0.74</td><td>0.461</td></tr>
-              <tr><th scope="row">Leave out trades made in 2020</th><td>3,234</td><td>&minus;3.90%</td><td>&minus;1.59</td><td>0.112</td></tr>
-              <tr><th scope="row">Drop the five most active members</th><td>2,622</td><td>&minus;3.26%</td><td>&minus;1.20</td><td>0.229</td></tr>
-              <tr><th scope="row">Weight by disclosed amount</th><td>3,942</td><td>7.12%</td><td>1.43</td><td>0.152</td></tr>
-              <tr><th scope="row">Members' own trades only</th><td>1,861</td><td>&minus;5.08%</td><td>&minus;1.54</td><td>0.123</td></tr>
-              <tr><th scope="row">House purchases from the trade date</th><td>3,996</td><td>&minus;1.37%</td><td>&minus;0.58</td><td>0.559</td></tr>
+              <tr><th scope="row">Primary: purchases from disclosure</th><td>3,942</td><td>&minus;1.63%</td><td>&minus;0.66</td><td>0.509</td></tr>
+              <tr><th scope="row">Leave out trades made in 2020</th><td>3,234</td><td>&minus;3.60%</td><td>&minus;1.49</td><td>0.137</td></tr>
+              <tr><th scope="row">Drop the five most active members</th><td>2,622</td><td>&minus;3.07%</td><td>&minus;1.12</td><td>0.261</td></tr>
+              <tr><th scope="row">Weight by disclosed amount</th><td>3,942</td><td>7.19%</td><td>1.45</td><td>0.148</td></tr>
+              <tr><th scope="row">Members' own trades only</th><td>1,861</td><td>&minus;5.00%</td><td>&minus;1.51</td><td>0.131</td></tr>
+              <tr><th scope="row">House purchases from the trade date</th><td>3,996</td><td>&minus;1.38%</td><td>&minus;0.59</td><td>0.557</td></tr>
               <tr><th scope="row">Senate purchases from the trade date</th><td>460</td><td>&minus;0.95%</td><td>&minus;0.10</td><td>0.920</td></tr>
-              <tr><th scope="row">Sales from disclosure</th><td>4,284</td><td>0.85%</td><td>0.30</td><td>0.762</td></tr>
+              <tr><th scope="row">Stocks sold, held long from disclosure</th><td>4,284</td><td>0.95%</td><td>0.34</td><td>0.736</td></tr>
             </tbody>
           </table>
         </div>
