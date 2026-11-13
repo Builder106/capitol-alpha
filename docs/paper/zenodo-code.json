@@ -25,10 +25,10 @@
       "resource_type": "publication-workingpaper"
     },
     {
-      "identifier": "https://github.com/Builder106/capitol-alpha/tree/1960545f16960f6f900ba3b27393c146d569b240",
+      "identifier": "https://github.com/Builder106/capitol-alpha/tree/dea6146be3d6558c2c2125c741117da3780ec654",
       "relation": "isDerivedFrom",
       "resource_type": "software"
     }
   ],
-  "version": "1960545"
+  "version": "dea6146"
 }
