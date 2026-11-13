@@ -149,6 +149,60 @@ slightly negative, so waiting did not cost a gain. It is unadjusted and close
 to the 5% line. The difference between the two CAR series in the table above
 does not measure that cost, because the windows and samples differ.
 
+## Second review (2026-11-13)
+
+A second outside review raised three points that needed new numbers.
+
+**Entry price.** CRSP daily returns run close to close, so the first day a
+copier holds a stock includes the move from the previous close to that
+day's open, which a copier who reads the filing after the close cannot
+earn. Buying at the close of the entry day instead (`start_offset=1`):
+
+| Holding days | Alpha (annual) | t | p | Days |
+| ---: | ---: | ---: | ---: | ---: |
+| 20 | 1.97% | 0.60 | 0.547 | 1,504 |
+| 62 | -2.23% | -0.90 | 0.370 | 1,504 |
+| 125 | -2.31% | -0.98 | 0.325 | 1,504 |
+
+**Issuer domicile.** The CRSP filter (`EQTY`, `COM`, `NS`) does not check
+where the issuer is incorporated. `pipeline.crsp` now also fetches
+`usincflg`. In the primary sample 240 purchases in 89 stocks are of issuers
+incorporated outside the US. Without them the 62-day alpha is -1.10% a year
+(t = -0.45, p = 0.656, 3,702 purchases).
+
+The CRSP extract was fetched again on 2026-11-13 to add the flag. The
+events and all 2,204,276 daily returns match the 2026-11-11 extract exactly,
+and every earlier table reproduces.
+
+**Disclosure delays.** The share of House trades disclosed more than 45 days
+after the trade is 6.58% under the main rules (`python -m
+pipeline.disclosure_lag` prints all three):
+
+| Rule | Share past 45 days |
+| --- | ---: |
+| Main (duplicates removed, lags 0 to 365 days) | 6.58% |
+| Also counting the 100 trades disclosed more than a year later | 7.32% |
+| Repeats within a filing kept; re-reported trades kept at their earliest filing (13,503 trades) | 6.68% |
+
+The 100 trades disclosed more than a year later come from 20 filings by 17
+members (367 to 1,065 days); none also appears in a filing made within a
+year. The share is not a bound on statutory violations: the 30-day rule from
+notification cannot be checked, which would push the true share up, and
+amendments would push it down.
+
+**Duplicates in the purchase sample.** The rule removes 25 rows in 21 groups:
+9 groups repeat a row within one filing and 12 span filings. In every group
+that spans filings the kept row has the earliest disclosure date. The
+portfolio holds each stock once, so these repeats cannot change it.
+
+**Factor files.** Kenneth French's library revises its data. The files used
+for every table (downloaded 2026-11-12 and again 2026-11-13, identical):
+
+| File | Range | SHA-256 |
+| --- | --- | --- |
+| `french_daily.csv` (three factors and momentum) | 1926-11-03 to 2026-09-30 | `a15652ef7d2ea1d3f41f863fabf04dfb0da9269bf2be29ca55c4cb007cd632fe` |
+| `french_5_daily.csv` (five factors) | 1963-07-01 to 2026-09-30 | `1d88e48794a5ec0c402c1f889eae5c272bcfdfdb36fd06c95619df94b85f0226` |
+
 ## Not yet done
 
 - Recovering Senate disclosure dates, which would add Senate trades to Q1.
