@@ -99,7 +99,7 @@ def lag_figure(lag: dict) -> str:
         f"  \\draw (0,0) -- ({width},0);",
         f"  \\draw (0,0) -- (0,{height});",
         f"  \\draw[dashed] ({deadline:.3f},0) -- ({deadline:.3f},{height - 0.2:.2f})"
-        f" node[above] {{{lag['deadline_days']}-day deadline}};",
+        f" node[above] {{{lag['deadline_days']}-day limit}};",
     ]
     for day in range(0, 90, 15):
         lines.append(f"  \\node[below] at ({step * day / 5:.3f},0) {{{day}}};")
