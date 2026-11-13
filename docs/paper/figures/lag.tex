@@ -1,0 +1,38 @@
+\begin{tikzpicture}[font=\small]
+  \fill[accent!70] (0.030,0) rectangle (0.570,4.484);
+  \fill[accent!70] (0.630,0) rectangle (1.170,1.893);
+  \fill[accent!70] (1.230,0) rectangle (1.770,1.163);
+  \fill[accent!70] (1.830,0) rectangle (2.370,1.062);
+  \fill[accent!70] (2.430,0) rectangle (2.970,1.566);
+  \fill[accent!70] (3.030,0) rectangle (3.570,1.612);
+  \fill[accent!70] (3.630,0) rectangle (4.170,0.881);
+  \fill[accent!70] (4.230,0) rectangle (4.770,0.312);
+  \fill[accent!70] (4.830,0) rectangle (5.370,0.144);
+  \fill[black!45] (5.430,0) rectangle (5.970,0.032);
+  \fill[black!45] (6.030,0) rectangle (6.570,0.071);
+  \fill[black!45] (6.630,0) rectangle (7.170,0.132);
+  \fill[black!45] (7.230,0) rectangle (7.770,0.056);
+  \fill[black!45] (7.830,0) rectangle (8.370,0.040);
+  \fill[black!45] (8.430,0) rectangle (8.970,0.019);
+  \fill[black!45] (9.030,0) rectangle (9.570,0.008);
+  \fill[black!45] (9.630,0) rectangle (10.170,0.003);
+  \fill[black!45] (10.230,0) rectangle (10.770,0.009);
+  \fill[black!45] (11.430,0) rectangle (11.970,0.567);
+  \node[below] at (11.700,0) {90+};
+  \draw (0,0) -- (12.0,0);
+  \draw (0,0) -- (0,5.0);
+  \draw[dashed] (5.400,0) -- (5.400,4.80) node[above] {45-day deadline};
+  \node[below] at (0.000,0) {0};
+  \node[below] at (1.800,0) {15};
+  \node[below] at (3.600,0) {30};
+  \node[below] at (5.400,0) {45};
+  \node[below] at (7.200,0) {60};
+  \node[below] at (9.000,0) {75};
+  \draw (0,0.000) -- (-0.08,0.000) node[left] {0};
+  \draw (0,1.111) -- (-0.08,1.111) node[left] {1,000};
+  \draw (0,2.222) -- (-0.08,2.222) node[left] {2,000};
+  \draw (0,3.333) -- (-0.08,3.333) node[left] {3,000};
+  \draw (0,4.444) -- (-0.08,4.444) node[left] {4,000};
+  \node[below] at (6.0,-0.5) {Days from trade to disclosure (5-day bins)};
+  \node[rotate=90, above] at (-1.0,2.5) {Trades};
+\end{tikzpicture}

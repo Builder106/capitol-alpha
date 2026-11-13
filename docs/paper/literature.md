@@ -35,47 +35,47 @@ from it. Keys refer to `references.bib`.
 
 ## After the STOCK Act
 
-- `belmont2022senators`: the NBER working paper version (w26975, April
-  2020) covers senators from 2012 to March 2020. Their purchases slightly
-  underperform stocks of the same industry and size, by 11, 28, and 17
-  basis points at 1, 3, and 6 months. There is no committee-specific skill.
-  Check the published version's sample and numbers. Its title includes
-  House members, so the scope may have grown.
+- `belmont2020relief` (NBER w26975, April 2020; full text read 2026-11-12)
+  and its published version `belmont2022senators` (not read; its title adds
+  House members, so its scope may differ). The working paper hand-collects
+  senators' trades, 2012 to March 2020: 4,378 purchases and 3,881 sales of
+  CRSP common stock. Returns run from the trade date. Buy-and-hold abnormal
+  returns use the CRSP value-weighted index, industry-size portfolios and
+  DGTW portfolios; CARs use the WRDS event tool with three-factor and Carhart
+  loadings. Purchases slightly underperform industry-size benchmarks (11,
+  28 and 17 basis points at 1, 3 and 6 months). A daily calendar-time
+  portfolio of stocks bought in the past year, weighted by trade size, gives
+  an insignificant Carhart alpha (-0.35 basis points a day). Stocks senators
+  bought had underperformed over the 100 days before purchase.
 - `zhou2026illusion` (working paper): uses an LLM to match firms to
   committee jurisdictions. Finds no abnormal returns on committee-aligned
   trades and no change after hearings. The result holds across trade sizes
   and reporting delays.
-- `fischer2025democracy` (working paper, posted 2025-12-25, revised
-  2026-01-21; abstract read on SSRN on 2026-11-10): the closest recent
-  study. It follows the 15 largest traders by volume and treats 2020 as a
-  break, arguing that the dropped COVID-19 insider trading investigations
-  may have weakened deterrence. Congress does not significantly outperform
-  the market in any period. Mean buy-and-hold abnormal returns, for Congress
-  and for the high-volume traders, rose at 20, 60, and 127 days, and their
-  spread widened in 2020 to 2023 compared with 2012 to 2020. Sacerdote is
-  also an author of `belmont2022senators`.
+- `fischer2025democracy` (working paper dated 2025-12-23; full text read
+  2026-11-12). Extends the Belmont et al. data with House and Senate trades
+  to 2023: 331 members, 69,905 transactions from 2012 to 2023. Covers all
+  members and also singles out the 15 most active traders. Returns run from
+  the purchase date: BHAR(0,20), (0,60) and (0,127), raw and DGTW-adjusted,
+  with no calendar-time regression. Congress does not significantly
+  outperform in any period; mean BHARs are somewhat higher from 2020 to 2023.
 
 ## Where this paper fits
 
 The large abnormal returns are in data from before 2008. Studies of the
 years after the STOCK Act mostly find none. Fischer and Sacerdote (2025)
-already cover 2020 to 2023 at nearly the same horizons as this paper's
-plan (20, 62, and 125 trading days), so the post-2020 period alone is not
-new. What this paper can add, pending a read of their full text:
+already cover all members from 2020 to 2023 at nearly the same horizons as
+this paper's plan, so the post-2020 period alone is not new. Both close
+studies measure from the trade date (confirmed in the full texts). What
+this paper adds:
 
 - returns from the disclosure date, which is what an outside investor can
-  earn, if they measure from the transaction date;
-- a calendar-time factor regression in place of mean buy-and-hold
-  abnormal returns, whose inference problems `lyon1999improved` and
-  `mitchell2000managerial` document;
-- every member with a disclosed purchase, where they follow the 15
-  largest traders;
+  earn;
+- a calendar-time factor regression from that date as the single
+  confirmatory test; Belmont et al. run one only from the trade date and
+  only for senators to 2020, and Fischer and Sacerdote run none;
 - 2024 and 2025;
+- a plan fixed before estimation;
 - how long members take to disclose, and how often they file late.
-
-Before writing the introduction, read the full texts of
-`fischer2025democracy` and `belmont2022senators` and confirm which event
-date and benchmark each uses.
 
 ## Methods references
 

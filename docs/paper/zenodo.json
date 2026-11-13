@@ -1,0 +1,31 @@
+{
+  "upload_type": "publication",
+  "publication_type": "workingpaper",
+  "title": "Copying Congress after disclosure: a pre-specified event study of congressional purchases, 2020-2025",
+  "description": "<p>Members of the US Congress must disclose their stock trades within 45 days. I ask whether an outside investor who buys what members bought, once the purchase is disclosed, earns an abnormal return. Using 3,942 purchases of US common stock by 124 House members from 2020 to 2025, I form a portfolio that buys each stock on the first trading day after its purchase is disclosed and holds it for 62 trading days. This test, specified before any return was estimated for this study, gives a Carhart four-factor alpha of -1.63% a year (t = -0.66, p = 0.51), with a 95% confidence interval from -6.5% to +3.2% a year. Other holding periods, a five-factor model, event-level abnormal returns and robustness checks also show no statistically significant abnormal return. Across all House trades in the sample, the median trade was disclosed 13 days after it was made, and 6.6% were disclosed more than 45 days after the trade.</p><p>Use of AI tools: I used Claude (Anthropic) to assist with writing the manuscript and the analysis code. I reviewed all text, code and results and take full responsibility for the content.</p>",
+  "publication_date": "2026-11-12",
+  "creators": [
+    {
+      "name": "Vaughan, Yinka",
+      "affiliation": "Wesleyan University",
+      "orcid": "0009-0005-8933-5396"
+    }
+  ],
+  "access_right": "open",
+  "license": "cc-by-4.0",
+  "keywords": [
+    "congressional trading",
+    "STOCK Act",
+    "event study",
+    "calendar-time portfolio",
+    "abnormal returns",
+    "disclosure"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/Builder106/capitol-alpha",
+      "relation": "isSupplementedBy",
+      "resource_type": "software"
+    }
+  ]
+}

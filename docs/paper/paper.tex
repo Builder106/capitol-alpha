@@ -1,0 +1,362 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage[round,authoryear]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{accent}{HTML}{1F44D6}
+\captionsetup{font=small,labelfont=bf}
+\setlist{itemsep=2pt,topsep=4pt}
+\newcommand{\m}{\ensuremath{-}}
+
+\title{Copying Congress After Disclosure:\\A Pre-Specified Event Study of Congressional Purchases, 2020--2025}
+\author{Yinka Vaughan\\
+\small Wesleyan University\\
+\small ORCID \href{https://orcid.org/0009-0005-8933-5396}{0009-0005-8933-5396}}
+\date{November 2026\\[2pt]\small Working paper}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Members of the US Congress must disclose their stock trades within 45 days. I ask whether an outside investor who buys what members bought, once the purchase is disclosed, earns an abnormal return. Using 3,942 purchases of US common stock by 124 House members from 2020 to 2025, I form a portfolio that buys each stock on the first trading day after its purchase is disclosed and holds it for 62 trading days. This test, specified before any return was estimated for this study, gives a Carhart four-factor alpha of \m1.63\% a year ($t = \m0.66$, $p = 0.51$), with a 95\% confidence interval from \m6.5\% to +3.2\% a year. Other holding periods, a five-factor model, event-level abnormal returns and robustness checks also show no statistically significant abnormal return. Across all House trades in the sample, the median trade was disclosed 13 days after it was made, and 6.6\% were disclosed more than 45 days after the trade.
+
+\medskip
+\noindent\textbf{Keywords:} congressional trading, STOCK Act, event study, calendar-time portfolio, abnormal returns, disclosure\\
+\textbf{JEL:} G11, G14, G18
+\end{abstract}
+
+\section{Introduction}
+
+Since the STOCK Act of 2012, members of Congress have had to report covered securities transactions over \$1,000 by themselves, their spouses and their dependent children within 30 days of learning of the transaction and no later than 45 days after it \citep{stockact2012,houseethics2026}. The reports are public. Anyone who believes that members trade on information the market does not have can wait for a report and buy what the member bought.
+
+Whether that strategy works depends on returns after the report, not after the trade. A member who knows something on the trade date may profit, but an outside investor sees the trade only when it is disclosed, by which time part or all of any information may already be in the price. Most studies of congressional trading measure returns from the trade date, which describes performance from the member's own entry point. This paper measures them from the disclosure date, the first day an outside investor could act.
+
+I study 3,942 House purchases of US common stock made from January 2020 to December 2025 and disclosed within a year. Returns come from CRSP and risk adjustment from the Fama--French three factors plus momentum. The primary test is a calendar-time portfolio: each day it holds every stock bought by a member and disclosed in the previous 62 trading days, and its four-factor intercept is the copy strategy's alpha. I also estimate event-level cumulative abnormal returns (CARs) from the trade date and from the disclosure date at three horizons, with standard errors clustered by member and by month and a Holm correction across the six tests.
+
+The sample rules, the price source, the factor model, the primary test and the multiple-testing correction were written into a plan and committed to the project's public repository before any return was computed for this analysis. An earlier version of the project had estimated returns with a different method; Appendix~\ref{app:earlier} explains why that estimate is withdrawn. Section~\ref{sec:plan} lists the departures from the plan, including an estimation change made after the first run and an entry-timing correction made after an outside review.
+
+The copy portfolio earns no detectable alpha. At the primary 62-day holding period the annualized four-factor alpha is \m1.63\% ($t = \m0.66$), and the 95\% confidence interval excludes alphas above about 3.2\% a year. None of the six planned CARs differs from zero after the Holm correction, and none of seven robustness checks is significant. The largest positive estimate weights each stock by its disclosed dollar amount (7.19\% a year, $t = 1.45$).
+
+The paper adds to a literature that has mostly found no outperformance since 2012 (Section~\ref{sec:literature}). The closest recent studies measure returns from the trade date, so they leave open whether anything remains for an investor who can act only on the report. This paper addresses that question with a calendar-time factor regression from the disclosure date and extends the evidence through 2025. Because the delay between trade and report is what separates the two questions, it also measures how long House members took to disclose and how often they missed the deadline.
+
+\section{Prior evidence}\label{sec:literature}
+
+Studies of the years before the STOCK Act disagree. \citet{ziobrowski2004senate} and \citet{ziobrowski2011house} find that portfolios mimicking senators' and House members' purchases beat the market in samples running from the mid-1980s to 2001. \citet{eggers2013capitol} revisit both studies and analyze 2004 to 2008; they find no information advantage in either period, and the average member would have done better in an index fund. \citet{eggers2014political} find that members' holdings in local firms and in campaign contributors do better than their other holdings. \citet{karadas2019trading} and \citet{huang2016trading} find abnormal returns in the years just before the Act and none after it.
+
+Studies of the years since the Act mostly find none. \citet{belmont2020relief} hand-collect senators' trades from 2012 to March 2020, measure buy-and-hold abnormal returns from the trade date, and find that purchases slightly underperform industry-and-size benchmarks; a calendar-time Carhart regression of a trade-size-weighted portfolio, also built from trade dates, gives an insignificant alpha. A later version was published as \citet{belmont2022senators}. \citet{fischer2025democracy} extend that data set to 2023 with House and Senate trades by 331 members and focus on the 15 most active traders. Measuring buy-and-hold abnormal returns from the purchase date at 20, 60 and 127 days, they find that Congress does not significantly outperform in any period, although mean abnormal returns are somewhat higher from 2020 to 2023. \citet{zhou2026illusion} finds no abnormal returns on trades in firms within the jurisdiction of a member's committees.
+
+This paper differs from the two closest studies in its event date and its main test. Both measure returns from the trade date. Mean buy-and-hold abnormal returns over long horizons have skewed distributions and overlapping, cross-correlated windows, and their test statistics can be badly misspecified \citep{lyon1999improved,mitchell2000managerial}. A calendar-time portfolio regression avoids both problems \citep{fama1998market}. This paper uses one, from the disclosure date, as its single confirmatory test.
+
+\section{Data}\label{sec:data}
+
+\subsection{Trades}
+
+Trades come from a snapshot of the House and Senate Stock Watcher data sets, which transcribe the periodic transaction reports that members file with the Clerk of the House and the Secretary of the Senate. The project's pipeline pulled those data sets and scraped the official disclosure sites where a record was missing. The snapshot was committed to the project repository on 6 April 2026 and has 16,202 rows. The upstream data sets are no longer reachable, so the snapshot is the only copy of this extract; it is archived with the code, with a test that fails if its hash changes.
+
+Each row gives the member, the owner (the member, a spouse, a dependent child, or joint), the ticker, the transaction type, the transaction date, the amount as one of the bands the law allows, and, for House rows, the disclosure date. Senate rows in the snapshot carry no disclosure date. Senate purchases therefore enter only the trade-date analyses.
+
+An event is a purchase of a listed common stock by a member, spouse or dependent with a transaction date from 1 January 2020 to 31 December 2025. Rows that repeat the same member, owner, ticker, transaction date and amount band are collapsed into one event. For the disclosure-date analyses, the disclosure must fall on or after the trade and no more than 365 days later; the 12 purchases disclosed before their trade and the 45 disclosed more than a year later are treated as data errors.
+
+\subsection{Prices and factors}
+
+Daily returns come from the CRSP daily stock file in the CIZ format, accessed through Wharton Research Data Services, with data through 31 December 2025 \citep{crsp2026daily}. A ticker is matched to the CRSP security whose name-history record covers the transaction date, since tickers move between firms. The match is restricted to common stock: equity securities of subtype common with ordinary shares. ADRs are excluded because the factors are built from US common stocks. In 14 events two CRSP common-stock records cover the trade date, and the lower permanent identifier is kept. CRSP's CIZ returns include the delisting return, so stocks that delist inside a window keep their final return.
+
+Factors are the daily Fama--French market, size and value factors and the momentum factor, with the one-month Treasury bill rate, from Kenneth French's data library, downloaded on 12 November 2026 \citep{fama1993common,carhart1997persistence,french2026data}. The five-factor robustness check uses the daily \citet{fama2015five} factors from the same library, downloaded the same day.
+
+\subsection{Sample}
+
+Table~\ref{tab:flow} shows how the sample is built. Of the 5,137 purchases that pass the trade rules, 4,456 match a CRSP common stock on the trade date: 3,996 House and 460 Senate purchases by 136 members in 1,011 securities. Most of the 365 purchases with no CRSP record are exchange-traded funds and trusts, over-the-counter foreign shares, and closed-end funds; none of the most frequent ones is a listed US common stock under a wrong ticker. The primary test uses the 3,942 matched House purchases with a valid disclosure date, made by 124 members in 959 stocks. In that sample the median purchase was disclosed 15 days after the trade, the members themselves own 1,861 of the purchases, and the five most active members account for 33.5\%. Because CRSP data end on 31 December 2025, 39 of the 3,942 purchases were disclosed too late to enter the portfolio, and another 237 are held for fewer than 62 trading days.
+
+\begin{table}[t]
+\centering
+\caption{Sample construction}\label{tab:flow}
+\begin{tabular}{lr}
+\toprule
+Step & Events \\
+\midrule
+Rows in the trade snapshot & 16,202 \\
+Purchases & 7,722 \\
+With a valid ticker & 5,652 \\
+Stock (no options or other securities) & 5,545 \\
+Transaction date 2020-01-01 to 2025-12-31 & 5,162 \\
+After removing duplicates & 5,137 \\
+\quad No CRSP common stock or ADR record on the trade date & 365 \\
+\quad ADRs (excluded) & 191 \\
+\quad Other share types (excluded) & 125 \\
+Matched to CRSP common stock & 4,456 \\
+\quad of which House & 3,996 \\
+\quad of which Senate & 460 \\
+Matched House purchases disclosed 0 to 365 days after the trade & 3,942 \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\parbox{0.86\linewidth}{\footnotesize The last row is the sample for the primary test. Before CRSP matching, 4,586 purchases meet the disclosure rule; 494 Senate purchases have no disclosure date, 12 were disclosed before the trade, and 45 more than 365 days after it.}
+\end{table}
+
+\section{Method}\label{sec:method}
+
+\subsection{Calendar-time copy portfolio (primary test)}
+
+On each trading day $t$, the copy portfolio holds every stock that a member bought and whose purchase was disclosed within the previous $H$ trading days. A stock enters on the first trading day strictly after the disclosure date, so a purchase disclosed on a Friday, a Saturday or a Sunday enters on Monday, and a filing posted after the close cannot be traded on the same day. It stays for $H$ trading days. Weights are equal by stock, not by purchase: a stock named by several active purchases is held once, with the same weight as every other stock held that day. The portfolio's daily excess return is regressed on the four factors:
+\begin{equation}
+R_{p,t} - R_{f,t} = \alpha + \beta\,(R_{m,t} - R_{f,t}) + s\,\mathit{SMB}_t + h\,\mathit{HML}_t + m\,\mathit{MOM}_t + \varepsilon_t .
+\end{equation}
+The intercept $\alpha$ is the daily abnormal return of copying, reported as $252\alpha$. Standard errors are Newey--West with Bartlett weights \citep{newey1987simple} and $\lfloor 4(T/100)^{2/9} \rfloor$ lags \citep{newey1994automatic}, which is 7 lags for the 1,505 days on which the portfolio holds a stock; Table~\ref{tab:extra} repeats the test with 21 and 62 lags. P-values come from the normal distribution. The pre-declared primary test is $H = 62$ trading days, about three calendar months; $H = 20$ and $H = 125$ are secondary.
+
+The calendar-time approach treats the portfolio's daily return as the unit of observation, so overlapping holding periods and purchases that cluster on the same dates do not overstate the evidence \citep{fama1998market,mitchell2000managerial}.
+
+\subsection{Event-level abnormal returns}
+
+For each event $i$ with event date $0$, I estimate the stock's factor loadings by regressing its excess return on the four factors over trading days $-250$ to $-30$, requiring at least 100 returns. Its abnormal return on day $\tau$ removes factor exposure only:
+\begin{equation}
+AR_{i,\tau} = (R_{i,\tau} - R_{f,\tau}) - \hat\beta_i (R_{m,\tau} - R_{f,\tau}) - \hat s_i\,\mathit{SMB}_\tau - \hat h_i\,\mathit{HML}_\tau - \hat m_i\,\mathit{MOM}_\tau ,
+\end{equation}
+and $\mathit{CAR}_i(h) = \sum_{\tau=0}^{h} AR_{i,\tau}$ for $h \in \{20, 62, 125\}$, where day 0 is the first trading day on or after the event date. This planned window holds $h + 1$ daily returns and, for the disclosure date, includes the disclosure day itself, which a copier cannot capture. A CAR is computed only when every return in its window is observed, so the 125-day CARs drop events from about mid-2025, when CRSP's coverage runs out. The event date is either the transaction date (all 4,456 matched purchases, House and Senate) or the disclosure date (the 3,942 House purchases in the primary sample). The market model, with the market factor only, is a robustness check.
+
+Two event-level measures were added after an outside review, and both are exploratory. The first matches the portfolio's holding window: $\sum_{\tau=1}^{h} AR_{i,\tau}$, where day 1 is the first trading day strictly after the disclosure date. The second measures what a copier misses by waiting for the report, for the same House purchases: the sum of abnormal returns from the trade's day 0 to the last trading day before the copier's entry, with loadings estimated over days $-250$ to $-30$ before the trade.
+
+The mean CAR's standard error is clustered two ways, by member and by calendar month of the event date \citep{cameron2011robust}. The six tests (two event dates, three horizons) are adjusted together with Holm's step-down procedure \citep{holm1979simple}.
+
+\subsection{The plan and departures from it}\label{sec:plan}
+
+The plan fixed the questions, the sample rules, the factor model, the calendar-time primary test at $H = 62$, the CAR horizons, the clustering and the Holm correction on 10 November 2026. The CRSP matching rules, the restriction to common stock and the treatment of delisting returns were added on 11 November 2026, before any return was computed for this analysis. Both versions are in the repository's history. The plan was not filed with a registry. The departures are:
+\begin{enumerate}
+\item \textbf{Senate trades are not in the primary test.} The plan allowed for this: Senate disclosure dates were to be recovered from the filings or the primary test limited to the House. They were not recovered.
+\item \textbf{The pre-event intercept was removed from the abnormal returns after the first run.} The plan specifies that abnormal returns remove the stock's estimated betas. The first run's code also subtracted the estimated intercept, which produced significantly negative CARs. I changed the code to match the plan after seeing those results. Appendix Table~\ref{tab:firstrun} reports the first run in full, and Section~\ref{sec:runup} explains the difference. The calendar-time test has no pre-event intercept and is unaffected.
+\item \textbf{The five-factor check was run late.} The plan listed the \citet{fama2015five} model as a robustness check. A first draft of this paper omitted it; it was run after the other results were known and is reported in Table~\ref{tab:extra}.
+\item \textbf{House and Senate are compared from the trade date only,} because Senate disclosure dates are missing.
+\item \textbf{The entry day was corrected after review.} The first version entered one trading day after the first trading day on or after the disclosure date, so a purchase disclosed on a weekend or a holiday entered a day late. The corrected rule enters on the first trading day strictly after the disclosure date. The primary alpha moved from \m1.82\% ($t = \m0.74$) to \m1.63\% ($t = \m0.66$). Every portfolio result reported here uses the corrected rule; the planned CARs, which start on day 0, are unaffected.
+\item \textbf{Further checks were added after review:} the holding-window CARs and the trade-to-entry return described above, the Newey--West lag sensitivity, and a direct test of amount weighting against equal weighting. All are exploratory.
+\end{enumerate}
+
+\section{Results}\label{sec:results}
+
+\subsection{The copy portfolio earns no detectable alpha}
+
+Table~\ref{tab:calendar} reports the primary test. At $H = 62$ the copy portfolio's four-factor alpha is \m1.63\% a year with a $t$-statistic of \m0.66 ($p = 0.509$). The standard error implies a 95\% confidence interval from \m6.48\% to +3.22\% a year. The secondary holding periods give +2.08\% ($H = 20$, $t = 0.64$) and \m1.67\% ($H = 125$, $t = \m0.72$). The portfolio holds a median of 99 stocks. Longer Newey--West lags and the five-factor model leave the conclusion unchanged (Table~\ref{tab:extra}).
+
+The portfolio's loadings describe what members buy. Its market beta is 1.03, it tilts toward small stocks ($s = 0.25$, $t = 10.5$) and value stocks ($h = 0.16$, $t = 8.8$), and it loads slightly against momentum ($m = \m0.04$, $t = \m2.8$). The four factors explain 93\% of its daily variance. The portfolio's return is therefore close to what its factor exposures predict.
+
+\begin{table}[t]
+\centering
+\caption{Copy portfolio from the disclosure date: four-factor alpha}\label{tab:calendar}
+\begin{tabular}{rcrrrrr}
+\toprule
+Holding days $H$ & Primary & Alpha (annual) & 95\% CI & $t$ & $p$ & Days \\
+\midrule
+20 & & 2.08\% & [\m4.26\%, 8.42\%] & 0.64 & 0.520 & 1,505 \\
+62 & yes & \m1.63\% & [\m6.48\%, 3.22\%] & \m0.66 & 0.509 & 1,505 \\
+125 & & \m1.67\% & [\m6.19\%, 2.86\%] & \m0.72 & 0.470 & 1,505 \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\parbox{0.9\linewidth}{\footnotesize Portfolio of every stock bought by a House member and disclosed in the last $H$ trading days, equal-weighted by stock, entering on the first trading day after the disclosure date. Alpha is the daily four-factor intercept times 252. Newey--West standard errors with 7 lags. Sample: 3,942 purchases; portfolio days from 7 January 2020 to 31 December 2025.}
+\end{table}
+
+\subsection{Event-level returns from the trade and from the disclosure}
+
+Table~\ref{tab:cars} and Figure~\ref{fig:car} show the planned event-level CARs. From the disclosure date the mean CAR is 0.00\% at 20 days, \m0.34\% at 62 days and \m0.68\% at 125 days. From the trade date it is \m0.04\%, \m0.04\% and \m0.20\%. None differs from zero after the Holm correction; the smallest adjusted p-value is 0.343. With the market model in place of four factors, the mean CARs range from \m0.34\% to +0.36\% and every Holm-adjusted p-value is 1.000.
+
+The two series do not measure the cost of waiting for the report. They start on different days and so cover different calendar windows, and the trade-date series also includes the 460 Senate purchases. Table~\ref{tab:extra} measures that cost directly. For 3,863 House purchases with the required data, the abnormal return from the trade to the copier's first possible entry, a median of 11 trading days, averages \m0.24\% (s.e.\ 0.12\%, $t = \m1.99$, $p = 0.046$). Waiting did not cost the copier a gain; if anything, these stocks slipped slightly below their factor-predicted return before the copier could buy. This estimate is exploratory and unadjusted for the other tests, and it is close to the 5\% threshold.
+
+Over the copier's own holding window, from the first trading day after disclosure, the mean CAR is +0.05\% at 20 days, \m0.27\% at 62 days and \m0.62\% at 125 days, and the smallest Holm-adjusted p-value across the three is 0.302 (Table~\ref{tab:extra}). Dropping the disclosure day therefore changes little.
+
+\begin{table}[t]
+\centering
+\caption{Mean cumulative four-factor abnormal returns}\label{tab:cars}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Event date & Days & Events & Mean CAR & s.e. & $t$ & $p$ & Holm $p$ \\
+\midrule
+Disclosure & 20 & 3,795 & 0.00\% & 0.22\% & 0.01 & 0.988 & 1.000 \\
+Disclosure & 62 & 3,630 & \m0.34\% & 0.40\% & \m0.83 & 0.404 & 1.000 \\
+Disclosure & 125 & 3,139 & \m0.68\% & 0.36\% & \m1.90 & 0.057 & 0.343 \\
+Transaction & 20 & 4,372 & \m0.04\% & 0.24\% & \m0.18 & 0.860 & 1.000 \\
+Transaction & 62 & 4,161 & \m0.04\% & 0.32\% & \m0.11 & 0.913 & 1.000 \\
+Transaction & 125 & 3,931 & \m0.20\% & 0.36\% & \m0.57 & 0.568 & 1.000 \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\parbox{0.9\linewidth}{\footnotesize CAR over trading days $[0, h]$. Loadings from days $-250$ to $-30$; abnormal returns remove factor exposure only. Standard errors clustered by member and by event month. Holm adjustment across the six tests. Fewer events have long-horizon CARs because CRSP data end on 31 December 2025.}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\input{figures/car.tex}
+\caption{Mean cumulative four-factor abnormal return over days $[0, d]$ for each trading day $d$ after the event. The solid line and band use the disclosure date as day 0; the dashed line uses the transaction date. The band is a pointwise 95\% interval and covers zero on every day. Each day's mean uses the events observed through that day, so the sample shrinks as events reach the end of the data (3,869 disclosure-date events on day 0, 3,139 on day 125).}\label{fig:car}
+\end{figure}
+
+\subsection{Robustness}
+
+Table~\ref{tab:robust} repeats the primary test on the plan's alternative samples and weights. No estimate is significant. Dropping trades made in 2020 (\m3.60\%, $t = \m1.49$), dropping the five most active members (\m3.07\%, $t = \m1.12$) and keeping only members' own trades (\m5.00\%, $t = \m1.51$) all move the estimate down. Weighting each stock by the disclosed amounts of its active purchases moves it up, to 7.19\% a year ($t = 1.45$). Tested directly, the difference between the amount-weighted and the equal-weighted portfolio has an alpha of 8.83\% a year ($t = 1.65$, $p = 0.099$; Table~\ref{tab:extra}). That is the one hint in the data that larger purchases do better, and it is not significant at the 5\% level. Senate purchases, measured from the trade date, give \m0.95\% ($t = \m0.10$) on only 288 portfolio days. Stocks that members sold, held long from the disclosure of the sale, earn +0.95\% ($t = 0.34$), so sold stocks do not underperform either. This is not the return to imitating the sale, which would mean shorting the stock.
+
+\begin{table}[t]
+\centering
+\caption{Robustness of the primary test ($H = 62$, four-factor alpha)}\label{tab:robust}
+\begin{tabular}{lrrrrr}
+\toprule
+Sample or weighting & Events & Alpha (annual) & $t$ & $p$ & Days \\
+\midrule
+Primary: House purchases from disclosure & 3,942 & \m1.63\% & \m0.66 & 0.509 & 1,505 \\
+Leave out trades made in 2020 & 3,234 & \m3.60\% & \m1.49 & 0.137 & 1,252 \\
+Drop the five most active members & 2,622 & \m3.07\% & \m1.12 & 0.261 & 1,505 \\
+Weight by disclosed amount & 3,942 & 7.19\% & 1.45 & 0.148 & 1,505 \\
+Members' own trades only & 1,861 & \m5.00\% & \m1.51 & 0.131 & 1,496 \\
+House purchases from the trade date & 3,996 & \m1.38\% & \m0.59 & 0.557 & 1,507 \\
+Senate purchases from the trade date & 460 & \m0.95\% & \m0.10 & 0.920 & 288 \\
+Stocks sold, held long from disclosure & 4,284 & 0.95\% & 0.34 & 0.736 & 1,502 \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\parbox{0.9\linewidth}{\footnotesize Each row reruns the calendar-time regression of Table~\ref{tab:calendar}. Under amount weighting, a stock's weight on a day is the sum, over its active purchases, of the midpoint of each disclosed band (or its floor when the band is open-ended); otherwise weights are equal by stock. Trade-date rows enter on the first trading day after the trade. ``Own trades'' excludes trades owned by a spouse, a dependent child, or jointly.}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Further checks: the planned five-factor model and analyses added after review}\label{tab:extra}
+\begin{tabular}{lrrrrr}
+\toprule
+\multicolumn{6}{l}{\textit{Copy portfolio alpha (annual), 1,505 portfolio days}} \\
+Check & $H$ & Alpha & $t$ & $p$ & \\
+\midrule
+Five-factor model & 20 & 2.37\% & 0.75 & 0.456 & \\
+Five-factor model & 62 & \m1.25\% & \m0.53 & 0.597 & \\
+Five-factor model & 125 & \m1.33\% & \m0.62 & 0.536 & \\
+Newey--West, 21 lags & 62 & \m1.63\% & \m0.71 & 0.479 & \\
+Newey--West, 62 lags & 62 & \m1.63\% & \m0.75 & 0.454 & \\
+Amount-weighted minus equal-weighted & 62 & 8.83\% & 1.65 & 0.099 & \\
+\midrule
+\multicolumn{6}{l}{\textit{Event-level four-factor abnormal returns, House purchases}} \\
+Window & Events & Mean & s.e. & $t$ & $p$ \\
+\midrule
+Holding window, days 1--20 & 3,795 & 0.05\% & 0.22\% & 0.25 & 0.802 \\
+Holding window, days 1--62 & 3,630 & \m0.27\% & 0.42\% & \m0.64 & 0.521 \\
+Holding window, days 1--125 & 3,141 & \m0.62\% & 0.38\% & \m1.64 & 0.101 \\
+Trade to the copier's entry & 3,863 & \m0.24\% & 0.12\% & \m1.99 & 0.046 \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\parbox{0.9\linewidth}{\footnotesize The five-factor model is \citet{fama2015five}, without momentum. ``Amount-weighted minus equal-weighted'' regresses the daily difference between the two 62-day portfolios on the four factors. Holding-window CARs start on the first trading day after the disclosure date; their Holm-adjusted p-values across the three horizons are 1.000, 1.000 and 0.302. The trade-to-entry window runs from the trade's day 0 to the last trading day before entry (median 11 trading days), with loadings estimated before the trade. Only the five-factor model was in the plan; the rest were added after an outside review and are exploratory.}
+\end{table}
+
+\subsection{Members buy stocks that had been beating the model}\label{sec:runup}
+
+The first run's significantly negative CARs (Appendix Table~\ref{tab:firstrun}) come from one term. That run subtracted each stock's estimated pre-event intercept, its average four-factor abnormal return over days $-250$ to $-30$, on every day of the event window. For the disclosure-date events that intercept, scaled to 63 trading days, has a mean of +1.67\% and a median of +0.79\%, and it is positive for 55\% of events. Subtracting it assumes the stock will keep beating the model at its past rate; when the stock instead earns its factor-predicted return, the CAR comes out negative. With betas only, the CARs agree with the calendar-time test, which has no pre-event intercept at all. The event-level results are therefore sensitive to how abnormal returns are specified, while the calendar-time test, which needs no pre-event estimate, is not; that is one reason it is the primary test.
+
+This pattern is exploratory, and it is the opposite of \citet{belmont2020relief}, who report that stocks senators bought had underperformed in the 100 days before purchase. It suggests that House members in this period tended to buy stocks after a stretch of factor-adjusted gains, and that those stocks did not continue to outperform.
+
+\section{How long members take to disclose}\label{sec:lag}
+
+Table~\ref{tab:lag} and Figure~\ref{fig:lag} describe disclosure delays for House trades of every transaction type in the snapshot from 2020 to 2025. Of the snapshot's 16,202 rows, 15,193 remain after duplicates are removed and 14,109 have a transaction date in that period; setting aside the rows listed under the table leaves 12,650 trades, all from the House. The legal deadline is the earlier of 30 days after the filer learns of a transaction and 45 days after it. The snapshot has no notification dates, so only the 45-day outer limit can be checked: a trade counts as past the limit when it was disclosed more than 45 days after the transaction date, and a filing counts when it lists at least one such trade. Some trades disclosed within 45 days may still have missed the 30-day rule, so these counts are a lower bound on late reporting. Most trades are disclosed well within the outer limit: the median delay is 13 days overall and between 8 and 22 days in every year. Across the six years, 833 of 12,650 trades (6.6\%) were disclosed more than 45 days after the trade, in 69 of 1,965 filings, by 48 of 210 members.
+
+These trades cluster in a few filings. In 2024, 217 of them come from 14 filings, one of which lists 68; in 2025 a single filing lists 234. Trade counts therefore overstate how often members file past the limit, and the filing counts are the better measure. Two caveats apply. The snapshot does not mark amendments, so some of these trades may have been reported on time and re-listed in an amended filing. And filings for late-2025 trades made after the snapshot was taken in April 2026 are missing, so the 2025 share over 45 days is a lower bound.
+
+\begin{table}[t]
+\centering
+\caption{Disclosure delay of House trades, by transaction year}\label{tab:lag}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Year & Trades & Median days & 90th pct. & Over 45 days & Share & Filings & Filings over 45 \\
+\midrule
+2020 & 2,678 & 9 & 31 & 73 & 2.7\% & 488 & 24 \\
+2021 & 2,047 & 8 & 32 & 59 & 2.9\% & 398 & 17 \\
+2022 & 1,405 & 8 & 32 & 6 & 0.4\% & 308 & 4 \\
+2023 & 1,816 & 22 & 31 & 95 & 5.2\% & 255 & 11 \\
+2024 & 1,203 & 17 & 292 & 217 & 18.0\% & 238 & 14 \\
+2025 & 3,501 & 14 & 50 & 383 & 10.9\% & 318 & 9 \\
+All & 12,650 & 13 & 34 & 833 & 6.6\% & 1,965 & 69 \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\parbox{0.92\linewidth}{\footnotesize All House transaction types, duplicates removed. ``Over 45 days'' counts trades disclosed more than 45 days after the trade, the statute's outer limit; the 30-day rule from notification cannot be checked. Yearly filing counts, and yearly counts of filings over 45 days, add to more than the totals (1,965 and 69) because a filing can list trades from two years. Excluded before tabulating: 1,325 trades with no disclosure date (mostly Senate rows), 34 dated before the trade and 100 dated more than 365 days after it.}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\input{figures/lag.tex}
+\caption{Days from trade to disclosure for 12,650 House trades, 2020--2025. Blue bars are within the 45-day outer limit. The last bar collects delays of 90 days or more.}\label{fig:lag}
+\end{figure}
+
+\section{Discussion and limitations}\label{sec:discussion}
+
+The primary estimate is small, negative and imprecise, and the confidence interval is the useful summary: at the 95\% level, the data are inconsistent with copying disclosed House purchases from 2020 to 2025 having earned more than about 3.2\% a year above its factor exposures, and the strategy may have earned less than the factors predict. That is consistent with \citet{eggers2013capitol}, \citet{belmont2020relief} and \citet{fischer2025democracy}, who find no significant outperformance from the trade date, and it finds no detectable outperformance in the returns an outside investor could act on.
+
+A null result for copying does not establish that no member trades on private information. Individual trades, members or committees could earn abnormal returns that an average over 3,942 purchases hides, and the amount-weighted estimate leaves room for larger trades to do somewhat better. The data cannot separate information from luck or from ordinary portfolio choices, and this paper makes no claim about insider trading.
+
+The study has limits that a reader should weigh:
+\begin{itemize}
+\item \textbf{House only.} The primary test excludes the Senate because the snapshot has no Senate disclosure dates. The Senate's trade-date estimate rests on 460 purchases.
+\item \textbf{One snapshot.} The trades come from a third-party transcription, not a fresh collection from the official filings, and cannot be re-downloaded from the same source. A replication against the official records would test its accuracy.
+\item \textbf{Disclosure date as recorded.} The disclosure date is the date in the snapshot. If a filing became publicly visible later than that date, the true copy strategy would enter later.
+\item \textbf{Common stock only.} Exchange-traded funds, ADRs, foreign over-the-counter shares and options are excluded, and they are a meaningful share of members' trading.
+\item \textbf{No costs.} Returns ignore trading costs, which would lower the copy strategy's return further.
+\item \textbf{Censoring.} CRSP data end on 31 December 2025. Long-horizon CARs omit purchases from about mid-2025; in the 62-day portfolio, 39 purchases never enter and 237 are held for fewer than 62 days.
+\end{itemize}
+
+\section{Conclusion}
+
+From 2020 to 2025, an investor who bought what House members bought, on the day after each purchase was disclosed, would have earned roughly the return that the stocks' exposure to the market, size, value and momentum factors predicts. The primary four-factor alpha is \m1.63\% a year and insignificant, the event-level abnormal returns are insignificant from both the trade and the disclosure date, and the robustness checks agree. Members mostly disclose within the 45-day outer limit, and disclosures past it are concentrated in a few filings.
+
+\section*{Data and code availability}
+
+Code, the trade snapshot, the sample-flow output and the aggregate figures are in the project repository at \url{https://github.com/Builder106/capitol-alpha} under the MIT license. The plan is \texttt{docs/specs/event-study.md}, and its commit history shows when each part was fixed. CRSP data are licensed through Wharton Research Data Services and are not redistributed; a reader with CRSP access can rebuild every table with \texttt{pipeline.crsp} and \texttt{pipeline.run\_event\_study}, which stops at the 31 December 2025 cutoff. The Zenodo record links the exact commit of the code that produced these tables. The factors are public \citep{french2026data}.
+
+\section*{Declarations}
+
+\noindent\textbf{Funding.} This research received no specific grant from any funding agency in the public, commercial or not-for-profit sectors. CRSP data were accessed through Wesleyan University's subscription to Wharton Research Data Services.
+
+\medskip
+\noindent\textbf{Competing interests.} I declare no competing interests.
+
+\medskip
+\noindent\textbf{Use of AI tools.} I used Claude (Anthropic) to assist with writing the manuscript and the analysis code. I reviewed all text, code and results and take full responsibility for the content of this paper.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\section{The first run, with the pre-event intercept}
+
+\begin{table}[H]
+\centering
+\caption{First run: CARs that also subtract the pre-event intercept}\label{tab:firstrun}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Event date & Days & Events & Mean CAR & s.e. & $t$ & $p$ & Holm $p$ \\
+\midrule
+Disclosure & 20 & 3,795 & \m0.56\% & 0.22\% & \m2.59 & 0.010 & 0.011 \\
+Disclosure & 62 & 3,630 & \m1.98\% & 0.51\% & \m3.87 & $<$0.001 & $<$0.001 \\
+Disclosure & 125 & 3,139 & \m4.43\% & 0.96\% & \m4.61 & $<$0.001 & $<$0.001 \\
+Transaction & 20 & 4,372 & \m0.63\% & 0.23\% & \m2.78 & 0.005 & 0.011 \\
+Transaction & 62 & 4,161 & \m1.76\% & 0.45\% & \m3.88 & $<$0.001 & $<$0.001 \\
+Transaction & 125 & 3,931 & \m3.80\% & 0.74\% & \m5.13 & $<$0.001 & $<$0.001 \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\parbox{0.9\linewidth}{\footnotesize Same as Table~\ref{tab:cars}, except that the expected return also includes the stock's intercept from days $-250$ to $-30$. This was the first run; the plan specifies betas only. See Section~\ref{sec:runup}.}
+\end{table}
+
+\section{Relation to an earlier version of this project}\label{app:earlier}
+
+An earlier version of this project, presented on its website and in the author's materials, reported that copying Senate purchases earned 2.58\% more than the SPY index fund over 90 days ($p = 0.013$, $n = 220$). An audit found that the estimate dropped every House purchase through a coding error, priced only the 50 most-traded tickers, measured returns from the transaction date, adjusted for risk by subtracting the index return, and treated overlapping trades as independent. That estimate is withdrawn. This paper replaces it, and the plan described in Section~\ref{sec:plan} was written to prevent the same problems.
+
+\end{document}
