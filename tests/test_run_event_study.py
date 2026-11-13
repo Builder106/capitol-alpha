@@ -65,7 +65,9 @@ def test_car_table_adjusts_six_tests():
 
 def test_main_reads_fetched_files(tmp_path, monkeypatch, capsys):
     returns, factors, events = constructed_inputs()
-    events.to_csv(tmp_path / "events.csv", index_label="event_id", date_format="%Y-%m-%d")
+    events.assign(usincflg="Y").to_csv(
+        tmp_path / "events.csv", index_label="event_id", date_format="%Y-%m-%d"
+    )
     long = returns.stack().rename("dlyret").rename_axis(["dlycaldt", "permno"]).reset_index()
     long.to_csv(tmp_path / "returns.csv.gz", index=False)
     extra = np.random.default_rng(13).normal(0, 0.01, (len(factors), 2))
@@ -87,6 +89,8 @@ def test_main_reads_fetched_files(tmp_path, monkeypatch, capsys):
     assert "| after disclosure | 20 |" in out
     assert "five-factor" in out
     assert "Censoring" in out
+    assert "close of the first trading day" in out
+    assert "US-incorporated" in out
 
 
 def test_load_inputs_stops_at_analysis_end(tmp_path):
@@ -115,6 +119,13 @@ def test_review_summaries():
     assert list(lags["lag"][:3])[1:] == [21, 62]
     difference = runner.weighting_difference(returns, factors, purchases)
     assert difference["days"] > 0
+    at_close = runner.close_entry_table(returns, factors, purchases)
+    assert list(at_close["holding_days"]) == [20, 62, 125]
+    assert runner.us_incorporated_check(returns, factors, purchases) is None
+    flagged = purchases.assign(usincflg=["Y", "Y", "N", "Y", "N", "Y"])
+    incorporated = runner.us_incorporated_check(returns, factors, flagged)
+    assert incorporated is not None
+    assert incorporated["events"] == 3
 
 
 def test_amount_midpoint():

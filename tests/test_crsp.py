@@ -9,15 +9,15 @@ import pytest
 
 from pipeline import crsp
 
-LINK_COLUMNS = ["ticker", "permno", "secinfostartdt", "secinfoenddt", "sharetype"]
+LINK_COLUMNS = ["ticker", "permno", "secinfostartdt", "secinfoenddt", "sharetype", "usincflg"]
 LINKS = [
-    ("AAPL", 14593, "2017-12-28", "2025-12-31", "NS"),
-    ("META", 13407, "2022-06-09", "2025-12-31", "NS"),
-    ("TSM", 85442, "2000-01-01", "2025-12-31", "AD"),
-    ("XYZ", 11111, "2000-01-01", "2025-12-31", "UG"),
-    ("AAA", 22222, "2000-01-01", "2025-12-31", "AD"),
-    ("AAA", 33333, "2000-01-01", "2025-12-31", "NS"),
-    ("AAA", 44444, "2000-01-01", "2025-12-31", "NS"),
+    ("AAPL", 14593, "2017-12-28", "2025-12-31", "NS", "Y"),
+    ("META", 13407, "2022-06-09", "2025-12-31", "NS", "Y"),
+    ("TSM", 85442, "2000-01-01", "2025-12-31", "AD", "N"),
+    ("XYZ", 11111, "2000-01-01", "2025-12-31", "UG", "Y"),
+    ("AAA", 22222, "2000-01-01", "2025-12-31", "AD", "N"),
+    ("AAA", 33333, "2000-01-01", "2025-12-31", "NS", "N"),
+    ("AAA", 44444, "2000-01-01", "2025-12-31", "NS", "Y"),
 ]
 RETURN_ROWS = [
     (14593, "2021-03-02", Decimal("0.010")),
@@ -75,6 +75,7 @@ def test_link_events_matches_by_date_and_share_type():
 
     assert list(linked["ticker"]) == ["AAPL", "AAA"]
     assert list(linked["security"]) == [14593, 33333]
+    assert list(linked["usincflg"]) == ["Y", "N"]
     assert list(linked.index) == [0, 4]
     assert flow == [
         ("events", 6),

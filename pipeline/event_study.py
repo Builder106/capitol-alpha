@@ -213,11 +213,15 @@ def copy_portfolio(
     date_column: str,
     holding_days: int,
     weight_column: str | None = None,
+    start_offset: int = 0,
 ) -> pd.Series:
     """Daily return of a portfolio of stocks bought in the last ``holding_days``.
 
     A stock enters on the first trading day strictly after its event date
-    (``entry_day``) and stays for ``holding_days`` trading days. With no
+    (``entry_day``) and stays for ``holding_days`` trading days. Daily returns
+    are close to close, so the first day's return includes the overnight move
+    before the open; ``start_offset=1`` instead buys at that day's close and
+    counts returns from the next day. With no
     ``weight_column``, each held stock gets equal weight however many events
     name it (equal weight by stock, not by purchase). Otherwise a stock's
     weight is the sum of its active events' weights, and events with a
@@ -233,6 +237,7 @@ def copy_portfolio(
     ):
         start = entry_day(days, date)
         if security in returns.columns and start is not None and not np.isnan(weight):
+            start += start_offset
             held[start : start + holding_days, returns.columns.get_loc(security)] += weight
     if not weight_column:
         held = (held > 0).astype(float)
@@ -279,9 +284,12 @@ def calendar_time_alpha(
     model: tuple[str, ...] = FOUR_FACTOR,
     weight_column: str | None = None,
     lag: int | None = None,
+    start_offset: int = 0,
 ) -> dict[str, float]:
     """Alpha of the copy portfolio (``copy_portfolio``) on the factors."""
-    portfolio = copy_portfolio(returns, factors, events, date_column, holding_days, weight_column)
+    portfolio = copy_portfolio(
+        returns, factors, events, date_column, holding_days, weight_column, start_offset
+    )
     excess = portfolio - factors.loc[portfolio.index, "RF"]
     return factor_alpha(excess, factors, model, lag)
 

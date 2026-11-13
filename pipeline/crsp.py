@@ -35,7 +35,7 @@ WRDS = {
     "sslmode": "require",
 }
 LINKS_SQL = """
-SELECT ticker, permno, secinfostartdt, secinfoenddt, sharetype
+SELECT ticker, permno, secinfostartdt, secinfoenddt, sharetype, usincflg
 FROM crsp.stksecurityinfohist
 WHERE ticker = ANY(%s)
   AND securitytype = 'EQTY' AND securitysubtype = 'COM'

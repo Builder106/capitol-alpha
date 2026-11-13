@@ -100,6 +100,8 @@ def test_weekend_disclosure_enters_on_monday():
     portfolio = es.copy_portfolio(returns, factors, events, "date", holding_days=3)
     assert list(portfolio.index) == list(days[days > saturday][:3])
     assert portfolio.index[0].day_of_week == 0
+    at_close = es.copy_portfolio(returns, factors, events, "date", holding_days=3, start_offset=1)
+    assert list(at_close.index) == list(days[days > saturday][1:4])
 
 
 def test_ols_recovers_exact_coefficients():

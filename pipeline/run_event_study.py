@@ -196,6 +196,42 @@ def lag_sensitivity_table(
     return pd.DataFrame(rows)
 
 
+def close_entry_table(
+    returns: pd.DataFrame, factors: pd.DataFrame, events: pd.DataFrame
+) -> pd.DataFrame:
+    """Q1 alpha when the copier buys at the close of the first trading day after disclosure.
+
+    Close-to-close returns on the entry day include the overnight move before
+    the open, which a copier who reads the filing that evening cannot earn.
+    """
+    disclosed = events[events["q1_eligible"]]
+    rows = []
+    for holding in HORIZONS:
+        result = calendar_time_alpha(
+            returns, factors, disclosed, "disclosure_date", holding, start_offset=1
+        )
+        rows.append(
+            {
+                "holding_days": holding,
+                "primary": False,
+                "alpha_annual": result["alpha_daily"] * DAYS_PER_YEAR,
+                **result,
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def us_incorporated_check(
+    returns: pd.DataFrame, factors: pd.DataFrame, events: pd.DataFrame
+) -> dict[str, float] | None:
+    """Q1 62-day alpha using only issuers CRSP flags as US-incorporated."""
+    if "usincflg" not in events.columns:
+        return None
+    q1 = events[events["q1_eligible"] & (events["usincflg"] == "Y")]
+    result = calendar_time_alpha(returns, factors, q1, "disclosure_date", PRIMARY_HOLDING)
+    return {"events": len(q1), "alpha_annual": result["alpha_daily"] * DAYS_PER_YEAR, **result}
+
+
 def five_factor_table(
     returns: pd.DataFrame, five: pd.DataFrame, events: pd.DataFrame
 ) -> pd.DataFrame:
@@ -386,6 +422,12 @@ def main(argv: list[str] | None = None) -> None:
     print(format_calendar(five_factor_table(returns, five, events).assign(primary=False)))
     print("\nAdded after review: amount-weighted minus equal-weighted, 62 days\n")
     print(format_summary(weighting_difference(returns, factors, events)))
+    print("\nAdded after review: buy at the close of the first trading day after disclosure\n")
+    print(format_calendar(close_entry_table(returns, factors, events)))
+    incorporated = us_incorporated_check(returns, factors, events)
+    if incorporated is not None:
+        print("\nAdded after review: US-incorporated issuers only, 62 days\n")
+        print(format_summary(incorporated))
     print("\nCensoring of the 62-day portfolio\n")
     print(format_summary(censoring_summary(returns, events)))
 

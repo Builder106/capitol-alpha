@@ -19,9 +19,14 @@ from .event_sample import DATE_FORMAT, END, EVENT_KEY, MAX_LAG_DAYS, SNAPSHOT, S
 DEADLINE_DAYS = 45
 
 
-def disclosure_lags(trades: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, int]]:
-    """Return trades with a usable lag, plus counts of the rows set aside."""
-    df = trades.drop_duplicates(EVENT_KEY + ["transaction_type"]).copy()
+def disclosure_lags(
+    trades: pd.DataFrame, dedupe: bool = True
+) -> tuple[pd.DataFrame, dict[str, int]]:
+    """Return trades with a usable lag, plus counts of the rows set aside.
+
+    ``dedupe=False`` keeps every row, for input already deduplicated another way.
+    """
+    df = (trades.drop_duplicates(EVENT_KEY + ["transaction_type"]) if dedupe else trades).copy()
     df["transaction_date"] = pd.to_datetime(
         df["transaction_date"], format=DATE_FORMAT, errors="coerce"
     )
@@ -42,6 +47,35 @@ def disclosure_lags(trades: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, int]]
     lags = dated[dated["lag_days"].between(0, MAX_LAG_DAYS)].copy()
     lags["late"] = lags["lag_days"] > DEADLINE_DAYS
     return lags.reset_index(drop=True), set_aside
+
+
+def earliest_filing_only(trades: pd.DataFrame) -> pd.DataFrame:
+    """Collapse a trade re-reported in later filings to its earliest filing.
+
+    Unlike ``disclosure_lags``, identical rows within one filing are kept as
+    separate trades, since a filing can list two lots that look the same.
+    """
+    key = EVENT_KEY + ["transaction_type"]
+    df = trades.assign(
+        _disclosed=pd.to_datetime(trades["disclosure_date"], format=DATE_FORMAT, errors="coerce")
+    )
+    df = df.sort_values("_disclosed", kind="stable")
+    first = df.groupby(key, dropna=False, sort=False)["ptr_link"].transform("first")
+    same = (df["ptr_link"] == first) | (df["ptr_link"].isna() & first.isna())
+    return df[same].drop(columns="_disclosed").sort_index()
+
+
+def late_share_sensitivity(trades: pd.DataFrame) -> dict[str, float]:
+    """Share of trades past 45 days under the main rules and two alternatives."""
+    lags, set_aside = disclosure_lags(trades)
+    over_year = set_aside[f"disclosed more than {MAX_LAG_DAYS} days later"]
+    alternative, _ = disclosure_lags(earliest_filing_only(trades), dedupe=False)
+    return {
+        "main": float(lags["late"].mean()),
+        "with_over_a_year": float((lags["late"].sum() + over_year) / (len(lags) + over_year)),
+        "earliest_filing_dedupe": float(alternative["late"].mean()),
+        "earliest_filing_trades": float(len(alternative)),
+    }
 
 
 def summarize(lags: pd.DataFrame, by: str | None = None) -> pd.DataFrame:
@@ -86,6 +120,13 @@ def main(argv: list[str] | None = None) -> None:
     lags, set_aside = disclosure_lags(load_snapshot(args.snapshot))
     lags["year"] = lags["transaction_date"].dt.year
     print("Set aside:", ", ".join(f"{label} {count:,}" for label, count in set_aside.items()))
+    shares = late_share_sensitivity(load_snapshot(args.snapshot))
+    print(
+        f"Share past 45 days: {shares['main']:.2%}; counting trades disclosed more than a year "
+        f"later: {shares['with_over_a_year']:.2%}; keeping same-filing repeats and only the "
+        f"earliest filing of re-reported trades: {shares['earliest_filing_dedupe']:.2%} of "
+        f"{int(shares['earliest_filing_trades']):,} trades"
+    )
     for label, by in (("Sample", None), ("Chamber", "chamber"), ("Year", "year")):
         print()
         print(to_markdown(summarize(lags, by), label))

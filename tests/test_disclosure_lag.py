@@ -3,7 +3,14 @@
 import pandas as pd
 import pytest
 
-from pipeline.disclosure_lag import disclosure_lags, main, summarize, to_markdown
+from pipeline.disclosure_lag import (
+    disclosure_lags,
+    earliest_filing_only,
+    late_share_sensitivity,
+    main,
+    summarize,
+    to_markdown,
+)
 
 COLUMNS = [
     "chamber",
@@ -90,3 +97,30 @@ def test_main_prints_tables(tmp_path, capsys):
     assert out.startswith("Set aside: no disclosure date 1, disclosed before the trade 1")
     assert "| Chamber | Trades |" in out
     assert "| 2022 | 1 | 30 |" in out
+    assert (
+        "Share past 45 days: 33.33%; counting trades disclosed more than a year later: 50.00%"
+        in out
+    )
+
+
+def test_earliest_filing_only_keeps_same_filing_repeats():
+    frame = pd.DataFrame(ROWS, columns=COLUMNS)
+    amended = trade("A", "01/01/2021", "03/01/2021")
+    blank_owner = trade("G", "02/01/2021", "02/05/2021")
+    blank_owner[2] = None
+    frame = pd.concat(
+        [frame, pd.DataFrame([amended, blank_owner, blank_owner], columns=COLUMNS)],
+        ignore_index=True,
+    )
+    kept = earliest_filing_only(frame)
+    a_rows = kept[(kept["legislator_name"] == "A") & (kept["ticker"] == "AAPL")]
+    assert list(a_rows["disclosure_date"]) == ["01/11/2021", "01/11/2021"]
+    assert int((kept["legislator_name"] == "G").sum()) == 2
+
+
+def test_late_share_sensitivity():
+    shares = late_share_sensitivity(pd.DataFrame(ROWS, columns=COLUMNS))
+    assert shares["main"] == pytest.approx(1 / 3)
+    assert shares["with_over_a_year"] == pytest.approx(2 / 4)
+    assert shares["earliest_filing_trades"] == 4
+    assert shares["earliest_filing_dedupe"] == pytest.approx(1 / 4)
