@@ -1,6 +1,6 @@
 # Contributing
 
-This repo is the submission for **QAC 420 (*Data for Good*)** at Wesleyan, Spring 2025. The findings and the deliverables in `docs/` reflect what was submitted at end of term and are not changing.
+This project began as a **QAC 420 (*Data for Good*)** submission at Wesleyan in Spring 2025. The course write-ups are preserved as a historical record. A later audit and event study supersede their findings; see the [project history](README.md#project-history).
 
 The pipeline is open source and reusable. Bug fixes, fetcher resilience improvements, and follow-on analyses are welcome.
 
@@ -53,7 +53,7 @@ Match that. No Conventional Commits prefix. No AI co-author trailer.
 
 ## PR process
 
-1. Open an issue first for anything beyond a one-file fix &mdash; the project is course-frozen but you and I should still agree on scope before code review.
+1. Open an issue first for anything beyond a one-file fix so the scope can be agreed before code review.
 2. Run `pytest` locally before opening the PR.
 3. CI (ruff + pytest) must be green.
 4. Squash-merge into `main`.
@@ -71,9 +71,9 @@ Match that. No Conventional Commits prefix. No AI co-author trailer.
 
 **Out of scope:**
 
-- Replacing the headline findings, the Jensen's-alpha specification, or the cohort definitions. Those are part of the course submission and are not changing.
+- Rewriting the original course submission as if its findings were current. Preserve it as a historical record and explain changes to the later event study against its [plan](docs/specs/event-study.md) and [results](docs/results/event-study.md).
 - Switching the analysis stack (e.g. R or Julia rewrite). The point of the repo is the reproducible Python pipeline as submitted.
-- Re-running against newer disclosure data and rewriting the findings. That's a fork, not a PR.
+- Re-running against newer disclosure data and rewriting the findings as a replacement for the existing study. Discuss a separate follow-on analysis first.
 - Adding non-public data sources (paid PTR aggregators, brokerage-leak datasets). The "public data, public methods" frame is load-bearing.
 
 If you're unsure where your change lands, open an issue and ask before coding.
