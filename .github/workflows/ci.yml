@@ -88,13 +88,7 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Node dependency audit
-        run: |
-          for i in 1 2 3; do
-            npm audit --audit-level=high && exit 0 || true
-            echo "npm audit failed or timed out (attempt $i/3), retrying in 5s..."
-            sleep 5
-          done
-          npm audit --audit-level=high
+        run: node scripts/audit.mjs
 
       - name: Cache Playwright browsers
         id: playwright-cache
