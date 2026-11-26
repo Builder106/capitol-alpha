@@ -52,6 +52,8 @@ The copy portfolio earns no detectable alpha. At the primary 62-day holding peri
 
 Most studies of congressional trades made since 2012 have found no abnormal returns (Section~\ref{sec:literature}). The closest recent ones measure returns from the trade date, so they leave open whether any return remains after the trades become public. I test that directly, using a calendar-time portfolio formed after disclosure and data through 2025. Because the delay between trade and report is what separates the two questions, I also measure how long House members took to disclose and how often they exceeded the 45-day limit.
 
+A null result can mean there is nothing to find or that the test is too weak to find it. To tell which, I run the same test on a group that earlier studies found to earn abnormal returns: corporate officers and directors buying their own company's stock. The same calendar-time portfolio, entered on the first trading day after each Form 4 is filed, earns a four-factor alpha of 8.50\% a year ($t = 2.64$) on 73,986 purchases (Section~\ref{sec:control}). I planned this control after the congressional results were known, and committed its plan before any insider return was computed.
+
 \section{Prior evidence}\label{sec:literature}
 
 Studies of the years before the STOCK Act disagree. \citet{ziobrowski2004senate} and \citet{ziobrowski2011house} find that portfolios mimicking senators' and House members' purchases beat the market in samples running from the mid-1980s to 2001. \citet{eggers2013capitol} revisit both studies and analyze 2004 to 2008; they find no information advantage in either period, and the average member would have done better in an index fund. \citet{eggers2014political} find that members' holdings in local firms and in campaign contributors do better than their other holdings. \citet{karadas2019trading} and \citet{huang2016trading} find abnormal returns in the years just before the Act and none after it.
@@ -59,6 +61,8 @@ Studies of the years before the STOCK Act disagree. \citet{ziobrowski2004senate}
 Studies using post-2012 trades generally find no abnormal returns. \citet{belmont2020relief} hand-collect senators' trades from 2012 to March 2020, measure buy-and-hold abnormal returns from the trade date, and find that purchases slightly underperform industry-and-size benchmarks; a calendar-time Carhart regression of a trade-size-weighted portfolio, also built from trade dates, gives an insignificant alpha. A later version was published as \citet{belmont2022senators}. \citet{fischer2025democracy} extend that data set to 2023 with House and Senate trades by 331 members and focus on the 15 most active traders. Measuring buy-and-hold abnormal returns from the purchase date at 20, 60 and 127 days, they find that Congress does not significantly outperform in any period, although mean abnormal returns are somewhat higher from 2020 to 2023. \citet{zhou2026illusion} finds no abnormal returns on trades in firms within the jurisdiction of a member's committees.
 
 The two closest studies both measure returns from the trade date. Mean buy-and-hold abnormal returns over long horizons have skewed distributions and overlapping, cross-correlated windows, and their test statistics can be badly misspecified \citep{lyon1999improved,mitchell2000managerial}. A calendar-time portfolio regression avoids both problems \citep{fama1998market}. I use one, from the disclosure date, as the single confirmatory test.
+
+Purchases by corporate insiders are the standard example of trades that predict returns. \citet{seyhun1986insiders}, \citet{lakonishok2001insider} and \citet{jeng2003estimating} find that stocks insiders buy earn positive abnormal returns afterwards, and \citet{cohen2012decoding} find that the information is concentrated in insiders' opportunistic trades rather than routine ones. I use insider purchases as a positive control in Section~\ref{sec:control}.
 
 \section{Data}\label{sec:data}
 
@@ -141,6 +145,7 @@ The plan fixed the questions, the sample rules, the factor model, the calendar-t
 \item \textbf{House and Senate are compared from the trade date only,} because Senate disclosure dates are missing.
 \item \textbf{The entry day was corrected after review.} The first version entered one trading day after the first trading day on or after the disclosure date, so a purchase disclosed on a weekend or a holiday entered a day late. The corrected rule enters on the first trading day strictly after the disclosure date. The primary alpha moved from \m1.82\% ($t = \m0.74$) to \m1.63\% ($t = \m0.66$). Every portfolio result reported here uses the corrected rule; the planned CARs, which start on day 0, are unaffected.
 \item \textbf{Further checks were added after review:} the holding-window CARs and the trade-to-entry return described above, the Newey--West lag sensitivity, a direct test of amount weighting against equal weighting, entry at the open or at the close of the first trading day after disclosure, and a sample limited to US-incorporated issuers. All are exploratory. For these the CRSP extract was fetched again on 13 November 2026 with the incorporation flag, opening and closing prices, and an explicit preference for ordinary shares when several records match; the events and all 2,204,276 daily returns matched the first extract exactly.
+\item \textbf{A positive control was added after the main results.} The plan for the insider-purchase control (Section~\ref{sec:control}) is \texttt{docs/specs/insider-control.md}, committed on 25 November 2026 before any insider return was computed. It fixes the sample, the test and how the result will be read. It was written after the congressional results were known, and nothing in it changed after the first run. Its data are the SEC's Form 4 files, because the Thomson Reuters insider tables are not part of the Wesleyan WRDS subscription.
 \end{enumerate}
 
 \section{Results}\label{sec:results}
@@ -270,6 +275,39 @@ The first run's significantly negative CARs (Appendix Table~\ref{tab:firstrun}) 
 
 This pattern is exploratory, and it is the opposite of \citet{belmont2020relief}, who report that stocks senators bought had underperformed in the 100 days before purchase. It suggests that House members in this period tended to buy stocks after a stretch of factor-adjusted gains, and that those stocks did not continue to outperform.
 
+\subsection{A positive control: insider purchases}\label{sec:control}
+
+A null result for copying could mean that members' purchases carry no information that survives disclosure, or that the test could not see it. To separate the two, I apply the same procedure to officers' and directors' open-market purchases of their own company's common stock, a group that the studies in Section~\ref{sec:literature} found to earn positive abnormal returns. The sample, the test and the rule for reading the result were fixed in \texttt{docs/specs/insider-control.md} before any insider return was computed (Section~\ref{sec:plan}).
+
+The events are Form 4 purchases (transaction code P, as originally filed) from the SEC's Insider Transactions Data Sets, 2020 to 2025, filed within a year of the trade, with ticker matched to CRSP common stock as in Section~\ref{sec:data}. After the sample rules and CRSP matching there are 73,986 purchases in 4,170 stocks, against 3,942 for Congress. The portfolio is the congressional one: each stock enters on the first trading day after the filing date, is held for $H$ trading days with equal weight by stock, and its daily excess return is regressed on the four factors with Newey--West standard errors.
+
+\begin{table}[t]
+\centering
+\caption{Insider copy portfolio from the filing date: four-factor alpha}\label{tab:control}
+\begin{tabular}{lrrrr}
+\toprule
+ & Alpha (annual) & $t$ & $p$ & Purchases \\
+\midrule
+$H = 20$ & 24.94\% & 6.60 & 0.000 & 73,986 \\
+$H = 62$ (primary) & 8.50\% & 2.64 & 0.008 & 73,986 \\
+$H = 125$ & 4.54\% & 1.39 & 0.165 & 73,986 \\
+\addlinespace
+\multicolumn{5}{l}{Checks at $H = 62$} \\
+Leave out trades made in 2020 & 6.57\% & 2.10 & 0.035 & 58,487 \\
+Price of \$5 a share or more & 5.25\% & 2.19 & 0.029 & 50,106 \\
+\addlinespace
+Congress, $H = 62$ (Table~\ref{tab:calendar}) & \m1.63\% & \m0.66 & 0.509 & 3,942 \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\parbox{0.9\linewidth}{\footnotesize Same procedure as Table~\ref{tab:calendar}. Newey--West standard errors with 7 lags; 1,506 portfolio days. Insider purchases are officers' and directors' open-market purchases of common stock reported on an original Form 4.}
+\end{table}
+
+The control detects an effect. By the rule fixed in advance, an alpha that is positive with $p < 0.05$ at $H = 62$, the primary estimate qualifies: 8.50\% a year ($t = 2.64$). It is 6.57\% without 2020 and 5.25\% for stocks priced at \$5 or more, and significant at the 5\% level in both. The estimate falls as the holding period grows, from 24.94\% at 20 days to 4.54\% at 125 days, where it is no longer significant, so most of the return arrives in the first weeks after the filing. The congressional 95\% confidence interval at $H = 62$, \m6.48\% to +3.22\%, excludes both 8.50\% and 5.25\%. The congressional test could see an alpha of that size, and it saw none.
+
+The control does not show that members have no information, and it does not predict what Congress would have earned. The two groups differ in firm size, trade size, the number of stocks held, and the filing lag (two business days for a Form 4, a median of 13 days for the House). Insider purchases cluster in small, thinly traded stocks, and the portfolio is equal-weighted and ignores trading costs, so the result says the method finds abnormal returns, not that an investor could profit.
+
 \section{How long members take to disclose}\label{sec:lag}
 
 Table~\ref{tab:lag} and Figure~\ref{fig:lag} describe disclosure delays for House trades of every transaction type in the snapshot from 2020 to 2025. Of the snapshot's 16,202 rows, 15,193 remain after duplicates are removed and 14,109 have a transaction date in that period; setting aside the rows listed under the table leaves 12,650 trades, all from the House. The legal deadline is the earlier of 30 days after the filer learns of a transaction and 45 days after it. The snapshot has no notification dates, so only the 45-day outer limit can be checked: a trade counts as past the limit when it was disclosed more than 45 days after the transaction date, and a filing counts when it lists at least one such trade. The measured share is therefore the share past the 45-day limit in this snapshot, not a bound on statutory violations: trades disclosed within 45 days may still have missed the 30-day rule, which would push the true share up, and amendments that re-list trades already reported on time would push it down. Most trades are disclosed well within the outer limit: the median delay is 13 days overall and between 8 and 22 days in every year. Across the six years, 833 of 12,650 trades (6.6\%) were disclosed more than 45 days after the trade, in 69 of 1,965 filings, by 48 of 210 members.
@@ -307,7 +345,7 @@ All & 12,650 & 13 & 34 & 833 & 6.6\% & 1,965 & 69 \\
 
 \section{Discussion and limitations}\label{sec:discussion}
 
-The primary estimate is negative but imprecise. Its 95\% confidence interval runs from \m6.48\% to +3.22\% a year, so the data are inconsistent with copying disclosed House purchases from 2020 to 2025 having earned more than about 3.2\% a year above its factor exposures, and the strategy may have earned less than the factors predict. The result is consistent with \citet{eggers2013capitol}, \citet{belmont2020relief} and \citet{fischer2025democracy}, who find no significant outperformance from the trade date, and extends that finding to the returns an outside investor could act on.
+The primary estimate is negative but imprecise. Its 95\% confidence interval runs from \m6.48\% to +3.22\% a year, so the data are inconsistent with copying disclosed House purchases from 2020 to 2025 having earned more than about 3.2\% a year above its factor exposures, and the strategy may have earned less than the factors predict. The result is consistent with \citet{eggers2013capitol}, \citet{belmont2020relief} and \citet{fischer2025democracy}, who find no significant outperformance from the trade date, and extends that finding to the returns an outside investor could act on. The insider control (Section~\ref{sec:control}) finds an alpha of 8.50\% a year for corporate insiders with the same procedure, and the congressional confidence interval excludes that value, so a failure of the method is not a likely reason for the null.
 
 A null result for copying does not establish that no member trades on private information. Individual trades, members or committees could earn abnormal returns that an average over 3,942 purchases hides, and the amount-weighted estimate leaves room for larger trades to do somewhat better. The data cannot separate information from luck or from ordinary portfolio choices, and this paper makes no claim about insider trading.
 
@@ -318,6 +356,7 @@ Several limitations affect the interpretation of these results:
 \item \textbf{Disclosure date as recorded.} The disclosure date is the date in the snapshot. If a filing became publicly visible later than that date, the true copy strategy would enter later.
 \item \textbf{Common stock only.} Exchange-traded funds, ADRs, foreign over-the-counter shares and options are excluded, and they are a meaningful share of members' trading.
 \item \textbf{No costs.} Returns ignore trading costs, which would lower the copy strategy's return further.
+\item \textbf{The control is a different group.} Insiders and members differ in firm size, trade size, filing lag and portfolio breadth, so the control shows that the method can find an effect, not what Congress would earn. The control plan was written after the congressional results were known.
 \item \textbf{Censoring.} CRSP data end on 31 December 2025. Long-horizon CARs omit purchases from about mid-2025; in the 62-day portfolio, 39 purchases never enter and 237 are held for fewer than 62 days.
 \end{itemize}
 
@@ -327,7 +366,7 @@ From 2020 to 2025, an investor who bought what House members bought, on the firs
 
 \section*{Data and code availability}
 
-Code, the trade snapshot, the sample-flow output and the aggregate figures are in the project repository at \url{https://github.com/Builder106/capitol-alpha} under the MIT license. Every table was produced by the code at commit \texttt{38583b1}. Because the repository's \texttt{main} branch may move on, the code and the trade snapshot are also archived with a permanent identifier at \url{https://doi.org/10.5281/zenodo.24204829}. The plan is \texttt{docs/specs/event-study.md}, and its commit history shows when each part was fixed. CRSP data are licensed through Wharton Research Data Services and are not redistributed; a reader with CRSP access can rebuild every table with \texttt{pipeline.crsp} and \texttt{pipeline.run\_event\_study}, which stops at the 31 December 2025 cutoff. Kenneth French's library revises its files, so the SHA-256 checksums of the two factor files used here are recorded in \texttt{docs/results/event-study.md}. The Zenodo record links the repository commit that holds this version of the paper. The factors are public \citep{french2026data}.
+Code, the trade snapshot, the sample-flow output and the aggregate figures are in the project repository at \url{https://github.com/Builder106/capitol-alpha} under the MIT license. Every table except Table~\ref{tab:control} was produced by the code at commit \texttt{38583b1}; Table~\ref{tab:control} was produced by the code at commit \texttt{687a719}. Because the repository's \texttt{main} branch may move on, the code and the trade snapshot are also archived with a permanent identifier at \url{https://doi.org/10.5281/zenodo.24204829}. The plan is \texttt{docs/specs/event-study.md}, and its commit history shows when each part was fixed. CRSP data are licensed through Wharton Research Data Services and are not redistributed; a reader with CRSP access can rebuild every table with \texttt{pipeline.crsp} and \texttt{pipeline.run\_event\_study}, which stops at the 31 December 2025 cutoff, and the insider control with \texttt{pipeline.insider\_control} and the SEC's public Insider Transactions Data Sets. Kenneth French's library revises its files, so the SHA-256 checksums of the two factor files used here are recorded in \texttt{docs/results/event-study.md}. The Zenodo record links the repository commit that holds this version of the paper. The factors are public \citep{french2026data}.
 
 \section*{Declarations}
 

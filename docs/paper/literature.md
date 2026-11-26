@@ -83,3 +83,14 @@ Factor models: `fama1993common`, `carhart1997persistence`, `fama2015five`.
 Calendar-time portfolios for long-horizon events: `fama1998market`,
 `lyon1999improved`, `mitchell2000managerial`. Inference: `newey1987simple`,
 `newey1994automatic`, `cameron2011robust`, `holm1979simple`.
+
+## Corporate insider trading (positive control)
+
+Cited only for the direction of the finding, with no numbers. DOIs were
+checked against Crossref on 2026-11-25; the full papers were not read for
+this study.
+
+- `seyhun1986insiders`, `lakonishok2001insider`, `jeng2003estimating`:
+  stocks that insiders buy earn positive abnormal returns afterwards.
+- `cohen2012decoding`: the information is concentrated in insiders'
+  opportunistic trades, not routine ones.
