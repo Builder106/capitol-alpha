@@ -1,8 +1,8 @@
 {
   "upload_type": "software",
   "title": "CapitolAlpha: code, trade snapshot and aggregate results for \"Copying Congress after disclosure\"",
-  "description": "<p>Source code, the cleaned trade snapshot and the aggregate results behind the working paper \"Copying Congress after disclosure: a pre-specified event study of congressional purchases, 2020-2025\". The code builds the purchase sample, matches it to CRSP returns, runs the calendar-time and event-level tests, and writes the aggregate figures.</p><p>CRSP price data are licensed through Wharton Research Data Services and are not included. A reader with CRSP access can rebuild every table with <code>pipeline.crsp</code> and <code>pipeline.run_event_study</code>. The trade snapshot is a copy of public periodic transaction reports.</p><p>Use of AI tools: I used Claude (Anthropic) to assist with writing the analysis code and the manuscript. I reviewed all code, text and results and take full responsibility for the content.</p>",
-  "publication_date": "2026-11-13",
+  "description": "<p>Source code, the cleaned trade snapshot and the aggregate results behind the working paper \"Copying Congress after disclosure: a pre-specified event study of congressional purchases, 2020-2025\". The code builds the purchase sample, matches it to CRSP returns, runs the calendar-time and event-level tests, and writes the aggregate figures. It also runs the insider-purchase control (<code>pipeline.insider_control</code>), which applies the same calendar-time test to open-market purchases by corporate officers and directors, using the SEC's public Insider Transactions Data Sets.</p><p>CRSP price data are licensed through Wharton Research Data Services and are not included. A reader with CRSP access can rebuild every table with <code>pipeline.crsp</code> and <code>pipeline.run_event_study</code>. The trade snapshot is a copy of public periodic transaction reports.</p><p>Use of AI tools: I used Claude (Anthropic) to assist with writing the analysis code and the manuscript. I reviewed all code, text and results and take full responsibility for the content.</p>",
+  "publication_date": "2026-11-26",
   "creators": [
     {
       "name": "Vaughan, Olayinka",
@@ -25,10 +25,10 @@
       "resource_type": "publication-workingpaper"
     },
     {
-      "identifier": "https://github.com/Builder106/capitol-alpha/tree/180483f82d9de74176d72d3a8c5d88d851ce1ca3",
+      "identifier": "https://github.com/Builder106/capitol-alpha/tree/a27916b",
       "relation": "isDerivedFrom",
       "resource_type": "software"
     }
   ],
-  "version": "180483f"
+  "version": "a27916b"
 }
