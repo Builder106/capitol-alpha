@@ -52,6 +52,8 @@ Sample: 5,137 purchases after the plan's rules, of which 4,456 match CRSP common
 
 One exploratory pattern: members tend to buy stocks that had been beating the factor model before the trade.
 
+**Positive control.** A null can mean the test is too weak to find anything, so the same test was run on corporate insiders, who earlier studies found to earn abnormal returns. Copying 73,986 officer and director purchases from the day after each Form 4 earns a four-factor alpha of 8.50% a year (t = 2.64, p = 0.008). The Congress interval at the same horizon, -6.48% to +3.22%, excludes it. The groups differ in firm size, trade size and filing lag, so this shows the method can find an effect, not what Congress would earn. Details: [`docs/results/insider-control.md`](docs/results/insider-control.md).
+
 ## Pipeline
 
 Senate and House filings are fetched separately and merged into one 16,203-row trade CSV. Both notebooks read that CSV, and the financial one also pulls market prices.
@@ -77,6 +79,8 @@ uv run python -m pipeline.disclosure_lag
 uv run --with "psycopg[binary]" python -m pipeline.crsp --user WRDS_USER --out-dir DIR
 uv run python -m pipeline.run_event_study --data-dir DIR
 uv run python -m pipeline.site_figures --data-dir DIR
+
+uv run --with "psycopg[binary]" python -m pipeline.insider_control --data-dir DIR --sec-dir SEC --user WRDS_USER
 
 uv run pytest
 ```
